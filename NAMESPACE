@@ -1,0 +1,6 @@
+exportMethods(nmScatterPlot, nmHistogram, nmBoxPlot, nmQQNorm, show, nmACPlot)
+exportMethods(nmScatterMatrix, nmBarChart, timeEventSPlot, timeEventDPlot, nmDotPlot)
+export(runRNMGraphicsTests)
+export(setGraphParams, getGraphParams, getAllGraphParams)
+exportClass(multiTrellis)
+export("panelLayout<-")

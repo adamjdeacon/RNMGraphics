@@ -1,0 +1,97 @@
+# $Rev$
+# $LastChangedDate$
+
+
+#' craetes histograms of one or more NONMEM variables
+#' @name nmHistogram
+#' @title NONMEM histogram
+#' @param obj The object from which data will be plotted (NMRun, NMProblem or data.frame)
+#' @param vars Variables from which to generate a histogram (character vector or comma seperate string of names)
+#' @param bVars “Trellis” variables on which to split data.  
+#' @param refLine Controls addition of a reference line to the histogram(s).  Use is self-explanatory.
+#' @param type Determines the style of y-axis that is used for the plot (percentages, frequencies, or proportions)
+#' @param addDensity Logical flag.  Should a density estimate be plotted? Only relevant for type = "density"
+#' @param titles Plot titles
+#' @param xLabs x axis labels
+#' @param extraSubset Currently unused
+#' @param addGrid Currently unused
+#' @param breaks Control the calculation of breakpoints for the histogram.  It functions identically to the breaks parameter of the histogram function from the lattice package.
+#' @param ... Additional parameters passed to panel.histogram 
+#' @return An object of class multiTrellis
+#' @author fgochez
+#' @keywords hplot
+
+nmHistogram <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+				 addGrid = TRUE, breaks, ...)
+{
+	RNMGraphicsStop("Not implemented for this class at the moment")
+}
+
+panel.nmHistogram <- function(x, refLine, addDensity, ...)
+{
+	refVal <- switch(refLine,
+						"none"   = NULL,
+						"mean"   = mean(x, na.rm = TRUE),
+						"median" = median(x, na.rm = TRUE))
+	panel.histogram(x, ...)
+	if(addDensity)
+		panel.densityplot(x, col = "black", ...)
+	reflineOpts <- getGraphParams("refline")
+	panel.abline(v = refVal, col = reflineOpts$col, lwd = reflineOpts$lwd, 
+			lty = reflineOpts$lty, ...)
+	
+}
+
+# TODO: handle simulated data
+
+nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+							addGrid = TRUE, breaks, ...)
+{
+	dataSet <- nmData(obj)
+	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , ...)
+}
+
+nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+							addGrid = TRUE, breaks, ...)
+{
+	if(!(is.element(refLine, c("none", "mean", "median"))))
+		RNMGraphicsStop("Reference line parameter not valid!")
+	if(!(is.element(type, c("count", "percent", "density"))))
+		RNMGraphicsStop("Type parameter not valid!")
+	if(type != "density")
+		addDensity <- FALSE
+	
+	vars <- paste(CSLtoVector(vars), collapse = "+")
+	numCombos <- length(vars)
+	titles <- rep(titles,numCombos)
+	
+	plotFormulas <- paste(" ~ ", vars)
+	if(missing(xLabs)) xLabs <- vars
+	repeatVars(c("titles", "xLabs"), list(titles, xLabs), length.out = numCombos)
+	dataSet <- obj
+	
+	if(!is.null(bVars))
+	{
+		bVars <- CSLtoVector(bVars)
+		dataSet <- coerceToFactors(dataSet, bVars)		
+		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|")
+	}
+	plotList <- vector(mode = "list", length = numCombos)
+	# graphParams <- getAllGraphParams()
+	stripfn = getStripFun()
+	exp <- quote(histogram(as.formula(plotFormulas), main = titles, data = dataSet, xlab = xLabs, 
+					par.settings = list(plot.polygon = getGraphParams("histogram"), par.xlab.text = getGraphParams("axis.text"), 
+					par.ylab.text = getGraphParams("axis.text"),
+					strip.background = getGraphParams("strip.bg")), 
+					refLine = refLine, type = type, addDensity = addDensity, panel = panel.nmHistogram, outer = TRUE, 
+					strip = stripfn, ...))
+	
+	if(!missing(breaks))
+		exp$breaks <- breaks	
+	
+	plt <- eval(exp)
+	multiTrellis(list(plt))
+}
+setGeneric("nmHistogram")
+setMethod("nmHistogram", signature(obj = "NMProblem"), nmHistogram.NMProblem)
+setMethod("nmHistogram", signature(obj = "data.frame"), nmHistogram.data.frame)
