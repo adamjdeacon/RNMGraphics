@@ -58,7 +58,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
-	with(graphParams,
+	plt <- with(graphParams,
 		qqmath(as.formula(plotFormulas), main = titles, data = dataSet, 
 		panel = panel.nmQQNorm, additions = additions, xlab = xLabs, ylab = yLabs, 
 		outer = TRUE,
@@ -66,6 +66,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 		par.ylab.text = axis.text, par.main.text = title.text, 
 		plot.symbol = plot.symbol, strip.background = strip.bg), # strip = strip, 
 		...))
+	multiTrellis(list(plt))
 }
 
 setMethod("nmQQNorm", signature(obj = "data.frame") , nmQQNorm.data.frame)
