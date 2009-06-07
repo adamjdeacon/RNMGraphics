@@ -161,6 +161,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[i] & gVars != "NULL")
+			# TODO: remove these hard-coded values
 			plotKey <- list(title = getVarDescription(gVars)$Label, columns = 3, cex=.7)
 		else plotKey <- NULL
 		
@@ -183,9 +184,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 					xyplot(as.formula(plotFormulas[[i]]), groups = eval(parse(text = gVars)),  
 					data = dataSet, panel = panel.nmScatterPlot, featuresToAdd = featuresToAdd, 
 					auto.key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
-					xlab = xLab[i], 
-					ylab = yLab[i], 
-					type = types[i], 
+					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
 					# TODO: move this logic out of the loop.  Also, wrap this in a function
 					par.settings = par.settings, outer = TRUE, strip = stripfn, ...)
  				) # end with
@@ -195,15 +194,15 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	result
 }
 
-	
+
 setMethod("nmScatterPlot", signature(obj = "data.frame"), nmScatterPlot.data.frame)
 
 setMethod("nmScatterPlot", signature(obj = "NMProblem"), nmScatterPlot.NMProblem)
 
-# TODO: this is becoming a mess of if/else statements - is there a better way to do this?
+# TODO: gVar not implemented correctly for all types other than "p"
 
 panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE), 
-		idLabels = NULL, type = c("p", "i", "l", "t"), groups = NULL, ...)
+		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, ...)
 {
 	type <- match.arg(type)
 	# call panel.xyplot to setup first
@@ -217,39 +216,69 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	reflineOpts <- getGraphParams("refline")
 	if(featuresToAdd["idLine"])
 		panel.abline(a = 0, b = 1)
+	
+	# grab "superpose.line" styles
+	superpose.line.col <- getGraphParams("superpose.line")$col
+	
 	# TODO: add more comments
-	# TODO: refactor the following to allow for groups and idlabels
-	# if there was an iVar and the type is either "l" or "i", we need to use the ID var for grouping
-	# note: use of gVar not allowed with type != "p"
-	if(!is.null(idLabels) & (type != "p")) 
+	if(type == "p")
 	{
-		# TODO: implement type = "t"
-		if(type == "l" ){
-			if(!is.null(groups)) grouping <- paste(groups, idLabels, sep = ",") else grouping <- idLabels
-			reqCol <- trellis.par.get(name = NULL)$superpose.line$col[1]
-			# TODO: colours wrong at the moment
-			panel.superpose(x, y, groups = grouping, type = type, subscripts = subscripts, col.line = reqCol, 
-					, ...)
-		}
-		if(type == "i")	
-		{
-			textopt <- getGraphParams("plot.text")
-			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
-		}
-	}
-	else 
-	{		
-		
 		if(!is.null(groups))
-		{
-			
 			panel.superpose(x = x, y = y, subscripts = subscripts, type = type, groups = groups, 
 					...)
-		}
 		else
 			panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, 
 					...)
 	}
+	# lines connecting subjects
+	else if(type == "l")
+	{		
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )	
+		# browser()
+		panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
+				col.line = groupInfo$colours,, ...)	
+	}
+	# lines + points connecting subjects
+	else if(type == "o")
+	{
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo2 <- subjectGrouping(idLabels, groups, getGraphParams("superpose.symbol")$col )
+		panel.superpose(x, y, groups = groupInfo$grouping, 
+				type = type, subscripts = subscripts, col.line = groupInfo$colours, 
+				col.symbol = groupInfo2$colours, ...) 		
+	}
+	# subject identifiers
+	else if(type == "i")
+	{
+		# TODO: allow use of "gVar"
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		textopt <- getGraphParams("plot.text")
+		ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
+	}
+	# lines connecting identifiers
+	else if(type == "t")
+	{
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		if(!is.null(groups)) 
+		{
+			grouping <- paste(groups, idLabels, sep = ",") 
+			reqCol <- getGraphParams("plot.line")$col[1]
+			textopt <- getGraphParams("plot.text")
+			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)		
+			panel.superpose(x, y, groups = grouping, type = "l", subscripts = subscripts, col.line = reqCol, 
+					, ...)
+		}
+		else
+		{
+			reqCol <- getGraphParams("plot.line")$col[1]
+			textopt <- getGraphParams("plot.text")
+			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
+			groups <- idLabels
+			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", groups = groups, col.line = reqCol, ...) 
+		}
+	}
+
 	if(featuresToAdd["loess"])
 	{
 		loessOpts <- getGraphParams("loess.line")
