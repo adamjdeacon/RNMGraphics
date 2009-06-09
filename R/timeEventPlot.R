@@ -33,7 +33,8 @@ timeEventDPlot.data.frame <- function(obj, tVar = "TIME", doseVar = "AMT",
 		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID", addLegend = TRUE, ...) 
 {
 		
-	nmDotPlot(obj, factVar = iVar, contVar = tVar, gVar = evtVar, xLab = xLab, yLab = yLab, addLegend = addLegend, ...)
+	nmDotPlot(obj, factVar = iVar, contVar = tVar, gVar = evtVar, xLab = xLab, yLab = yLab, addLegend = addLegend, 
+			title = title, ...)
 }
 
 setGeneric("timeEventDPlot")
