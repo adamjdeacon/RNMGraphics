@@ -15,6 +15,7 @@
 #' @param xLabs x axis labels
 #' @param extraSubset Currently unused
 #' @param addGrid Currently unused
+#' @param nint Number of intervals for the creation of X axis bars.  It functions identically to the nint parameter of the histogram function from the lattice package.
 #' @param breaks Control the calculation of breakpoints for the histogram.  It functions identically to the breaks parameter of the histogram function from the lattice package.
 #' @param ... Additional parameters passed to panel.histogram 
 #' @return An object of class multiTrellis
@@ -22,7 +23,7 @@
 #' @keywords hplot
 
 nmHistogram <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-				 addGrid = TRUE, breaks, ...)
+				 addGrid = TRUE, nint = 12, breaks, ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
@@ -45,14 +46,14 @@ panel.nmHistogram <- function(x, refLine, addDensity, ...)
 # TODO: handle simulated data
 
 nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, breaks, ...)
+							addGrid = TRUE, nint = 12, breaks, ...)
 {
 	dataSet <- nmData(obj)
-	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , ...)
+	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , breaks, nint, ...)
 }
 
 nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, breaks, ...)
+							addGrid = TRUE, nint = 12, breaks, ...)
 {
 	if(!(is.element(refLine, c("none", "mean", "median"))))
 		RNMGraphicsStop("Reference line parameter not valid!")
@@ -84,7 +85,7 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", ty
 					par.ylab.text = getGraphParams("axis.text"),
 					strip.background = getGraphParams("strip.bg")), 
 					refLine = refLine, type = type, addDensity = addDensity, panel = panel.nmHistogram, outer = TRUE, 
-					strip = stripfn, ...))
+					strip = stripfn, nint = nint, ...))
 	
 	if(!missing(breaks))
 		exp$breaks <- breaks	
