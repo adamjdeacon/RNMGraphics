@@ -19,10 +19,11 @@ initializeOptions <- function()
 	hist <- list(alpha = 1, col = "steelblue", border = "black", lty = 1, lwd = 1, dens.col = "darkred", dens.lty = 1, dens.lwd = 1.5)
 	
 	superpose.symbol <- list(cex = rep(0.8, 7), 
-			col =  grey.colors(7),
-		pch = rep(c(1, 2, 19), length.out = 8) )
-# controls padding and layout of panels	
-layout.widths <- list(left.padding = 1, right.padding = 1, axis.ylab.padding = 1,
+			col =  grey.colors(7),	pch = rep(c(1, 2, 19), length.out = 8) )
+	superpose.line <- list(alpha = 1, col = topo.colors(8), lty = rep(1, 8), lwd = rep(1, 8))
+	
+	# controls padding and layout of panels
+	layout.widths <- list(left.padding = 1, right.padding = 1, axis.ylab.padding = 1,
 		axis.right = 1, axis.left = 0.9)
 	layout.heights <- list(bottom.padding = 1, top.padding = 1, axis.xlab.padding = 0.8,
 			axis.top = 0.8, axis.bottom = 0.9) 
@@ -31,9 +32,11 @@ layout.widths <- list(left.padding = 1, right.padding = 1, axis.ylab.padding = 1
 	
 	.RNMGraphicsEnv$graphPars <- 
 		list(superpose.symbol = superpose.symbol,
+			superpose.line = superpose.line,
 			plot.symbol = list(alpha = 0.75, cex = 0.8, col = "darkblue", fill = "black", pch = 21), 
 			plot.line = list(alpha = 0.8, col = "darkblue", lty = 1, lwd = 1),	
-			plot.text = list(alpha = 1, cex = 1, col = "darkgray"),
+			plot.text = list(alpha = 1, cex = 1, col = "black"),
+			superpose.text = list(alpha = 1, cex = 1, col = superpose.line$col),
 			loess.line = list(lwd = 1.5, col = "darkred"),
 			barchart = superpose.polygon,
 			histogram = hist,
