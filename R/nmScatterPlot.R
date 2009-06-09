@@ -161,8 +161,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[i] & gVars != "NULL")
+		{
 			# TODO: remove these hard-coded values
+			# TODO: fix legend
 			plotKey <- list(title = getVarDescription(gVars)$Label, columns = 3, cex=.7)
+			# add line info if type is l, o, or t
+		}
 		else plotKey <- NULL
 		
 		# get idLabels.  Note that these will have to be repeated if there is more than one yvar
@@ -186,7 +190,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 					auto.key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
 					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
 					# TODO: move this logic out of the loop.  Also, wrap this in a function
-					par.settings = par.settings, outer = TRUE, strip = stripfn, ...)
+					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, ...)
  				) # end with
 	}
 	gridDims <- stdGridDims(numCombos,3 )
@@ -243,39 +247,49 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
 		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
-		groupInfo2 <- subjectGrouping(idLabels, groups, getGraphParams("superpose.symbol")$col )
-		panel.superpose(x, y, groups = groupInfo$grouping, 
-				type = type, subscripts = subscripts, col.line = groupInfo$colours, 
-				col.symbol = groupInfo2$colours, ...) 		
+		# groupInfo2 <- subjectGrouping(idLabels, groups, getGraphParams("superpose.symbol")$col )
+		if(is.null(groups))
+		{
+	
+			panel.xyplot(x, y, type = "p", subscripts = subscripts, ...)
+			panel.superpose(x, y, groups = groupInfo$grouping, 
+				type = "l", subscripts = subscripts, col.line = groupInfo$colours, ...)
+		}
+		else
+		{
+			panel.superpose(x, y, groups = groups, type = "p", subscripts = subscripts, ...)
+			panel.superpose(x, y, groups = groupInfo$grouping, 
+					type = "l", subscripts = subscripts, col.line = groupInfo$colours, ...)
+		}
 	}
 	# subject identifiers
 	else if(type == "i")
 	{
 		# TODO: allow use of "gVar"
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		textopt <- getGraphParams("plot.text")
-		ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text")$col)
+		textopt <- getGraphParams("superpose.text")
+		ltext(x, y, idLabels[subscripts], col = groupInfo$colours , cex = textopt$cex , ...)
 	}
 	# lines connecting identifiers
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
 		if(!is.null(groups)) 
 		{
-			grouping <- paste(groups, idLabels, sep = ",") 
-			reqCol <- getGraphParams("plot.line")$col[1]
 			textopt <- getGraphParams("plot.text")
 			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)		
-			panel.superpose(x, y, groups = grouping, type = "l", subscripts = subscripts, col.line = reqCol, 
-					, ...)
+			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
+					subscripts = subscripts, col.line = groupInfo$colours,	, ...)
 		}
 		else
 		{
-			reqCol <- getGraphParams("plot.line")$col[1]
 			textopt <- getGraphParams("plot.text")
 			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
 			groups <- idLabels
-			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", groups = groups, col.line = reqCol, ...) 
+			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", 
+					groups = groupInfo$grouping, col.line = groupInfo$colours, ...) 
 		}
 	}
 
