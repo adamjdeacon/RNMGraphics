@@ -10,6 +10,7 @@
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  doPlot=FALSE, types = "p", equalAxisScales = FALSE, ...)
 {
+	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")
 	gVars <- if(!is.null(gVars)) CSLtoVector(gVars)[1] else "NULL"
 	
@@ -51,17 +52,18 @@
 		# log axes if necessary
 		if(logX[i]) scales$x <- list(log = "e", at = pretty(obj[[xVars[i]]]))
 		if(logY[i]) scales$y <- list(log = "e", at = pretty(obj[[yVars[1]]]))
-		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars[i])]), na.rm=T)
+		# TODO: this will not quite work when there are multiple yVars
+		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
 		
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
 		plotList[[i]] <- 
 				with(graphParams, 
-				xyplot(as.formula(plotFormulas[[i]]), groups = eval(parse(text = gVars)),
-				data = obj, panel = panel.nmScatterPlot, featuresToAdd = featuresToAdd, 
-				auto.key = plotKey, main = titles[[i]], idLabels = idLabels,
-				xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
-				par.settings = list(
+				xyplot(as.formula(plotFormulas[[i]]), stack = TRUE,
+						data = obj, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
+						auto.key = plotKey, main = titles[[i]], idLabels = idLabels,
+						xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
+						par.settings = list(
 						superpose.symbol = superpose.symbol,
 						par.xlab.text = axis.text, par.ylab.text = axis.text,
 						par.main.text = title.text, plot.line = plot.line,
@@ -74,14 +76,15 @@
 	gridDims[1] <- ceiling(numCombos / gridDims[2])
 	
 	result <- multiTrellis(plotList, gridDims)
-	if(doPlot) show(result)
 	result
 }
 
 # TODO: implement different plot types
 
-panel.overlaidScatter <- function(x, y, subscripts, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE))
+panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE),
+		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, ...)
 {
+	type <- match.arg(type)
 	if(featuresToAdd["grid"])
 	{
 		gridOpts <- getGraphParams("grid")
@@ -91,8 +94,52 @@ panel.overlaidScatter <- function(x, y, subscripts, groups, featuresToAdd =  c("
 	reflineOpts <- getGraphParams("refline")
 	if(featuresToAdd["idLine"])
 		panel.abline(a = 0, b = 1)
-	panel.superpose(x, y, subscripts = subscripts, groups = groups)
 	
+	if(type == "p")
+		panel.superpose(x, y, subscripts = subscripts, groups = groups)
+	else if(type == "i")
+	{
+		#TODO: fix colours here, as they ignore the different y-variables
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text")$col)
+		textopt <- getGraphParams("superpose.text")
+		ltext(x, y, idLabels[subscripts], col = groupInfo$colours , cex = textopt$cex , ...)		
+	}
+	else if(type == "l")
+	{
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
+				col.line = groupInfo$colours, ...)	
+		
+	}
+	else if(type == "t")
+	{
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		if(!is.null(groups)) 
+		{
+			textopt <- getGraphParams("plot.text")
+			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)		
+			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
+					subscripts = subscripts, col.line = groupInfo$colours,	, ...)
+		}
+		else
+		{
+			textopt <- getGraphParams("plot.text")
+			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
+			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", 
+					groups = groupInfo$grouping, col.line = groupInfo$colours, ...) 
+		}
+	}
+	else if(type == "o")
+	{
+		RNMGraphicsStopifnot(!is.null(idLabels))
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo2 <- subjectGrouping(idLabels, groups, getGraphParams("superpose.symbol")$col )
+		panel.superpose(x, y, groups = groupInfo$grouping, 
+				type = type, subscripts = subscripts, col.line = groupInfo$colours, 
+				col.symbol = groupInfo2$colours, ...) 			
+	}
 	if(featuresToAdd["loess"])
 	{
 		loessOpts <- getGraphParams("loess.line")
