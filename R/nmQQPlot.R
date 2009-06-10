@@ -12,13 +12,14 @@
 #' @param yLabs y-axis labels
 #' @param addGrid unused
 #' @param qqLine logical flag.  Should a reference line be added?
+#' @param yAxisScales One of "same" "free" "sliced". How panel y axis are scaled in relation to each other 
 #' @param ... additional parameters to pass to qqmath
 #' @return Multi-trellis class object
 #' @author fgochez
 #' @keywords hplot
 
 nmQQNorm <- function(obj, vars, bVars = NULL, titles = "", xLabs = "normal", yLabs, 
-		addGrid = TRUE, qqLine = TRUE, ...)
+		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), ...)
 {
 	RNMGraphicsStop("Not implemeneted for this class\n")
 }
@@ -35,8 +36,9 @@ panel.nmQQNorm <- function(x, additions, ...)
 }
 
 nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
-			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, ...)
-{
+			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), ...)
+{   
+	yAxisScales<-match.arg(yAxisScales)
 	vars <- paste(CSLtoVector(vars), collapse = "+")
 	dataSet <- obj
 
@@ -62,6 +64,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 		qqmath(as.formula(plotFormulas), main = titles, data = dataSet, 
 		panel = panel.nmQQNorm, additions = additions, xlab = xLabs, ylab = yLabs, 
 		outer = TRUE,
+		scales=list(relation=yAxisScales),
 		par.settings = list(par.xlab.text = axis.text, 
 		par.ylab.text = axis.text, par.main.text = title.text, 
 		plot.symbol = plot.symbol, strip.background = strip.bg), # strip = strip, 
