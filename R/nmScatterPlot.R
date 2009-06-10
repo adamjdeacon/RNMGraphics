@@ -42,7 +42,7 @@ nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
 		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		xBin = Inf, problemNum = 1, subProblems = 1,
+		xBin = Inf, layout = NULL, maxPanels = NULL,problemNum = 1, subProblems = 1,
 		...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
@@ -53,7 +53,8 @@ nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, 
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="" , 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
 							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
-							equalYScales = TRUE, xBin = Inf, problemNum = 1, subProblems = 1, ...)
+							equalYScales = TRUE, xBin = Inf, layout = NULL, maxPanels = NULL , 
+							problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -69,7 +70,8 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
 							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
-							equalYScales = TRUE, xBin = Inf, problemNum = 1, subProblems = 1,
+							equalYScales = TRUE, xBin = Inf,layout = NULL, maxPanels = NULL , 
+							problemNum = 1, subProblems = 1,
 							...)
 {
 	
@@ -90,11 +92,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  types = "p", overlaid = FALSE , 
-		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf,  problemNum = 1, subProblems = 1, ...)
+		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf, layout = NULL, maxPanels = NULL ,  
+		 problemNum = 1, subProblems = 1, ...)
 {
 
 	xVars <- CSLtoVector(xVars)
-	RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
+	#RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
 	# TODO eliminate this copy
 	dataSet <- obj
@@ -106,7 +109,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						addLegend = addLegend, addGrid = addGrid,
 						addLoess = addLoess, titles = titles, logX = logX, 
 						logY = logY, idLines = idLines, xLab = xLab,
-						yLab = yLab, doPlot = doPlot, types = types, equalAxisScales = equalAxisScales, ...))
+						yLab = yLab, types = types, equalAxisScales = equalAxisScales, ...))
 	}
 	# bin the xVariable if it has more than a certain number of levels, and then use boxplot if this is the case.  Note:
 	# TODO: move this behaviour into a different package!
@@ -167,6 +170,10 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 			add.line = refline, strip.background = strip.bg, 
 			layout.widths = layout.widths, layout.heights = layout.heights)) 
 	stripfn <- getStripFun()
+	# at the moment, maxPanels overrides the layout
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[i] & gVars != "NULL")
@@ -189,9 +196,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars[i])]), na.rm=T)
 
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
-	
-		# TODO: dynamically calculate left and right padding
-
+		
 		plotList[[i]] <- 
 				with(graphParams, 
 					xyplot(as.formula(plotFormulas[[i]]), groups = eval(parse(text = gVars)),  
@@ -199,11 +204,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 					auto.key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
 					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
 					# TODO: move this logic out of the loop.  Also, wrap this in a function
-					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, ...)
+					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, 
+					layout = layout, ...)
  				) # end with
 	}
 	gridDims <- stdGridDims(numCombos,3 )
-	result <- multiTrellis(plotList, gridDims)
+	result <- multiTrellis(plotList, gridDims, maxPanels = maxPanels)
 	result
 }
 
