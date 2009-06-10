@@ -203,6 +203,21 @@ gen.nmQQNorm <- function(testData)
 	plots[[3]] <- nmQQNorm(sleep, "extra", qqLine = FALSE)
 	
 	setGraphParams("refline", oldSettings)
+	
+	#####okimberlin#####
+	
+	plots[[4]]<- nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="free")
+	plots[[5]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="sliced")
+	plots[[6]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="same")
+	plots[[7]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education"),yAxisScales="same")
+	plots[[8]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education"),yAxisScales="free")
+	plots[[9]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="free")
+	plots[[10]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="sliced")
+	plots[[11]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="same")
+	plots[[11]]<-nmQQNorm(quakes,c("depth","mag"),yAxisScales="free")
+	
+	
+	
 	plots
 }
 
