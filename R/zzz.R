@@ -52,14 +52,22 @@ initializeOptions <- function()
 			layout.heights = layout.heights,
 			panelLayout = panelLayout,
 			panelMisc = list("as.table" = TRUE), 
-			strip = list(stripfun = strip.custom(strip.names = c(FALSE, FALSE)), strip.bg = rev(grey.colors(4)))
+			strip = list(stripfun = defaultStrip, strip.bg = rev(grey.colors(4)))
 		)
 	
 
 	.RNMGraphicsEnv$defaultSubset <- "EVID == 1"
 }
 
+# TODO: move this to the header of PopPKPD
+
+updateRNMImportSettings <- function()
+{
+	setVarDescription("SEX", "Gender",c("0=male,1=female"), "Covariate")
+}
+
 .onLoad <- function(libname, pkgname)
 {
+	updateRNMImportSettings()
 	initializeOptions()
 }
