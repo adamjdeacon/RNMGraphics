@@ -37,18 +37,11 @@ setGeneric("nmACPlot")
 nmACPlot.NMBasicModel <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
 		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, ...)
 {
-# TODO: make the "match.call" approach work
-#	browser()
-#	funcCall <- match.call()
-#	obj <- nmData(obj)
-#	callList <- do.call("c", as.list(funcCall))
-#	callList$obj <- obj
 	
 	funcCall <- as.list(match.call())[-1]
 	dataSet <- nmData(obj)
 	funcCall$obj <- dataSet
 	do.call(nmACPlot, funcCall)
-	#nmACPlot(obj, var, tVar, iVar, bVars, gVars,titles, xLabs, yLabs, extraSubset, addGrid,...)
 }
 setMethod("nmACPlot", signature(obj = "NMBasicModel"), nmACPlot.NMBasicModel)
 nmACPlot.data.frame <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
