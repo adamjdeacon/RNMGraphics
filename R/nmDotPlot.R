@@ -73,7 +73,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NU
 					par.main.text = title.text, plot.line = plot.line,
 					add.line = refline, strip.background = graphParams$strip.bg, 
 					layout.widths = layout.widths, layout.heights = layout.heights))
-	auto.key <- if(addLegend) list(title = gVar, cex=.7, columns = 3) else NULL
+	auto.key <- if(addLegend) list(title = gVar, cex=.7, rows=10,space="right") else NULL
 	for(i in seq_along(plotFormulas))
 	{
 		# TODO: strip is broken, don't know why
