@@ -12,7 +12,7 @@ genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE,
 	.dataList[[3]] <-  data.frame(X = 1:50, TIME = rep(1:25, 2), ID = rep(1:2, each = 25))
 	
 	.dataList[[4]] <- importNm(system.file(package = "RNMImport", "unittests/testdata/TestRun/TestData1.ctl"))
-	
+	.dataList[[5]] <- data.frame(X = rnorm(100), Y = 1)
 	if(loadPack)
 	{
 		require(RNMGraphics)
@@ -33,7 +33,7 @@ genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE,
 			"nmBoxPlot" = gen.nmBoxPlot(.dataList), "nmScatterMatrix" = gen.nmScatterMatrix(.dataList), 
 			"nmHistogram" = gen.nmHistogram(.dataList), "nmACPlot" = gen.nmACPlot(.dataList),
 			"nmBarChart" = gen.nmBarChart(.dataList), "nmBoxPlot" = gen.nmDotPlot(.dataList),
-			"nmDotPlot" = gen.nmDotPlot(.dataList))
+			"nmDotPlot" = gen.nmDotPlot(.dataList), "timeEventPlots" = gen.timeEventPlots(.dataList))
 	
 	
 	setGraphParams("plot.symbol", list(alpha = 1, cex = 1.5, col = "green", pch = 2))
@@ -44,7 +44,7 @@ genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE,
 			"nmBoxPlot" = gen.nmBoxPlot(.dataList), "nmScatterMatrix" = gen.nmScatterMatrix(.dataList), 
 			"nmHistogram" = gen.nmHistogram(.dataList), "nmACPlot" = gen.nmACPlot(.dataList),
 			"nmBarChart" = gen.nmBarChart(.dataList), "nmBoxPlot" = gen.nmDotPlot(.dataList),
-			"nmDotPlot" = gen.nmDotPlot(.dataList))
+			"nmDotPlot" = gen.nmDotPlot(.dataList), "timeEventPlots" = gen.timeEventPlots(.dataList))
 	# append to the names of the list elements
 	names(plots2) <- paste(names(plots2), "_st", sep = "" )
 	plots <- c(plots, plots2)
@@ -238,4 +238,14 @@ gen.nmDotPlot <- function(testData)
 			 xLab = "xlabel", yLab = "ylabel")
 	plots
 	
+}
+
+gen.timeEventPlots <- function(testData)
+{
+	x <- nmData(testData[[4]])
+	x <- subset(x, ID %in% 2:4)
+	plots <- list()
+	plots[[1]] <- timeEventSPlot(x, title = "Time/event", xLab = "Time", yLab = "Concentration")
+	plots[[2]] <- timeEventDPlot(x, title = "Time/event", xLab = "Time", yLab = "Subject")
+	plots
 }
