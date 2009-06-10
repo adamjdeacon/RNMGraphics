@@ -19,29 +19,36 @@
 #' @author fgochez
 #' @keywords hplot
 
+# TODO: contVarOnX does not work with overLaid = TRUE
+
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, problemNum = 1, ...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1,...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
 setGeneric("nmBoxPlot")	
 
 nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, problemNum = 1, ...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1, ...)
 {
 	dat <- nmData(obj)
 	nmBoxPlot(dat, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-			yLabs = NULL, problemNum = 1, ...)
+			yLabs = NULL,overlaid = overlaid, contVarOnX = contVarOnX, problemNum = 1, ...)
 	
 }
 
 nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, problemNum = 1, ...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1, ...)
 {
+	
 	contVar <- CSLtoVector(contVar)
 	factVar <- CSLtoVector(factVar)
 	
-	varCombos <-  expand.grid(contVar, factVar)
+	contVarCollapsed <- paste(contVar, collapse = "+")
+	if(!contVarOnX)
+		varCombos <-  expand.grid(contVarCollapsed, factVar)
+	else 
+		varCombos <-  expand.grid(factVar, contVarCollapsed)
 	numCombos <- nrow(varCombos)
 	
 	plotFormulas <- apply(varCombos, 1, paste, collapse = "~")
@@ -66,7 +73,7 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 		yLabs <- as.character(varCombos[,1])
 	
 	graphParams <- getAllGraphParams()
-	
+	# TODO: fix this
 	if(overlaid && length(contVar) > 1 && all(sapply(obj[, contVar], class) == "numeric"))
 	{
 		stackedData <- stack(obj[, contVar])
@@ -78,20 +85,22 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 	}
 	else
 	{
+		browser()
 		stripfn = getStripFun()
 		for(i in seq_along(plotFormulas))
-			plotList[[i]] <- with(graphParams,
+			plotList[[i]] <- 
+			with(graphParams,
 				# TODO: passing options this way is getting unwieldy
-				 			bwplot(as.formula(plotFormulas[[i]]), data = obj, main = titles[[i]], xlab = xLabs[i], 
-									ylab = yLabs[i], 
-									par.settings = list(plot.symbol = plot.symbol,
-											par.xlab.text = axis.text, 
-									par.ylab.text = axis.text,par.main.text = title.text,
-									box.rectangle = boxplot[c("alpha","col","fill","lty","lwd")],
-									box.umbrella = list(col = boxplot$umb.col, lty = boxplot$umb.lty, 
+				bwplot(as.formula(plotFormulas[[i]]), data = obj, main = titles[[i]], 
+						xlab = xLabs[i], horizontal = contVarOnX, 
+					 ylab = yLabs[i], par.settings = list(plot.symbol = plot.symbol,
+				 		par.xlab.text = axis.text,
+						par.ylab.text = axis.text,par.main.text = title.text,
+						box.rectangle = boxplot[c("alpha","col","fill","lty","lwd")],
+						box.umbrella = list(col = boxplot$umb.col, lty = boxplot$umb.lty, 
 											lwd = boxplot$umb.lwd),
 									strip.background = strip.bg), 
-								strip = stripfn, ...)
+								strip = stripfn, outer = TRUE, ...)
 				) # end with(graphParams, 
 	
 		gridDims <- numeric(2)
