@@ -41,8 +41,8 @@
 nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
-		doPlot = FALSE, types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		problemNum = 1, subProblems = 1,
+		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
+		xBin = Inf, problemNum = 1, subProblems = 1,
 		...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
@@ -52,8 +52,8 @@ setGeneric("nmScatterPlot")
 nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="" , 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
-							yLab = NULL, doPlot = FALSE, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
-							equalYScales = TRUE, problemNum = 1, subProblems = 1, ...)
+							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
+							equalYScales = TRUE, xBin = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -68,8 +68,8 @@ setMethod("nmScatterPlot", signature(obj = "NMRun"), nmScatterPlot.NMRun)
 nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
-							doPlot = FALSE, types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
-							equalYScales = TRUE, problemNum = 1, subProblems = 1,
+							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
+							equalYScales = TRUE, xBin = Inf, problemNum = 1, subProblems = 1,
 							...)
 {
 	
@@ -89,11 +89,12 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
-		yLab = NULL,  doPlot=FALSE, types = "p", overlaid = FALSE , 
-		 equalAxisScales = FALSE, equalYScales = TRUE, problemNum = 1, subProblems = 1, ...)
+		yLab = NULL,  types = "p", overlaid = FALSE , 
+		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf,  problemNum = 1, subProblems = 1, ...)
 {
 
 	xVars <- CSLtoVector(xVars)
+	RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
 	# TODO eliminate this copy
 	dataSet <- obj
@@ -107,8 +108,16 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						logY = logY, idLines = idLines, xLab = xLab,
 						yLab = yLab, doPlot = doPlot, types = types, equalAxisScales = equalAxisScales, ...))
 	}
+	# bin the xVariable if it has more than a certain number of levels, and then use boxplot if this is the case.  Note:
+	# TODO: move this behaviour into a different package!
+	# TODO: UNITTESTS
+	if(length(unique(obj[,xVars])) > xBin)
+	{
+		newObj <- addDerivedCategorical(obj, xVars, paste(xVars, "CUT", sep = "."), breaks = xBin)
+		return(nmBoxPlot(newObj, contVar = yVars, factVar = paste(xVars, "CUT", sep = "."), xLabs =NULL, yLabs = NULL,
+						ovelaid = overlaid, titles = titles, bVars = bVars))
+	}
 	# take all combinations of x variables against y variables
-	
 	varCombos <- varComboMatrix(xVars, yVars)
 	numCombos <- nrow(varCombos)
 	
