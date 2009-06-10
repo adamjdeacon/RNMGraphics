@@ -23,7 +23,8 @@
 #' @author fgochez
 #' @keywords
 nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar = "ID", 
-		title = NULL, xLabs = NULL, yLabs = NULL,	addLegend = TRUE, ...)   
+		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
+		addLegend = TRUE, ...)   
 {
 	RNMGraphicsStop("Not implemented for this class yet \n")	
 }
@@ -32,7 +33,8 @@ nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar =
 # TODO: allow multiple factVars and contVars
 
 nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar = "ID", 
-					title = NULL, xLabs = NULL, yLabs = NULL,	addLegend = TRUE, ...)   
+					title = NULL, xLabs = NULL, yLabs = NULL,layout = NULL, maxPanels = numeric(0),	
+					addLegend = TRUE,		...)   
 {
 
 	# TODO : an excess of copy-paste is cropping up - try to find a way to reduce this
@@ -73,7 +75,13 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NU
 					par.main.text = title.text, plot.line = plot.line,
 					add.line = refline, strip.background = graphParams$strip.bg, 
 					layout.widths = layout.widths, layout.heights = layout.heights))
+
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
+	
 	auto.key <- if(addLegend) list(title = gVar, cex=.7, rows=10,space="right") else NULL
+
 	for(i in seq_along(plotFormulas))
 	{
 		# TODO: strip is broken, don't know why
@@ -81,12 +89,12 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NU
 		plotList[[i]] <- 
 				dotplot(as.formula(plotFormulas[i]), data = obj, main = title, xlab = xLabs[i], 
 						ylab = yLabs[i], auto.key = auto.key, groups = eval(parse(text = gVar)),
-						par.settings = par.settings, #  strip = graphParams$strip, 
-						outer = TRUE, ...)
+						par.settings = par.settings, strip = getStripFun(), 
+						outer = TRUE, layout = layout, ...)
 	} 
 	gridDims <- stdGridDims(numCombos,3 )
 			# numeric(2)
-	multiTrellis(plotList, gridDims)
+	multiTrellis(plotList, gridDims, maxPanels = maxPanels)
 	
 }
 
