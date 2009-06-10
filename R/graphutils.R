@@ -27,11 +27,11 @@ subjectGrouping <- function(idLabels, group = NULL, superposeCol)
 	if(!is.null(group))
 	{
 		grouping <- paste(group, idLabels, sep = ",")
-		groupTable <- cbind(idLabels, group)
+		groupTable <- cbind(idLabels, as.factor(group))
 		indices <- match(unique(idLabels), idLabels)
 		groupTable <- groupTable[indices,]
-		cols <- rep(superposeCol, length.out = length(unique(grouping)))
-		cols <- cols[groupTable[,2]]
+		cols <- rep(superposeCol, length.out = length(unique(group)))
+		cols <- cols[as.numeric(groupTable[,2])]
 	}
 	else
 	{
@@ -40,3 +40,70 @@ subjectGrouping <- function(idLabels, group = NULL, superposeCol)
 	}
 	return(list(grouping = grouping, colours = cols))
 }
+
+# this strip function is needed since if multiple y variables are used yet no
+# "by" variable is, a crash occurs if strip.names = c(TRUE, TRUE)
+
+defaultStrip <- function(..., var.name)
+{
+	if(is.null(var.name)) strip.names = c(FALSE, TRUE) else strip.names = c(TRUE, TRUE)
+	strip.default(..., var.name = var.name, strip.names = strip.names)
+}
+
+#myDf <- data.frame(X = rnorm(100), Y = rnorm(100), Z1 = as.factor(sample(1:14, 100, T)), Z2 = as.factor(sample(1:5, 100, T)), Z3 = as.factor(sample(1:2, 100, T)))
+#
+#myPlotNone <- with(myDf, xyplot(Y~X, as.table = T, main = "No Lattice Variables"))
+#
+#myPlotOneSmall <- with(myDf, xyplot(Y~X|Z2, as.table = T, main = "1 Lattice Variable with 5 Levels", strip = strip.custom(strip.names=T)))
+#
+#myPlotOneLarge <- with(myDf, xyplot(Y~X|Z1, as.table = T, main = "1 Lattice Variable with 14 Levels", strip = strip.custom(strip.names=T)))
+#
+#myPlotTwoSmall <- with(myDf, xyplot(Y~X|Z2*Z1, as.table = T, main = "2 Lattice Variable with 5 THEN 14 Levels", strip = strip.custom(strip.names=T)))
+#
+#myPlotTwoLarge <- with(myDf, xyplot(Y~X|Z1*Z2, as.table = T, main = "2 Lattice Variable with 14 THEN 5 Levels", strip = strip.custom(strip.names=T)))
+#
+#myPlotThree <- with(myDf, xyplot(Y~X|Z1*Z2*Z3, as.table = T, main = "3 Lattice Variable with 14 THEN 5 THEN 2 Levels", strip = strip.custom(strip.names=T)))
+#
+
+
+# Define the maxPanels function
+
+calcMaxPanels <- function(obj, maxPanels = 8) 
+{
+	if (length(maxPanels) != 1 || maxPanels[1] < 1) stop("Illegal maxPanels value")	
+	if (length(obj$layout) | !length(obj$condlevels)) return(obj)
+	nLats <- length(cl <- obj$condlevels)
+	cLens <- sapply(cl, length)
+	totalPanels <- prod(cLens)
+	if (totalPanels <= maxPanels) return(obj)
+	maxPanels <- min(maxPanels, cLens[1])
+	switch(as.character(nLats), 
+			"0" = obj$layout <- NULL, 
+			"1" = {
+				obj$layout <- lattice:::compute.layout(NULL, maxPanels) 
+				obj$layout[3] <- ceiling(totalPanels / obj$layout[2])
+			}, {
+				firstLevel <- 1:cLens[1]
+				obj$layout <- lattice:::compute.layout(NULL, maxPanels)
+				if (length(obj$layout) && obj$layout[1] == 0) {
+					m <- max(1, round(sqrt(obj$layout[2])))
+					n <- ceiling(obj$layout[2]/m)					
+					m <- ceiling(obj$layout[2]/n)
+					obj$layout[1] <- n
+					obj$layout[2] <- m
+				}
+				
+				firstPages <- ceiling(cLens[1]/prod(obj$layout[1:2]))
+				obj$layout[3] <- firstPages * prod(cLens[-1])
+				firstPanels <- firstPages * obj$layout[1] * obj$layout[2]
+				if (firstPanels > cLens[1]) {
+					
+					# Need to skip extra spaces
+					
+					obj$skip <- rep(1:firstPanels > cLens[1], prod(cLens[-1]))
+				}
+			})
+	obj
+	
+}
+
