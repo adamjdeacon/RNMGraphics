@@ -1,14 +1,13 @@
 # $Rev$
 # $LastChangedDate$
 
-# TODO: bVars not working yet
 # TODO: logX, logY not used
 # TODO: take out "doPlot"
 
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
-		yLab = NULL,  doPlot=FALSE, types = "p", equalAxisScales = FALSE, ...)
+		yLab = NULL, types = "p", equalAxisScales = FALSE, ...)
 {
 	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")

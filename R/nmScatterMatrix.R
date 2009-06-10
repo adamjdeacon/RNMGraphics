@@ -15,7 +15,8 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmScatterMatrix <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title ="", ...)
+nmScatterMatrix <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title ="", 
+		layout = NULL, maxPanels = NULL, ...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
 }
@@ -24,11 +25,15 @@ setGeneric("nmScatterMatrix")
 
 # TODO: ability to add L curve
 
-nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title = "", ...)
+nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title = "", 
+		layout = NULL, maxPanels = NULL, ...)
 {
 	vars <- CSLtoVector(vars)
 	vars <- paste("'", vars, "'", sep = "")
 	numCombos <- length(vars)
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	
 	#repeatVars(c("addLoess"), list(addLoess), 
 	#		length.out = numCombos)
@@ -46,8 +51,8 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL,  addLoess = FALSE
 			par.settings = list(par.xlab.text = graphParams$"axis.text", 
 					par.ylab.text = graphParams$"axis.text", par.main.text = graphParams$title.text,
 					plot.symbol = graphParams$plot.symbol, strip.background = graphParams$strip.bg),
-			...)
-	multiTrellis(list(plt))
+			layout = layout, ...)
+	multiTrellis(list(plt), maxPanels = maxPanels)
 		
 }
 

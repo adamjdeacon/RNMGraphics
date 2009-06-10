@@ -19,17 +19,20 @@
 #' @author fgochez
 #' @keywords hplot
 
+
 # TODO: contVarOnX does not work with overLaid = TRUE
 
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1,...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
+		problemNum = 1,...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
 setGeneric("nmBoxPlot")	
 
 nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1, ...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
+		problemNum = 1, ...)
 {
 	dat <- nmData(obj)
 	nmBoxPlot(dat, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
@@ -38,7 +41,8 @@ nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL, titles =
 }
 
 nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, problemNum = 1, ...)
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
+		problemNum = 1, ...)
 {
 	
 	contVar <- CSLtoVector(contVar)
@@ -72,6 +76,9 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 	else
 		yLabs <- as.character(varCombos[,1])
 	
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	graphParams <- getAllGraphParams()
 	# TODO: fix this
 	if(overlaid && length(contVar) > 1 && all(sapply(obj[, contVar], class) == "numeric"))
@@ -85,7 +92,6 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 	}
 	else
 	{
-		browser()
 		stripfn = getStripFun()
 		for(i in seq_along(plotFormulas))
 			plotList[[i]] <- 
@@ -100,14 +106,14 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 						box.umbrella = list(col = boxplot$umb.col, lty = boxplot$umb.lty, 
 											lwd = boxplot$umb.lwd),
 									strip.background = strip.bg), 
-								strip = stripfn, outer = TRUE, ...)
+								strip = stripfn, outer = TRUE, layout = layout, ...)
 				) # end with(graphParams, 
 	
 		gridDims <- numeric(2)
 		gridDims[2] <- min(3, length(plotList))
 		gridDims[1] <- ceiling(numCombos / gridDims[2])
 	
-		multiTrellis(plotList, gridDims)
+		multiTrellis(plotList, gridDims, maxPanels = maxPanels)
 	} # end else
 }
 

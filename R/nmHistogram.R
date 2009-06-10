@@ -23,7 +23,7 @@
 #' @keywords hplot
 
 nmHistogram <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-				 addGrid = TRUE, nint = 12, breaks, ...)
+				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
@@ -46,14 +46,14 @@ panel.nmHistogram <- function(x, refLine, addDensity, ...)
 # TODO: handle simulated data
 
 nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, ...)
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
 {
 	dataSet <- nmData(obj)
 	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , breaks, nint, ...)
 }
 
 nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, ...)
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
 {
 	if(!(is.element(refLine, c("none", "mean", "median"))))
 		RNMGraphicsStop("Reference line parameter not valid!")
@@ -61,6 +61,9 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", ty
 		RNMGraphicsStop("Type parameter not valid!")
 	if(type != "density")
 		addDensity <- FALSE
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	
 	vars <- paste(CSLtoVector(vars), collapse = "+")
 	numCombos <- length(vars)
@@ -91,7 +94,7 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", ty
 		exp$breaks <- breaks	
 	
 	plt <- eval(exp)
-	multiTrellis(list(plt))
+	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 setGeneric("nmHistogram")
 setMethod("nmHistogram", signature(obj = "NMProblem"), nmHistogram.NMProblem)

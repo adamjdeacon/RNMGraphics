@@ -19,7 +19,8 @@
 #' @keywords hplot
 
 nmQQNorm <- function(obj, vars, bVars = NULL, titles = "", xLabs = "normal", yLabs, 
-		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), ...)
+		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
+		...)
 {
 	RNMGraphicsStop("Not implemeneted for this class\n")
 }
@@ -36,7 +37,8 @@ panel.nmQQNorm <- function(x, additions, ...)
 }
 
 nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
-			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), ...)
+			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
+			layout = NULL, maxPanels = NULL,...)
 {   
 	vars <- CSLtoVector(vars)
 	# we now filter variables that do not have more than one level
@@ -51,7 +53,9 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 	dataSet <- obj
 
 	numCombos <- 1
-	
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	if(missing(yLabs)) yLabs <- vars
 	
 
@@ -76,9 +80,10 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 		scales = scales,
 		par.settings = list(par.xlab.text = axis.text, 
 		par.ylab.text = axis.text, par.main.text = title.text, 
-		plot.symbol = plot.symbol, strip.background = strip.bg), # strip = strip, 
-		...))
-	multiTrellis(list(plt))
+		plot.symbol = plot.symbol, strip.background = strip.bg), 
+# strip = strip, 
+		...), layout = layout)
+	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 
 setMethod("nmQQNorm", signature(obj = "data.frame") , nmQQNorm.data.frame)

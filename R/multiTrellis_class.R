@@ -8,10 +8,12 @@
 
 
 multiTrellis <- function(plotSet, gridDims = c(1,1), mainTitle = "", 
-		panelLayout = getGraphParams("panelLayout")$layout, gridLayout = numeric(0))
+		panelLayout = getGraphParams("panelLayout")$layout, gridLayout = numeric(0), 
+		maxPanels = numeric(0))
 {
 	new("multiTrellis", plots = plotSet, 
-			layout = gridDims, mainTitle = mainTitle, panelLayout = panelLayout)
+			layout = gridDims, mainTitle = mainTitle, 
+			panelLayout = panelLayout, maxPanels = maxPanels)
 }
 
 # TODO: finish
@@ -28,19 +30,24 @@ validity.multiTrellis <- function(object)
 }
 
 setClass("multiTrellis", representation(plots = "list", layout = "numeric", 
-				mainTitle = "character", panelLayout = "numeric"), 
+				mainTitle = "character", panelLayout = "numeric", maxPanels = "numeric"), 
 		validity = validity.multiTrellis)
 
 # special case for a single plot
 
 plotSingletonmultiTrellis <- function(object)
 {
+	# TODO: remove this
 	if(length(object@panelLayout) > 0)
 		object@plots[[1]]$layout <- object@panelLayout
 	as.table <- getGraphParams("panelMisc")$as.table
+	# TODO: this is currently a hack.  Pass as.table as a parameter later.
 	if(!is.na(as.table))
 		object@plots[[1]]$as.table <- as.table
-	# TODO: this is currently a hack.  Pass as.table as a parameter later.
+	if(length(object@maxPanels) > 0)
+	{
+		object@plots[[1]] <- calcMaxPanels(object@plots[[1]])
+	}
 	print(object@plots[[1]])
 }
 

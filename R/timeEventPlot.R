@@ -62,7 +62,8 @@ setMethod("timeEventDPlot", signature(obj = "data.frame"), timeEventDPlot.data.f
 
 timeEventSPlot <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
-		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, ...) 
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, layout = NULL, maxPanels = NULL,
+		...) 
 {
 	RNMGraphicsStop("Not implemented for this class\n")
 }
@@ -79,14 +80,15 @@ panel.timeEventSPlot <- function(x, y, subscripts, doseInfo, colNames = c("tVar"
 
 timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
-		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, ...) 
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE,layout = NULL, maxPanels = NULL, ...) 
 {
-	# TODO: UNITTEST
 	if(is.null(xLab)) xLab <- "Time"
 	if(is.null(yLab)) yLab <- "Concentration"
 	if(is.null(title)) title <- "Concentration vs Time"
 	if(is.null(subjectNum)) subjectNum <- unique(obj[[iVar]])
-	
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
 	form <- paste(concVar, tVar, sep = "~")
 	form <- paste(form, iVar, sep = "|")
 	
@@ -111,8 +113,8 @@ timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVa
 					layout.widths = layout.widths, layout.heights = layout.heights), 
 			strip = strip$stripfun, panel = panel.timeEventSPlot, doseInfo = doses, colNames = varMapping,
 			xlab = xLab, ylab = yLab, main = title,
-			key = plotKey ,...))
-	multiTrellis(list(plt))
+			key = plotKey , layout = layout, ...) )
+	multiTrellis(list(plt), maxPanels = maxPanels)
 	# plt
 }
 
