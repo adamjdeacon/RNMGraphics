@@ -38,16 +38,22 @@ panel.nmQQNorm <- function(x, additions, ...)
 nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), ...)
 {   
-	yAxisScales<-match.arg(yAxisScales)
-	vars <- paste(CSLtoVector(vars), collapse = "+")
+	vars <- CSLtoVector(vars)
+	# we now filter variables that do not have more than one level
+	# TODO: UNITTEST
+	hasSeveralValues <- sapply(vars, function(n) length(unique(obj[,n])) > 1)
+	if(!all(hasSeveralValues))
+		RNMGraphicsWarning("Several columns have been detected with only a single value, dropping\n")
+	vars <- vars[hasSeveralValues]
+	if(length(vars) == 0)
+		RNMGraphicsStop("None of the supplied variables had more than one value", match.call())
+	vars <- paste(vars, collapse = "+")
 	dataSet <- obj
 
 	numCombos <- 1
 	
 	if(missing(yLabs)) yLabs <- vars
 	
-	# repeatVars(c("titles", "qqLine", xLabs, yLabs), list(titles, qqLine, xLabs, yLabs), 
-	#		length.out = numCombos)
 
 	plotFormulas <- paste(" ~ ", vars)
 	
@@ -60,11 +66,14 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
+	if (length(vars) > 1) scales <- list(relation=yAxisScales)
+	else scales <- list()
+	
 	plt <- with(graphParams,
 		qqmath(as.formula(plotFormulas), main = titles, data = dataSet, 
 		panel = panel.nmQQNorm, additions = additions, xlab = xLabs, ylab = yLabs, 
 		outer = TRUE,
-		scales=list(relation=yAxisScales),
+		scales = scales,
 		par.settings = list(par.xlab.text = axis.text, 
 		par.ylab.text = axis.text, par.main.text = title.text, 
 		plot.symbol = plot.symbol, strip.background = strip.bg), # strip = strip, 
