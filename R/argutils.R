@@ -16,10 +16,38 @@ repeatVars <- function(assignTo, valsToRepeat, length.out = 1)
 	for(i in seq_along(assignTo)) assign(assignTo[i], rep(valsToRepeat[[i]], length.out = length.out), parent.frame(1))
 }
 
-coerceToFactors <- function(df, columns)
+# this function does all processing of trellis variables.  It partitions those having a more than "maxLevels",
+# coerces others to factors, 
+# and returns a list of the processed data frame
+
+processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = "BINNED", exemptColumns = "ID")
+{
+	# TODO: UNITTEST
+	columns <- intersect(columns, names(df))
+	outputNames <- columns
+	outDf <- df
+	for(n in seq_along(columns))
+	{
+		column <- columns[[n]]
+		# if numeric and has too many levels, bin it
+		if(class(df[[column]]) == "numeric" && length(unique(df[[column]])) > maxLevels && !(column %in% exemptColumns))
+		{
+			outDf <- addDerivedCategorical(outDf, column, paste(column, postFix, sep = "."), breaks = maxLevels)
+		# reference the binned variable
+			outputNames[n] <-  paste(column, postFix, sep = ".") 
+		}
+	}
+	return(list(data = outDf, columns = outputNames))
+}
+
+coerceToFactors <- function(df, columns, excludeClasses = "shingle")
 {
 	columns <- intersect(columns, names(df))
-	for(n in columns) df[[n]] <- as.factor(df[[n]])
+	for(n in columns) 
+	{
+		if(!inherits(df[[n]], excludeClasses))
+			df[[n]] <- as.factor(df[[n]])
+	}
 	df
 }
 
