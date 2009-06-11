@@ -21,17 +21,23 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 	if(collapseX) xVars <- paste(xVars, collapse = "+")
 	as.matrix(expand.grid(xVars, yVars))
 }
+
+sortByGroupings <- function(x, iVar, gVar = NULL)
+{
+	
+}
+
 # TODO: this does not seem to work correctly when group is not NULL
 subjectGrouping <- function(idLabels, group = NULL, superposeCol)
 {
 	if(!is.null(group))
 	{
 		grouping <- paste(group, idLabels, sep = ",")
-		groupTable <- cbind(idLabels, as.factor(group))
+		groupTable <- cbind(as.factor(group), idLabels)
 		indices <- match(unique(idLabels), idLabels)
 		groupTable <- groupTable[indices,]
 		cols <- rep(superposeCol, length.out = length(unique(group)))
-		cols <- cols[as.numeric(groupTable[,2])]
+		cols <- cols[as.numeric(groupTable[,1])]
 	}
 	else
 	{
@@ -49,24 +55,6 @@ defaultStrip <- function(..., var.name)
 	if(is.null(var.name)) strip.names = c(FALSE, TRUE) else strip.names = c(TRUE, TRUE)
 	strip.default(..., var.name = var.name, strip.names = strip.names)
 }
-
-#myDf <- data.frame(X = rnorm(100), Y = rnorm(100), Z1 = as.factor(sample(1:14, 100, T)), Z2 = as.factor(sample(1:5, 100, T)), Z3 = as.factor(sample(1:2, 100, T)))
-#
-#myPlotNone <- with(myDf, xyplot(Y~X, as.table = T, main = "No Lattice Variables"))
-#
-#myPlotOneSmall <- with(myDf, xyplot(Y~X|Z2, as.table = T, main = "1 Lattice Variable with 5 Levels", strip = strip.custom(strip.names=T)))
-#
-#myPlotOneLarge <- with(myDf, xyplot(Y~X|Z1, as.table = T, main = "1 Lattice Variable with 14 Levels", strip = strip.custom(strip.names=T)))
-#
-#myPlotTwoSmall <- with(myDf, xyplot(Y~X|Z2*Z1, as.table = T, main = "2 Lattice Variable with 5 THEN 14 Levels", strip = strip.custom(strip.names=T)))
-#
-#myPlotTwoLarge <- with(myDf, xyplot(Y~X|Z1*Z2, as.table = T, main = "2 Lattice Variable with 14 THEN 5 Levels", strip = strip.custom(strip.names=T)))
-#
-#myPlotThree <- with(myDf, xyplot(Y~X|Z1*Z2*Z3, as.table = T, main = "3 Lattice Variable with 14 THEN 5 THEN 2 Levels", strip = strip.custom(strip.names=T)))
-#
-
-
-# Define the maxPanels function
 
 calcMaxPanels <- function(obj, maxPanels = 8) 
 {
