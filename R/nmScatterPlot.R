@@ -42,7 +42,7 @@ nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
 		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		xBin = Inf, layout = NULL, maxPanels = NULL, problemNum = 1, subProblems = 1,
+		xBin = Inf, layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1,
 		...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
@@ -53,8 +53,8 @@ nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, 
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="" , 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
 							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
-							equalYScales = TRUE, xBin = Inf, layout = NULL, maxPanels = NULL , 
-							problemNum = 1, subProblems = 1, ...)
+							equalYScales = TRUE, xBin = Inf, layout = NULL, maxPanels = NULL, 
+							maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -71,7 +71,7 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
 							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
 							equalYScales = TRUE, xBin = Inf,layout = NULL, maxPanels = NULL , 
-							problemNum = 1, subProblems = 1,
+							maxTLevels = Inf,problemNum = 1, subProblems = 1,
 							...)
 {
 	
@@ -93,7 +93,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  types = "p", overlaid = FALSE , 
 		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf, layout = NULL, maxPanels = NULL ,  
-		 problemNum = 1, subProblems = 1, ...)
+		 maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {
 
 	xVars <- CSLtoVector(xVars)
@@ -153,15 +153,15 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		dataSet <- coerceToFactors(dataSet, bVars)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVars)
+		bVars <- temp$columns
 		# coerce each "by" variable to a factor
+		dataSet <- coerceToFactors(temp$data, bVars)
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	# This function is used in order to allow for "NULL" x and y labels
-	# TODO: expand the keywords that may be used
-	.nullIfnone <- function(x) { if (x == "@none") NULL else x }
 	
 	par.settings <- with(graphParams, list(
 			plot.symbol =plot.symbol, superpose.symbol = superpose.symbol,

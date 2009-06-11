@@ -18,9 +18,9 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmQQNorm <- function(obj, vars, bVars = NULL, titles = "", xLabs = "normal", yLabs, 
+nmQQNorm <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
 		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
-		...)
+		maxTLevels = Inf,	...)
 {
 	RNMGraphicsStop("Not implemeneted for this class\n")
 }
@@ -36,9 +36,9 @@ panel.nmQQNorm <- function(x, additions, ...)
 	
 }
 
-nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
+nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
 			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
-			layout = NULL, maxPanels = NULL,...)
+			layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
 {   
 	vars <- CSLtoVector(vars)
 	# we now filter variables that do not have more than one level
@@ -47,6 +47,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 	if(!all(hasSeveralValues))
 		RNMGraphicsWarning("Several columns have been detected with only a single value, dropping\n")
 	vars <- vars[hasSeveralValues]
+	uncollapsedVars <- vars
 	if(length(vars) == 0)
 		RNMGraphicsStop("None of the supplied variables had more than one value", match.call())
 	vars <- paste(vars, collapse = "+")
@@ -64,15 +65,17 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		dataSet <- coerceToFactors(dataSet, bVars)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVar)
+		dataSet <- coerceToFactors(temp$data, temp$columns)
+		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|") 
 	}
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
-	if (length(vars) > 1) scales <- list(relation=yAxisScales)
+	if (length(uncollapsedVars) * length(bVars) > 1) scales <- list(relation=yAxisScales)
 	else scales <- list()
-	
+
 	plt <- with(graphParams,
 		qqmath(as.formula(plotFormulas), main = titles, data = dataSet, 
 		panel = panel.nmQQNorm, additions = additions, xlab = xLabs, ylab = yLabs, 
@@ -81,8 +84,8 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, titles = "",
 		par.settings = list(par.xlab.text = axis.text, 
 		par.ylab.text = axis.text, par.main.text = title.text, 
 		plot.symbol = plot.symbol, strip.background = strip.bg), 
-# strip = strip, 
-		...), layout = layout)
+		 strip = getStripFun(), 
+		..., layout = layout))
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 

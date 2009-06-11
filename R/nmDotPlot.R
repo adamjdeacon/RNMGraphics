@@ -22,9 +22,9 @@
 #' @return 
 #' @author fgochez
 #' @keywords
-nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar = "ID", 
+nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
-		addLegend = TRUE, ...)   
+		addLegend = TRUE, maxTLevels = Inf, ...)   
 {
 	RNMGraphicsStop("Not implemented for this class yet \n")	
 }
@@ -32,9 +32,9 @@ nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar =
 
 # TODO: allow multiple factVars and contVars
 
-nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NULL", iVar = "ID", 
+nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID", gVar = "NULL", 
 					title = NULL, xLabs = NULL, yLabs = NULL,layout = NULL, maxPanels = numeric(0),	
-					addLegend = TRUE,		...)   
+					addLegend = TRUE, maxTLevels = Inf, ...)   
 {
 
 	# TODO : an excess of copy-paste is cropping up - try to find a way to reduce this
@@ -49,7 +49,9 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL, gVar = "NU
 	if(!is.null(bVars))
 	{
 		bVars <-CSLtoVector(bVars)
-		obj <- coerceToFactors(obj, bVars)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
+		obj <- coerceToFactors(temp$data, temp$columns)
+		bVars <- temp$columns
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	

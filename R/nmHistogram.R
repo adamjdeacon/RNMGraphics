@@ -22,8 +22,8 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmHistogram <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
+nmHistogram <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
@@ -45,15 +45,15 @@ panel.nmHistogram <- function(x, refLine, addDensity, ...)
 
 # TODO: handle simulated data
 
-nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
+nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, maxTLevels = Inf,...)
 {
 	dataSet <- nmData(obj)
 	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , breaks, nint, ...)
 }
 
-nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, ...)
+nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL,maxTLevels = Inf, ...)
 {
 	if(!(is.element(refLine, c("none", "mean", "median"))))
 		RNMGraphicsStop("Reference line parameter not valid!")
@@ -77,7 +77,9 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, refLine = "none", ty
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		dataSet <- coerceToFactors(dataSet, bVars)		
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVar)
+		dataSet <- coerceToFactors(temp$data, temp$columns)
+		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|")
 	}
 	plotList <- vector(mode = "list", length = numCombos)

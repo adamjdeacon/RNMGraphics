@@ -19,30 +19,31 @@
 #' @author fgochez
 #' @keywords hplot
 
-
 # TODO: contVarOnX does not work with overLaid = TRUE
 
-nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
+nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		problemNum = 1,...)
+		maxTLevels = Inf, problemNum = 1,...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
 setGeneric("nmBoxPlot")	
 
-nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
+nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", xLabs = NULL, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
-		problemNum = 1, ...)
+		maxTLevels = Inf, problemNum = 1, ...)
 {
 	dat <- nmData(obj)
-	nmBoxPlot(dat, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-			yLabs = NULL,overlaid = overlaid, contVarOnX = contVarOnX, problemNum = 1, ...)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(nmBoxPlot, x[-1])
 	
 }
 
-nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "", xLabs = NULL, 
-		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		problemNum = 1, ...)
+nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL,
+		maxTLevels = Inf, problemNum = 1, ...)
 {
 	
 	contVar <- CSLtoVector(contVar)
@@ -60,7 +61,9 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 	if(!is.null(bVars))
 	{
 		bVars <-CSLtoVector(bVars)
-		obj <- coerceToFactors(obj, bVars)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
+		obj <- coerceToFactors(temp$data, temp$columns)
+		bVars <- temp$columns
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	obj <- coerceToFactors(obj, factVar)
@@ -118,3 +121,4 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, titles = "
 }
 
 setMethod("nmBoxPlot", signature(obj = "data.frame"), nmBoxPlot.data.frame)
+setMethod("nmBoxPlot", signature(obj = "NMBasicModel"), nmBoxPlot.NMBasicModel)

@@ -15,8 +15,8 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmScatterMatrix <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title ="", 
-		layout = NULL, maxPanels = NULL, ...)
+nmScatterMatrix <- function(obj, vars,bVars = NULL, iVar = "ID",  addLoess = FALSE, title ="", 
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
 }
@@ -25,8 +25,8 @@ setGeneric("nmScatterMatrix")
 
 # TODO: ability to add L curve
 
-nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL,  addLoess = FALSE, title = "", 
-		layout = NULL, maxPanels = NULL, ...)
+nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",  
+		addLoess = FALSE, title = "", layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
 {
 	vars <- CSLtoVector(vars)
 	vars <- paste("'", vars, "'", sep = "")
@@ -43,7 +43,9 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL,  addLoess = FALSE
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		obj <- coerceToFactors(obj, bVars)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
+		obj <- coerceToFactors(temp$data, temp$columns)
+		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "+"), sep = "|") 
 	}	
 	graphParams <- getAllGraphParams()
