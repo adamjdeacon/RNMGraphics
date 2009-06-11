@@ -180,7 +180,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		{
 			# TODO: remove these hard-coded values
 			# TODO: fix legend
-			plotKey <- list(title = getVarDescription(gVars)$Label, columns = 3, cex=.7)
+			plotKey <- list(title = getVarDescription(gVars)$Label, rows = 10, cex=.7, space="right")
 			# add line info if type is l, o, or t
 		}
 		else plotKey <- NULL
@@ -190,10 +190,11 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		
 		scales <- list()
 		# log axes if necessary
+		# TODO: update for multiple y vars
 		if(logX[i]) scales$x <- list(log = "e", at = pretty(dataSet[[xVars[i]]]))
-		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[i]]]))
+		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[1]]]))
 		# Set axes equal if required
-		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars[i])]), na.rm=T)
+		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
 
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
@@ -205,7 +206,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
 					# TODO: move this logic out of the loop.  Also, wrap this in a function
 					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, 
-					layout = layout, ...)
+					layout = layout, multiYVar = length(yVars) > 1,...)
  				) # end with
 	}
 	gridDims <- stdGridDims(numCombos,3 )
@@ -221,7 +222,7 @@ setMethod("nmScatterPlot", signature(obj = "NMProblem"), nmScatterPlot.NMProblem
 # TODO: gVar not implemented correctly for all types other than "p"
 
 panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE), 
-		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, ...)
+		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, multiYVar = FALSE, ...)
 {
 	type <- match.arg(type)
 	# call panel.xyplot to setup first
@@ -242,33 +243,38 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	# TODO: add more comments
 	if(type == "p")
 	{
-		if(!is.null(groups))
-			panel.superpose(x = x, y = y, subscripts = subscripts, type = type, groups = groups, 
-					...)
-		else
-			panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, 
+
+		panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, groups,
 					...)
 	}
 	# lines connecting subjects
 	else if(type == "l")
 	{		
 		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )	
-		# browser()
-		panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
-				col.line = groupInfo$colours,, ...)	
+		if(is.null(groups))
+		{
+			panel.superpose(x, y, groups = idLabels, type = type, subscripts = subscripts, 
+				col.line = getGraphParams("plot.line")$col, ...)
+		}
+		else
+		{
+			panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
+					col.line = groupInfo$colours, ...)
+		}
+			
 	}
 	# lines + points connecting subjects
 	else if(type == "o")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
 		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
-		# groupInfo2 <- subjectGrouping(idLabels, groups, getGraphParams("superpose.symbol")$col )
+		
 		if(is.null(groups))
 		{
 	
 			panel.xyplot(x, y, type = "p", subscripts = subscripts, ...)
-			panel.superpose(x, y, groups = groupInfo$grouping, 
-				type = "l", subscripts = subscripts, col.line = groupInfo$colours, ...)
+			panel.superpose(x, y, groups = idLabels, 
+				type = "l", subscripts = subscripts, col = getGraphParams("plot.line")$col, ...)
 		}
 		else
 		{
@@ -282,19 +288,29 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	{
 		# TODO: allow use of "gVar"
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text")$col)
-		textopt <- getGraphParams("superpose.text")
-		ltext(x, y, idLabels[subscripts], col = groupInfo$colours , cex = textopt$cex , ...)
+		if(!is.null(groups))
+		{
+			textopt <- getGraphParams("superpose.text")
+			groupInfo <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE)
+			ltext(x, y, idLabels[subscripts], col = groupInfo$colours[subscripts] , cex = textopt$cex , ...)
+		}
+		else
+		{
+			textopt <- getGraphParams("plot.text")
+			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
+		}
 	}
 	# lines connecting identifiers
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
 		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE) 
 		if(!is.null(groups)) 
 		{
 			textopt <- getGraphParams("plot.text")
-			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)		
+			
+			ltext(x, y, col = groupInfo2$colours[subscripts] , cex = textopt$cex , ...)		
 			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
 					subscripts = subscripts, col.line = groupInfo$colours,	, ...)
 		}
@@ -304,7 +320,7 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
 			groups <- idLabels
 			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", 
-					groups = groupInfo$grouping, col.line = groupInfo$colours, ...) 
+					groups = idLabels, col.line = getGraphParams("plot.line")$col, ...) 
 		}
 	}
 

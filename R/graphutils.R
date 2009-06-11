@@ -28,23 +28,31 @@ sortByGroupings <- function(x, iVar, gVar = NULL)
 }
 
 # TODO: this does not seem to work correctly when group is not NULL
-subjectGrouping <- function(idLabels, group = NULL, superposeCol)
+subjectGrouping <- function(idLabels, group = NULL, superposeCol, expandColours = FALSE)
 {
 	if(!is.null(group))
 	{
 		grouping <- paste(group, idLabels, sep = ",")
 		groupTable <- cbind(as.factor(group), idLabels)
-		indices <- match(unique(idLabels), idLabels)
-		groupTable <- groupTable[indices,]
-		cols <- rep(superposeCol, length.out = length(unique(group)))
-		cols <- cols[as.numeric(groupTable[,1])]
+		if(!expandColours)
+		{
+			indices <- match(unique(grouping), grouping)
+			groupTable <- groupTable[indices,]
+			cols <- rep(superposeCol, length.out = length(unique(group)))
+			cols <- cols[as.numeric(groupTable[,1])]
+		}
+		else
+		{
+			cols <- rep(superposeCol, length.out = length(group))
+			cols <- cols[as.numeric(groupTable[,1])]
+		}
 	}
 	else
 	{
 		grouping <- idLabels
 		cols <- superposeCol[1]
 	}
-	return(list(grouping = grouping, colours = cols))
+	return(list(grouping = factor(grouping, ordered = TRUE, levels = unique(grouping)), colours = cols))
 }
 
 # this strip function is needed since if multiple y variables are used yet no
@@ -56,9 +64,12 @@ defaultStrip <- function(..., var.name)
 	strip.default(..., var.name = var.name, strip.names = strip.names)
 }
 
+
+# Written by R. Pugh
+# reassigns panel layout based on a maximum number of panels
 calcMaxPanels <- function(obj, maxPanels = 8) 
 {
-	if (length(maxPanels) != 1 || maxPanels[1] < 1) stop("Illegal maxPanels value")	
+	if (length(maxPanels) != 1 || maxPanels[1] < 1) RNMGraphicsStop("Illegal maxPanels value")	
 	if (length(obj$layout) | !length(obj$condlevels)) return(obj)
 	nLats <- length(cl <- obj$condlevels)
 	cLens <- sapply(cl, length)
@@ -94,4 +105,6 @@ calcMaxPanels <- function(obj, maxPanels = 8)
 	obj
 	
 }
+
+# for binning trellis variables:
 
