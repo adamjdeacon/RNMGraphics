@@ -95,7 +95,10 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf, layout = NULL, maxPanels = NULL ,  
 		 maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {
-
+	if(length(maxPanels) > 0) layout <- NULL
+	# ensure that maxPanels is numeric, even if empty
+	else maxPanels <- numeric(0)
+	
 	xVars <- CSLtoVector(xVars)
 	#RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
@@ -109,7 +112,8 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						addLegend = addLegend, addGrid = addGrid,
 						addLoess = addLoess, titles = titles, logX = logX, 
 						logY = logY, idLines = idLines, xLab = xLab,
-						yLab = yLab, types = types, equalAxisScales = equalAxisScales, ...))
+						yLab = yLab, types = types, equalAxisScales = equalAxisScales,
+						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, ...))
 	}
 	# bin the xVariable if it has more than a certain number of levels, and then use boxplot if this is the case.  Note:
 	# TODO: move this behaviour into a different package!
@@ -171,17 +175,13 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 			layout.widths = layout.widths, layout.heights = layout.heights)) 
 	stripfn <- getStripFun()
 	# at the moment, maxPanels overrides the layout
-	if(length(maxPanels) > 0) layout <- NULL
-	# ensure that maxPanels is numeric, even if empty
-	else maxPanels <- numeric(0)
+	
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[i] & gVars != "NULL")
 		{
-			# TODO: remove these hard-coded values
-			# TODO: fix legend
-			plotKey <- list(title = getVarDescription(gVars)$Label, rows = 10, cex=.7, space="right")
-			# add line info if type is l, o, or t
+			plotKey <- scatterPlotKey(getVarDescription(gVars)$Label, dataSet[[gVars]], type = types[i])
+					# list(title = getVarDescription(gVars)$Label, rows = 10, cex=.7, space="right")
 		}
 		else plotKey <- NULL
 		
@@ -202,7 +202,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 				with(graphParams, 
 					xyplot(as.formula(plotFormulas[[i]]), groups = eval(parse(text = gVars)),  
 					data = dataSet, panel = panel.nmScatterPlot, featuresToAdd = featuresToAdd, 
-					auto.key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
+					key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
 					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
 					# TODO: move this logic out of the loop.  Also, wrap this in a function
 					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, 
@@ -304,13 +304,13 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
-		groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE) 
+		 
 		if(!is.null(groups)) 
 		{
-			textopt <- getGraphParams("plot.text")
-			
-			ltext(x, y, col = groupInfo2$colours[subscripts] , cex = textopt$cex , ...)		
+			textopt <- getGraphParams("superpose.text")
+			groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+			groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE)
+			ltext(x, y, idLabels[subscripts], col = groupInfo2$colours[subscripts] , cex = textopt$cex , ...)		
 			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
 					subscripts = subscripts, col.line = groupInfo$colours,	, ...)
 		}
