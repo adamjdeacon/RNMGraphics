@@ -42,7 +42,7 @@ nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
 		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		xBin = Inf, layout = NULL, maxPanels = NULL,problemNum = 1, subProblems = 1,
+		xBin = Inf, layout = NULL, maxPanels = NULL, problemNum = 1, subProblems = 1,
 		...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")

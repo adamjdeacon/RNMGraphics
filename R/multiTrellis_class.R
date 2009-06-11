@@ -46,7 +46,7 @@ plotSingletonmultiTrellis <- function(object)
 		object@plots[[1]]$as.table <- as.table
 	if(length(object@maxPanels) > 0)
 	{
-		object@plots[[1]] <- calcMaxPanels(object@plots[[1]])
+		object@plots[[1]] <- calcMaxPanels(object@plots[[1]], maxPanels)
 	}
 	print(object@plots[[1]])
 }
