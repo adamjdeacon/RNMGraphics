@@ -44,10 +44,17 @@ scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
 	}
 	else
 	{
-		result <- list(space = "right", text =  list(as.character(sort(gVarLevels)), 
-						col = getGraphParams("superpose.text")$col[1:length(gVarLevels)] ),
-				
-			title = gVar, cex = 0.7, rows = 10) 
+		result <- with(graphParams,
+					{ 
+						textCol = rep(superpose.text$col, length.out = numLevels)
+						lineCol = rep(superpose.line$col, length.out = numLevels)
+						lineStyle = rep(superpose.line$lty, length.out = numLevels)
+						x <- list(space = "right", text =  list(as.character(sort(gVarLevels)), 
+						col = textCol ),title = gVar, cex = 0.7, rows = 10)
+						if(type == "t") x$lines <- list(col = lineCol, lty = lineStyle)
+						x
+					}
+				)
 	}
 	result
 }
