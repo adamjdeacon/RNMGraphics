@@ -20,7 +20,8 @@ initializeOptions <- function()
 	
 	superpose.symbol <- list(cex = rep(0.8, 7), 
 			col =  grey.colors(7),	pch = rep(c(1, 2, 19), length.out = 8) )
-	superpose.line <- list(alpha = 1, col = topo.colors(8), lty = rep(1, 8), lwd = rep(1, 8))
+	superpose.line <- list(alpha = 1, col = c("#0080ff", "#ff00ff",  "darkgreen","#ff0000",  "orange", "#00ff00","brown")  , 
+			lty = rep(1, 8), lwd = rep(1, 8))
 	
 	# controls padding and layout of panels
 	layout.widths <- list(left.padding = 1, right.padding = 1, axis.ylab.padding = 1,
@@ -36,7 +37,7 @@ initializeOptions <- function()
 			plot.symbol = list(alpha = 0.75, cex = 0.8, col = "darkblue", fill = "black", pch = 21), 
 			plot.line = list(alpha = 0.8, col = "darkblue", lty = 1, lwd = 1),	
 			plot.text = list(alpha = 1, cex = 1, col = "black"),
-			superpose.text = list(alpha = 1, cex = 1, col = superpose.line$col),
+			superpose.text = list(alpha = rep(1, 8), cex = rep(1, 8), col = superpose.line$col),
 			loess.line = list(lwd = 1.5, col = "darkred"),
 			barchart = superpose.polygon,
 			histogram = hist,
