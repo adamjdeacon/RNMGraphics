@@ -7,7 +7,7 @@
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
-		yLab = NULL, types = "p", equalAxisScales = FALSE, ...)
+		yLab = NULL, types = "p", equalAxisScales = FALSE, maxPanels = NULL, layout = NULL, maxTLevels, ...)
 {
 	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")
@@ -32,7 +32,10 @@
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		obj <- coerceToFactors(obj, bVars)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVars)
+		bVars <- temp$columns
+		# coerce each "by" variable to a factor
+		obj <- coerceToFactors(temp$data, bVars)
 		# coerce each "by" variable to a factor
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
@@ -43,7 +46,8 @@
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[1])
-			plotKey <- list(title = "Variable", cex=.7, rows = 10, space = "right")
+			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i])
+					# list(title = "Variable", cex=.7, rows = 10, space = "right")
 		else plotKey <- NULL
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(obj[[iVars[i]]], times = length(yVars))
 		
@@ -60,21 +64,21 @@
 				with(graphParams, 
 				xyplot(as.formula(plotFormulas[[i]]), stack = TRUE,
 						data = obj, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
-						auto.key = plotKey, main = titles[[i]], idLabels = idLabels,
+						key = plotKey, main = titles[[i]], idLabels = idLabels,
 						xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
 						par.settings = list(
 						superpose.symbol = superpose.symbol,
 						par.xlab.text = axis.text, par.ylab.text = axis.text,
 						par.main.text = title.text, plot.line = plot.line,
 						add.line = refline, strip.background = strip.bg), 
-				strip = strip$stripfun, ...)
+				strip = strip$stripfun, layout = layout, ...)
 )
 	}
 	gridDims <- numeric(2)
 	gridDims[2] <- min(3, length(plotList) )
 	gridDims[1] <- ceiling(numCombos / gridDims[2])
 	
-	result <- multiTrellis(plotList, gridDims)
+	result <- multiTrellis(plotList, gridDims, maxPanels = maxPanels)
 	result
 }
 
@@ -115,7 +119,7 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		textopt <- getGraphParams("plot.text")
+		textopt <- getGraphParams("superpose.text")
 		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
 		groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE) 
 		
