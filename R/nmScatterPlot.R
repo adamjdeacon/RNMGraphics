@@ -42,7 +42,9 @@ nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
 		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		xBin = Inf, layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1,
+		xBin = Inf, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		yAxisRelations = c("same", "free", "sliced"),
+		problemNum = 1, subProblems = 1,
 		...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
@@ -54,7 +56,7 @@ nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
 							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
 							equalYScales = TRUE, xBin = Inf, layout = NULL, maxPanels = NULL, 
-							maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -71,7 +73,8 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
 							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
 							equalYScales = TRUE, xBin = Inf,layout = NULL, maxPanels = NULL , 
-							maxTLevels = Inf,problemNum = 1, subProblems = 1,
+							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
+							problemNum = 1, subProblems = 1,
 							...)
 {
 	
@@ -93,7 +96,8 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  types = "p", overlaid = FALSE , 
 		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf, layout = NULL, maxPanels = NULL ,  
-		 maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+		 maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), 
+		 problemNum = 1, subProblems = 1, ...)
 {
 	if(length(maxPanels) > 0) layout <- NULL
 	# ensure that maxPanels is numeric, even if empty
@@ -188,14 +192,15 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		# get idLabels.  Note that these will have to be repeated if there is more than one yvar
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], length(yVars) ) 
 		
-		scales <- list()
+		scales <- list(x = list(), y = list())
 		# log axes if necessary
 		# TODO: update for multiple y vars
 		if(logX[i]) scales$x <- list(log = "e", at = pretty(dataSet[[xVars[i]]]))
 		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[1]]]))
 		# Set axes equal if required
+		# TODO check that this really works with multiple y axes
 		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
-
+		if(length(yVars) > 1 || length(bVars) > 0) scales$y$relation <- yAxisRelations
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
 		plotList[[i]] <- 
