@@ -73,7 +73,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
-	if (length(uncollapsedVars) * length(bVars) > 1) scales <- list(relation=yAxisScales)
+	if (length(uncollapsedVars) > 1 | length(bVars) > 0) scales <- list(relation=yAxisScales)
 	else scales <- list()
 
 	plt <- with(graphParams,
