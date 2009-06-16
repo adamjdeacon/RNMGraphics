@@ -29,6 +29,16 @@ nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "
 	RNMGraphicsStop("Not implemented for this class yet \n")	
 }
 
+nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
+		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
+		addLegend = TRUE, maxTLevels = Inf, ...)
+{
+	dataSet <- nmData(obj)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(nmDotPlot, x[-1])
+}
 
 # TODO: allow multiple factVars and contVars
 
@@ -81,13 +91,13 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	if(length(maxPanels) > 0) layout <- NULL
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
-	
-	auto.key <- if(addLegend) list(title = gVar, cex=.7, rows=10,space="right") else NULL
+	# TODO: at the moment, title = gVar rather than its label.  This is because 
+	# the full description often causes overflows (e.g. when gVar = EVID)
+	auto.key <- if(addLegend) list(title =gVar, cex=.7, rows=10,space="right") else NULL
 
 	for(i in seq_along(plotFormulas))
 	{
-		# TODO: strip is broken, don't know why
-		# TODO: strip background colour not being captured!
+		
 		plotList[[i]] <- 
 				dotplot(as.formula(plotFormulas[i]), data = obj, main = title, xlab = xLabs[i], 
 						ylab = yLabs[i], auto.key = auto.key, groups = eval(parse(text = gVar)),
@@ -102,3 +112,4 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 
 setGeneric("nmDotPlot")
 setMethod("nmDotPlot", signature(obj = "data.frame"), nmDotPlot.data.frame)
+setMethod("nmDotPlot", signature(obj = "NMBasicModel"), nmDotPlot.NMBasicModel)
