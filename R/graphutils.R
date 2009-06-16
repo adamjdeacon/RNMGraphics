@@ -4,6 +4,16 @@
 # Author: fgochez
 ###############################################################################
 
+# safe version of getVarLabel - extracts the label associated to a variable, unless there is none
+# in which case the name of the varible is replaced
+
+getVarLabel <- function(varName, useVarNameifMissing = TRUE)
+{
+	lab <- getVarDescription(varName)$Label
+	if(length(lab) == 0 && useVarNameifMissing)
+		return(varName)
+	lab
+}
 
 stdGridDims <- function(numPlots, maxColumns )
 {
@@ -22,37 +32,34 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 	as.matrix(expand.grid(xVars, yVars))
 }
 
-sortByGroupings <- function(x, iVar, gVar = NULL)
-{
-	
-}
 
-# TODO: this does not seem to work correctly when group is not NULL
-subjectGrouping <- function(idLabels, group = NULL, superposeCol, expandColours = FALSE)
+subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandElements = FALSE)
 {
 	if(!is.null(group))
 	{
 		grouping <- paste(group, idLabels, sep = ",")
 		groupTable <- cbind(as.factor(group), idLabels)
-		if(!expandColours)
+		if(!expandElements)
 		{
 			indices <- match(unique(grouping), grouping)
 			groupTable <- groupTable[indices,]
-			cols <- rep(superposeCol, length.out = length(unique(group)))
-			cols <- cols[as.numeric(groupTable[,1])]
+			elts <- lapply(superposeElements, rep, length.out = length(unique(group)))
+			# cols <- rep(superposeCol, length.out = length(unique(group)))
+			elts <- lapply(elts, function(x) x[as.numeric(groupTable[,1])])
+			# cols <- cols[as.numeric(groupTable[,1])]
 		}
 		else
 		{
-			cols <- rep(superposeCol, length.out = length(group))
-			cols <- cols[as.numeric(groupTable[,1])]
+			elts <- lapply(superposeElements, rep, length.out = length(group))
+			elts <- lapply(elts, function(x) x[as.numeric(groupTable[,1])])
 		}
 	}
 	else
 	{
 		grouping <- idLabels
-		cols <- superposeCol[1]
+		elts <- lapply(superposeElements, function(x) x[1])
 	}
-	return(list(grouping = factor(grouping, ordered = TRUE, levels = unique(grouping)), colours = cols))
+	return(list(grouping = factor(grouping, ordered = TRUE, levels = unique(grouping)), elements = elts))
 }
 
 # this strip function is needed since if multiple y variables are used yet no
@@ -105,6 +112,4 @@ calcMaxPanels <- function(obj, maxPanels = 8)
 	obj
 	
 }
-
-# for binning trellis variables:
 

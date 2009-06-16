@@ -252,19 +252,20 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, groups,
 					...)
 	}
-	# lines connecting subjects
+	# TODO: capture all line parameters
 	else if(type == "l")
 	{		
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )	
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line"))	
 		if(is.null(groups))
 		{
+			plot.line <- getGraphParams("plot.line")
 			panel.superpose(x, y, groups = idLabels, type = type, subscripts = subscripts, 
-				col.line = getGraphParams("plot.line")$col, ...)
+				col.line = plot.line$col, col.lwd = plot.line$lwd, lty = plot.line$lty, ...)
 		}
 		else
 		{
 			panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
-					col.line = groupInfo$colours, ...)
+					col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)
 		}
 			
 	}
@@ -272,20 +273,21 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	else if(type == "o")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line") )
 		
 		if(is.null(groups))
 		{
-	
+			plot.line <- getGraphParams("plot.line")
 			panel.xyplot(x, y, type = "p", subscripts = subscripts, ...)
 			panel.superpose(x, y, groups = idLabels, 
-				type = "l", subscripts = subscripts, col = getGraphParams("plot.line")$col, ...)
+				type = "l", subscripts = subscripts, col = plot.line$col, 
+				lty = plot.line$lty, lwd = plot.line$lwd, ...)
 		}
 		else
 		{
 			panel.superpose(x, y, groups = groups, type = "p", subscripts = subscripts, ...)
-			panel.superpose(x, y, groups = groupInfo$grouping, 
-					type = "l", subscripts = subscripts, col.line = groupInfo$colours, ...)
+			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", subscripts = subscripts, 
+					col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)
 		}
 	}
 	# subject identifiers
@@ -296,8 +298,8 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		if(!is.null(groups))
 		{
 			textopt <- getGraphParams("superpose.text")
-			groupInfo <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE)
-			ltext(x, y, idLabels[subscripts], col = groupInfo$colours[subscripts] , cex = textopt$cex , ...)
+			groupInfo <- subjectGrouping(idLabels, groups, textopt, expand = TRUE)
+			ltext(x, y, idLabels[subscripts], col = groupInfo$elements$col[subscripts] , cex = groupInfo$elements$cex[subscripts] , ...)
 		}
 		else
 		{
@@ -313,19 +315,22 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		if(!is.null(groups)) 
 		{
 			textopt <- getGraphParams("superpose.text")
-			groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
-			groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE)
-			ltext(x, y, idLabels[subscripts], col = groupInfo2$colours[subscripts] , cex = textopt$cex , ...)		
+			groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line"))
+			groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expand = TRUE)
+			ltext(x, y, idLabels[subscripts], col = groupInfo2$elements$col[subscripts] ,
+					groupInfo2$elements$cex[subscripts], ...)		
 			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
-					subscripts = subscripts, col.line = groupInfo$colours,	, ...)
+					subscripts = subscripts, col.line = groupInfo$elements$col,
+					lty = groupInfo$elements$lty , lwd = groupInfo$elements$lwd,  ...)
 		}
 		else
 		{
+			plot.line <- getGraphParams("plot.line")
 			textopt <- getGraphParams("plot.text")
 			ltext(x, y, idLabels[subscripts], col = textopt$col , cex = textopt$cex , ...)
 			groups <- idLabels
 			panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", 
-					groups = idLabels, col.line = getGraphParams("plot.line")$col, ...) 
+					groups = idLabels, col.line = plot.line$col, lty = plot.line$lty, lwd = plot.line$lwd, ...) 
 		}
 	}
 

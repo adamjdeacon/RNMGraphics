@@ -104,38 +104,39 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	{
 		#TODO: fix colours here, as they ignore the different y-variables
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text")$col, expandColours = TRUE)
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text"), expand= TRUE)
 		textopt <- getGraphParams("superpose.text")
-		
-		ltext(x, y, idLabels[subscripts], col = groupInfo$colours[subscripts] , cex = textopt$cex , ...)		
+		ltext(x, y, idLabels[subscripts], col = groupInfo$elements$col[subscripts] , cex = groupInfo$elements$cex[subscripts] , ...)
 	}
 	else if(type == "l")
 	{
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line"))
 		panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
-				col.line = groupInfo$colours, ...)	
-		
+				col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)		
 	}
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
 		textopt <- getGraphParams("superpose.text")
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
-		groupInfo2 <- subjectGrouping(idLabels, groups, textopt$col, expandColours = TRUE) 
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line") )
+		groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expand = TRUE) 
 		
-		ltext(x, y, idLabels[subscripts], col = groupInfo2$colours[subscripts] , cex = textopt$cex , ...)
-		panel.superpose(x = x, y = y, subscripts = subscripts, type = "l", 
-					groups = groupInfo$grouping, col.line = groupInfo$colours, ...) 
+		ltext(x, y, idLabels[subscripts], col = groupInfo2$elements$col[subscripts] ,
+				groupInfo2$elements$cex[subscripts], ...)		
+		
+		panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 
+				subscripts = subscripts, col.line = groupInfo$elements$col,
+				lty = groupInfo$elements$lty , lwd = groupInfo$elements$lwd,  ...)
 	}
 	else if(type == "o")
 	{
 		
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line")$col )
+		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line") )
 
 		panel.superpose(x, y, groups = groups, type = "p", subscripts = subscripts, ...)
-		panel.superpose(x, y, groups = groupInfo$grouping, 
-				type = "l", subscripts = subscripts, col.line = groupInfo$colours, ...)
+		panel.superpose(x, y, groups = groupInfo$grouping, type = "l", subscripts = subscripts, 
+				col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)
 	}
 	if(featuresToAdd["loess"])
 	{
