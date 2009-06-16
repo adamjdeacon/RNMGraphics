@@ -99,9 +99,7 @@ timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVa
 	varMapping = c("tVar" = tVar, "doseVar" = doseVar, "evtVar" = evtVar)
 	graphParams <- getAllGraphParams()
 	plotKey <- list(text = list(c("Concentration", "Dose"), space = "right"),
-			lines = list(lty = 1:2, col = c(graphParams$plot.line$col, "black")))
-#	plotKey <- list(text = c("Concentration", "Dose"), lines = TRUE,
-		#points = FALSE, lty = 1:2, col = c("darkblue", "black"))
+			lines = list(lty = 1:2, col = c(graphParams$plot.line$col, "black")), cex = 0.7)
 	plt <- with(graphParams, 
 			xyplot(as.formula(form), type = "l", data = obj,
 				par.settings = list(
