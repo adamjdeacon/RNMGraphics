@@ -35,7 +35,7 @@ nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "I
 {
 	dat <- nmData(obj)
 	x <- as.list(match.call())
-	x$obj <- dataSet
+	x$obj <- dat
 	
 	do.call(nmBoxPlot, x[-1])
 	
@@ -90,7 +90,8 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 		lev <- levels(obj[[factVar]])
 		df <- data.frame(y = stackedData$values, x = rep(obj[[factVar]], length(contVar)), which = gl(length(contVar), length(obj[[factVar]])))	
 		bwplot(y ~ x:which, data = df, horizontal = FALSE, ylab = NULL, xlab = factVar, groups = which,
-				panel = panel.superpose, panel.groups = panel.bwplot, pch = "|", key = simpleKey(contVar, points = FALSE, rectangles = TRUE),
+				panel = panel.superpose, panel.groups = panel.bwplot, pch = "|", 
+				key = simpleKey(contVar, points = FALSE, rectangles = TRUE, space = "right", cex = 0.7),
 				scales = list(x = list(labels = rep(lev, each = length(contVar)))))
 	}
 	else
