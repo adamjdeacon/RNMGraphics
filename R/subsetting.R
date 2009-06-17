@@ -1,6 +1,6 @@
 # TODO: Add comment
 #  $Rev$
-#  $LastChangeDate: $
+#  $LastChangedDate$
 # Author: fgochez
 ###############################################################################
 
