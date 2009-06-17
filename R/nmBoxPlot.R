@@ -23,7 +23,7 @@
 
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, problemNum = 1,...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
@@ -31,7 +31,7 @@ setGeneric("nmBoxPlot")
 
 nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", xLabs = NULL, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, problemNum = 1, ...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, ...)
 {
 	dat <- nmData(obj)
 	x <- as.list(match.call())
@@ -43,11 +43,19 @@ nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "I
 
 nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf, problemNum = 1, ...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1, ...)
 {
 	
 	contVar <- CSLtoVector(contVar)
 	factVar <- CSLtoVector(factVar)
+	
+	RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
+	# bin the x variable if necessary
+	if(length(unique(obj[[factVar]])) > factBin)
+		obj <- addDerivedCategorical(obj, factVar, paste(factVar, "BINNED", sep = "."), 
+				breaks = factBin, binType = "counts")
+	
+	factVar <- paste(factVar, "BINNED", sep = ".")
 	
 	contVarCollapsed <- paste(contVar, collapse = "+")
 	if(!contVarOnX)
@@ -97,12 +105,14 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	else
 	{
 		stripfn = getStripFun()
+		scales <- list(x = list(), y = list())
+		if(length(contVar) > 1 | length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
 		for(i in seq_along(plotFormulas))
 			plotList[[i]] <- 
 			with(graphParams,
 				# TODO: passing options this way is getting unwieldy
 				bwplot(as.formula(plotFormulas[[i]]), data = obj, main = titles[[i]], 
-						xlab = xLabs[i], horizontal = contVarOnX, 
+						xlab = xLabs[i], horizontal = contVarOnX, scales = scales, 
 					 ylab = yLabs[i], par.settings = list(plot.symbol = plot.symbol,
 				 		par.xlab.text = axis.text,
 						par.ylab.text = axis.text,par.main.text = title.text,

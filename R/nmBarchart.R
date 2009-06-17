@@ -18,33 +18,41 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmBarChart <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, addLegend = TRUE, ...)
+nmBarChart <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, addLegend = TRUE 
+					   ,xBin = Inf ,...)
 {
 	RNMGraphicsStop("Not implemented for this class!", call = match.call())
 }
 
 setGeneric("nmBarChart")
 
-nmBarChart.NMBasicModel<- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, 
-		addLegend = TRUE, ...)
+nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, 
+		addLegend = TRUE, xBin = Inf, ...)
 {
 	callList <- as.list(match.call())
 	callList$obj <- nmData(obj)
+	graphSubset(callList$obj) <- graphSubset(obj)
 	do.call(nmBarChart, callList[-1])
 }
 
 # TODO: add bVars?
+# TODO: test xBin
 
-nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = "", addLegend = TRUE, ...)
+nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = "", 
+		addLegend = TRUE, xBin = Inf, ...)
 {
 	xVars <- CSLtoVector(xVars)
-	# yVars <- # paste(CSLtoVector(yVars), collapse = "+")
+	RNMGraphicsStopifnot(length(xVars) == 1, "Currently not accepting more than one x variable\n")
 	yVars <- CSLtoVector(yVars)
-	
+	obj <- applyGraphSubset(obj)
+	# bin the x variable if necessary
+	if(length(unique(obj[[xVars]])) > xBin)
+		obj <- addDerivedCategorical(obj, xVars, paste(xVars, "BINNED", sep = "."), breaks = xBin, binType = "counts")
+	xVars <- paste(xVars, "BINNED", sep = ".")
 	# take all combinations of x variables against y variables
 	varCombos <- as.matrix(expand.grid(yVars, xVars))
 	numCombos <- nrow(varCombos)
-	# browser()
+
 	if(!is.null(xLab))
 		xLab <- rep(CSLtoVector(xLab), length.out = numCombos)
 	else
