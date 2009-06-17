@@ -81,7 +81,7 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 	dataSet <- applyGraphSubset(nmData(obj, subProblems = subProblems), graphSubset(obj))
 	x <- as.list(match.call())
 	x$obj <- dataSet
-	
+
 	do.call(nmScatterPlot, x[-1])
 	
 }
@@ -106,7 +106,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	#RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
 	# TODO eliminate this copy
-	dataSet <- applyGraphSubset(nmData(obj, subProblems = subProblems), graphSubset(obj))
+	dataSet <- applyGraphSubset(obj, graphSubset(obj))
 	
 	if(overlaid)
 	{
