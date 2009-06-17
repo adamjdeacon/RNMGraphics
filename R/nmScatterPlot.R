@@ -78,12 +78,11 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							...)
 {
 	
-	dataSet <- nmData(obj, subProblems = subProblems)
-	
+	dataSet <- applyGraphSubset(nmData(obj, subProblems = subProblems), graphSubset(obj))
 	x <- as.list(match.call())
 	x$obj <- dataSet
 	
-	do.call(nmScatterPlot.data.frame, x[-1])
+	do.call(nmScatterPlot, x[-1])
 	
 }
 
@@ -107,7 +106,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	#RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
 	# TODO eliminate this copy
-	dataSet <- obj
+	dataSet <- applyGraphSubset(nmData(obj, subProblems = subProblems), graphSubset(obj))
 	
 	if(overlaid)
 	{
@@ -200,7 +199,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		# Set axes equal if required
 		# TODO check that this really works with multiple y axes
 		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
-		if(length(yVars) > 1 || length(bVars) > 0) scales$y$relation <- yAxisRelations
+		if(length(yVars) > 1 || length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
 		plotList[[i]] <- 
