@@ -43,6 +43,9 @@
 			list(addLegend, addGrid, addLoess, titles, logX, logY, idLines ,types,yVarsCollapsed, equalAxisScales), length.out = numCombos )
 	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
 	graphParams <- getAllGraphParams()
+
+	par.settings <- mapTopar.settings(graphParams)
+
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[1])
@@ -66,11 +69,7 @@
 						data = obj, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
 						key = plotKey, main = titles[[i]], idLabels = idLabels,
 						xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
-						par.settings = list(
-						superpose.symbol = superpose.symbol,
-						par.xlab.text = axis.text, par.ylab.text = axis.text,
-						par.main.text = title.text, plot.line = plot.line,
-						add.line = refline, strip.background = strip.bg), 
+						par.settings = par.settings, 
 				strip = strip$stripfun, layout = layout, ...)
 )
 	}
