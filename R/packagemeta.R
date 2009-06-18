@@ -51,14 +51,3 @@ getStripFun <- function()
 	.RNMGraphicsEnv$graphPars[["strip"]]$stripfun
 }
 
-# gets a subset of the graphical settings that map directly to lattice settings.
-
-mapTopar.settings <- function()
-{
-	with(getAllGraphParams(), list(
-					plot.symbol =plot.symbol, superpose.symbol = superpose.symbol,
-					par.xlab.text = axis.text, par.ylab.text = axis.text,
-					par.main.text = title.text, plot.line = plot.line,
-					add.line = refline, strip.background = strip.bg, 
-					layout.widths = layout.widths, layout.heights = layout.heights)) 
-}
