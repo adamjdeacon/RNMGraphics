@@ -67,3 +67,16 @@ CSLtoVector <- function(txt, sep =",", removeBlank = TRUE, removeEmpty = FALSE)
 	}
 	outTxt
 }
+
+# utility function that maps RNMGraphics settings to trellis settings 
+# assumes that settings has all of the settings
+mapTopar.settings <- function(settings = getAllGraphParams())
+{
+	
+	with(settings, 
+			list(plot.symbol =plot.symbol, superpose.symbol = superpose.symbol,
+					par.xlab.text = axis.text, par.ylab.text = axis.text,
+					par.main.text = title.text, plot.line = plot.line,
+					add.line = refline, strip.background = strip.bg, 
+					layout.widths = layout.widths, layout.heights = layout.heights)) 
+}
