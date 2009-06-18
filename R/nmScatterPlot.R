@@ -170,12 +170,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	graphParams <- getAllGraphParams()
 	# This function is used in order to allow for "NULL" x and y labels
 	
-	par.settings <- with(graphParams, list(
-			plot.symbol =plot.symbol, superpose.symbol = superpose.symbol,
-			par.xlab.text = axis.text, par.ylab.text = axis.text,
-			par.main.text = title.text, plot.line = plot.line,
-			add.line = refline, strip.background = strip.bg, 
-			layout.widths = layout.widths, layout.heights = layout.heights)) 
+	par.settings <- mapTopar.settings()
 	stripfn <- getStripFun()
 	# at the moment, maxPanels overrides the layout
 	
