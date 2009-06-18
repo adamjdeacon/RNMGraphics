@@ -28,13 +28,13 @@ initializeOptions <- function()
 		axis.right = 1, axis.left = 0.9)
 	layout.heights <- list(bottom.padding = 1, top.padding = 1, axis.xlab.padding = 0.8,
 			axis.top = 0.8, axis.bottom = 0.9) 
-	
+	legend = list(position = "right", cex = 0.7)
 	panelLayout = list(layout = numeric(0))
 	
 	.RNMGraphicsEnv$graphPars <- 
 		list(superpose.symbol = superpose.symbol,
 			superpose.line = superpose.line,
-			plot.symbol = list(alpha = 0.75, cex = 0.8, col = "darkblue", fill = "black", pch = 21), 
+			plot.symbol = list(alpha = 0.75, cex = 0.8, col = "darkblue", fill = "black", pch = 1), 
 			plot.line = list(alpha = 0.8, col = "darkblue", lty = 1, lwd = 1),	
 			plot.text = list(alpha = 1, cex = 1, col = "black"),
 			superpose.text = list(alpha = rep(1, 8), cex = rep(1, 8), col = superpose.line$col),
@@ -55,9 +55,7 @@ initializeOptions <- function()
 			panelMisc = list("as.table" = TRUE), 
 			strip = list(stripfun = defaultStrip, strip.bg = rev(grey.colors(4)))
 		)
-	
-
-	.RNMGraphicsEnv$defaultSubset <- "EVID == 1"
+	.RNMGraphicsEnv$defaultSubset <- c("MDV != 1", "EVID == 0", "AMT <= 0") 
 }
 
 # TODO: move this to the header of PopPKPD
