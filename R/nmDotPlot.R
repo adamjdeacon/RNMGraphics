@@ -34,6 +34,7 @@ nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "
 		addLegend = TRUE, maxTLevels = Inf, ...)
 {
 	dataSet <- nmData(obj)
+	graphSubset(dataSet) <- graphSubset(obj)
 	x <- as.list(match.call())
 	x$obj <- dataSet
 	
@@ -55,7 +56,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	numCombos <- nrow(varCombos)
 	
 	plotFormulas <- apply(varCombos, 1, paste, collapse = "~")
-	
+	obj <- applyGraphSubset(obj, graphSubset(obj))
 	if(!is.null(bVars))
 	{
 		bVars <-CSLtoVector(bVars)
