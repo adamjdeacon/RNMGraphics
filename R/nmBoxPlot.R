@@ -51,11 +51,12 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	
 	RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
 	# bin the x variable if necessary
-	if(length(unique(obj[[factVar]])) > factBin)
+	if(length(unique(obj[[factVar]])) > factBin) {
 		obj <- addDerivedCategorical(obj, factVar, paste(factVar, "BINNED", sep = "."), 
 				breaks = factBin, binType = "counts")
 	
-	factVar <- paste(factVar, "BINNED", sep = ".")
+		factVar <- paste(factVar, "BINNED", sep = ".")
+	}
 	
 	contVarCollapsed <- paste(contVar, collapse = "+")
 	if(!contVarOnX)
