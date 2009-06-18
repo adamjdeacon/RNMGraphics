@@ -46,9 +46,10 @@ nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, t
 	yVars <- CSLtoVector(yVars)
 	obj <- applyGraphSubset(obj)
 	# bin the x variable if necessary
-	if(length(unique(obj[[xVars]])) > xBin)
+	if(length(unique(obj[[xVars]])) > xBin) {
 		obj <- addDerivedCategorical(obj, xVars, paste(xVars, "BINNED", sep = "."), breaks = xBin, binType = "counts")
-	xVars <- paste(xVars, "BINNED", sep = ".")
+		xVars <- paste(xVars, "BINNED", sep = ".")
+	}
 	# take all combinations of x variables against y variables
 	varCombos <- as.matrix(expand.grid(yVars, xVars))
 	numCombos <- nrow(varCombos)
