@@ -27,26 +27,45 @@
 #' @keywords hplot
 
 nmACPlot <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
-		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, ...)
+		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, 
+		problemNum = 1, subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
 
+
 setGeneric("nmACPlot")
 
-nmACPlot.NMBasicModel <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
-		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, ...)
+nmACPlot.NMRun <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
+		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, 
+		problemNum = 1, subProblems = 1, ...)
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmACPlot, x[-1])
+}
+
+setMethod("nmACPlot", signature(obj = "NMRun"), nmACPlot.NMRun)
+
+
+nmACPlot.NMProblem <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
+		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, 
+		problemNum = 1, subProblems = 1, ...)
 {
 	
 	funcCall <- as.list(match.call())[-1]
-	dataSet <- nmData(obj)
+	dataSet <- nmData(obj, subProblemNum = subProblems)
 	graphSubset(dataSet) <- graphSubset(obj)
 	funcCall$obj <- dataSet
 	do.call(nmACPlot, funcCall)
 }
-setMethod("nmACPlot", signature(obj = "NMBasicModel"), nmACPlot.NMBasicModel)
+
+setMethod("nmACPlot", signature(obj = "NMProblem"), nmACPlot.NMProblem)
+
 nmACPlot.data.frame <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
-		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, ...)
+		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, 
+		problemNum = 1, subProblems = 1, ...)
 {
 	
 	# lag while preserving the ID structure

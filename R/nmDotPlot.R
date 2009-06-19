@@ -29,16 +29,30 @@
 
 nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
-		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, ...)   
+		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, problemNum = 1, subProblems = 1,
+		...)   
 {
 	RNMGraphicsStop("Not implemented for this class yet \n")	
 }
-# TODO: unit test maxFactPerPanel
-nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
+
+nmDotPlot.NMRun <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
-		addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  ...)
+		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, problemNum = 1, subProblems = 1,
+		...)   
 {
-	dataSet <- nmData(obj)
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmDotPlot, x[-1])
+}
+
+# TODO: unit test maxFactPerPanel
+nmDotPlot.NMProblem  <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
+		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
+		addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  
+		problemNum = 1, subProblems = 1,...)
+{
+	dataSet <- nmData(obj, sumProblemNum = subProblems)
 	graphSubset(dataSet) <- graphSubset(obj)
 	x <- as.list(match.call())
 	x$obj <- dataSet
@@ -49,7 +63,8 @@ nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "
 
 nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID", gVar = "NULL", 
 					title = NULL, xLabs = NULL, yLabs = NULL,layout = NULL, maxPanels = numeric(0),	
-					addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  ...)   
+					addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  
+					problemNum = 1, subProblems = 1,...)   
 {
 
 
@@ -158,4 +173,6 @@ panel.nmDotPlot <- function(x, y, ... )
 
 setGeneric("nmDotPlot")
 setMethod("nmDotPlot", signature(obj = "data.frame"), nmDotPlot.data.frame)
-setMethod("nmDotPlot", signature(obj = "NMBasicModel"), nmDotPlot.NMBasicModel)
+setMethod("nmDotPlot", signature(obj = "NMProblem"), nmDotPlot.NMProblem)
+setMethod("nmDotPlot", signature(obj = "NMRun"), nmDotPlot.NMRun)
+

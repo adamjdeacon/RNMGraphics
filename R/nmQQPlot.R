@@ -20,27 +20,46 @@
 
 nmQQNorm <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
 		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf,	...)
+		maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemeneted for this class\n")
 }
 
+nmQQNorm.NMRun <-function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
+		xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmScatterMatrix, x[-1])
+}
+
+nmQQNorm.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
+		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
+		maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+{
+	dataSet <- nmData(obj, subProblemNum = subProblems)
+	graphSubset(dataSet) <- graphSubset(obj)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(nmScatterMatrix, x[-1])
+	
+	RNMGraphicsStop("Not implemeneted for this class\n")
+}
+
+
 setGeneric("nmQQNorm")
 
-panel.nmQQNorm <- function(x, additions, ...)
-{
-	reflineOpts <- getGraphParams("refline")
-	panel.qqmath(x,...)
-	if(additions["qqLine"])
-		panel.qqmathline(x, col = reflineOpts$col, lwd = reflineOpts$lwd, lty = reflineOpts$lty)
-	
-}
+
 
 nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
 			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
-			layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
+			layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {   
 	vars <- CSLtoVector(vars)
+	obj <- applyGraphSubset(obj)
 	# we now filter variables that do not have more than one level
 	# TODO: UNITTEST
 	hasSeveralValues <- sapply(vars, function(n) length(unique(obj[,n])) > 1)
@@ -90,3 +109,13 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 }
 
 setMethod("nmQQNorm", signature(obj = "data.frame") , nmQQNorm.data.frame)
+
+
+panel.nmQQNorm <- function(x, additions, ...)
+{
+	reflineOpts <- getGraphParams("refline")
+	panel.qqmath(x,...)
+	if(additions["qqLine"])
+		panel.qqmathline(x, col = reflineOpts$col, lwd = reflineOpts$lwd, lty = reflineOpts$lty)
+	
+}

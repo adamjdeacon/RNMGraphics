@@ -19,18 +19,28 @@
 #' @keywords hplot
 
 nmBarChart <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = NULL, addLegend = TRUE 
-					   ,xBin = Inf ,...)
+					   ,xBin = Inf , problemNum = 1, subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemented for this class!", call = match.call())
 }
 
 setGeneric("nmBarChart")
 
-nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0 , yLab = NULL, titles = NULL, 
-		addLegend = TRUE, xBin = Inf, ...)
+nmBarChart.NMRun <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = NULL, addLegend = TRUE 
+		,xBin = Inf , problemNum = 1, subProblems = 1, ...)
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmBarChart, x[-1])
+}
+
+
+nmBarChart.NMProblem <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0 , yLab = NULL, titles = NULL, 
+		addLegend = TRUE, xBin = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	callList <- as.list(match.call())
-	callList$obj <- nmData(obj)
+	callList$obj <- nmData(obj, subProblemNum = subProblems)
 	graphSubset(callList$obj) <- graphSubset(obj)
 	do.call(nmBarChart, callList[-1])
 }
@@ -39,13 +49,16 @@ nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 
 # TODO: test xBin
 
 nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = "", 
-		addLegend = TRUE, xBin = Inf, ...)
+		addLegend = TRUE, xBin = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	xVars <- CSLtoVector(xVars)
 	RNMGraphicsStopifnot(length(xVars) == 1, "Currently not accepting more than one x variable\n")
 	yVars <- CSLtoVector(yVars)
 	obj <- applyGraphSubset(obj)
+	
+	
 	# bin the x variable if necessary
+	
 	if(length(unique(obj[[xVars]])) > xBin) {
 		obj <- addDerivedCategorical(obj, xVars, paste(xVars, "BINNED", sep = "."), breaks = xBin, binType = "counts")
 		xVars <- paste(xVars, "BINNED", sep = ".")
@@ -89,4 +102,5 @@ nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0,
 }
 
 setMethod("nmBarChart", signature(obj = "data.frame"), nmBarChart.data.frame)
-setMethod("nmBarChart", signature(obj = "NMBasicModel"), nmBarChart.NMBasicModel)
+setMethod("nmBarChart", signature(obj = "NMProblem"), nmBarChart.NMProblem)
+setMethod("nmBarChart", signature(obj = "NMRun"), nmBarChart.NMRun)

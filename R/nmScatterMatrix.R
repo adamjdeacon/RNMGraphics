@@ -16,17 +16,39 @@
 #' @keywords hplot
 
 nmScatterMatrix <- function(obj, vars,bVars = NULL, iVar = "ID",  addLoess = FALSE, title ="", 
-		layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
 }
 
+
 setGeneric("nmScatterMatrix")
+
+nmScatterMatrix.NMRun <- function(obj, vars,bVars = NULL, iVar = "ID",  addLoess = FALSE, title ="", 
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmScatterMatrix, x[-1])
+}
+
+nmScatterMatrix.NMProblem <- function(obj, vars,bVars = NULL, iVar = "ID",  addLoess = FALSE, title ="", 
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+{
+	dataSet <- nmData(obj, subProblems = subProblems)
+	graphSubset(dataSet) <- graphSubset(obj)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(nmScatterMatrix, x[-1])
+}
 
 # TODO: ability to add L curve
 
 nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",  
-		addLoess = FALSE, title = "", layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
+		addLoess = FALSE, title = "", layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		problemNum = 1, subProblems = 1, ...)
 {
 	vars <- CSLtoVector(vars)
 	vars <- paste("'", vars, "'", sep = "")
@@ -35,8 +57,8 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
 	
-	#repeatVars(c("addLoess"), list(addLoess), 
-	#		length.out = numCombos)
+	obj <- applyDataSubset(obj, graphSubset(obj))
+	
 	# only one allowed at the moment
 	plotFormulas <- paste(" ~ obj[c(", paste(vars, collapse = ","), ")]")
 	
@@ -59,6 +81,9 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 }
 
 setMethod("nmScatterMatrix", signature(obj = "data.frame"), nmScatterMatrix.data.frame)
+setMethod("nmScatterMatrix", signature(obj = "data.frame"), nmScatterMatrix.data.frame)
+setMethod("nmScatterMatrix", signature(obj = "NMRun"), nmScatterMatrix.NMRun)
+setMethod("nmScatterMatrix", signature(obj = "NMProblem"), nmScatterMatrix.NMProblem)
 
 panel.nmScatterMatrix <- function(x,y, addLoess = FALSE, ...)
 {

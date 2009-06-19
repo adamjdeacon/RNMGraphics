@@ -78,7 +78,7 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							...)
 {
 	
-	dataSet <- applyGraphSubset(nmData(obj, subProblems = subProblems), graphSubset(obj))
+	dataSet <- applyGraphSubset(nmData(obj, subProblemNum = subProblems), graphSubset(obj))
 	x <- as.list(match.call())
 	x$obj <- dataSet
 

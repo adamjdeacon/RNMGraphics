@@ -23,37 +23,41 @@
 #' @keywords hplot
 
 nmHistogram <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, maxTLevels = Inf, ...)
+				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
+				 maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
 
-panel.nmHistogram <- function(x, refLine, addDensity, ...)
+nmHistogram.NMRun <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
+		addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
+		maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
 {
-	refVal <- switch(refLine,
-						"none"   = NULL,
-						"mean"   = mean(x, na.rm = TRUE),
-						"median" = median(x, na.rm = TRUE))
-	panel.histogram(x, ...)
-	if(addDensity)
-		panel.densityplot(x, col = "black", ...)
-	reflineOpts <- getGraphParams("refline")
-	panel.abline(v = refVal, col = reflineOpts$col, lwd = reflineOpts$lwd, 
-			lty = reflineOpts$lty, ...)
-	
+
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmHistogram, x[-1])
 }
 
 # TODO: handle simulated data
 
 nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, maxTLevels = Inf,...)
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL,
+							maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
 {
-	dataSet <- nmData(obj)
-	nmHistogram(dataSet, vars, bVars, titles, xLabs, extraSubset,addDensity, addGrid , breaks, nint, ...)
+	dataSet <- nmData(obj, subProblemNum = subProblems )
+	
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(nmHistogram, x[-1])
+	
 }
 
 nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL,maxTLevels = Inf, ...)
+							addGrid = TRUE, nint = 12, breaks, layout = NULL,
+							maxPanels = NULL,maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
 {
 	if(!(is.element(refLine, c("none", "mean", "median"))))
 		RNMGraphicsStop("Reference line parameter not valid!")
@@ -83,7 +87,6 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|")
 	}
 	plotList <- vector(mode = "list", length = numCombos)
-	# graphParams <- getAllGraphParams()
 	stripfn = getStripFun()
 	exp <- quote(histogram(as.formula(plotFormulas), main = titles, data = dataSet, xlab = xLabs, 
 					par.settings = list(plot.polygon = getGraphParams("histogram"), par.xlab.text = getGraphParams("axis.text"), 
@@ -98,6 +101,24 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 	plt <- eval(exp)
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
+
+panel.nmHistogram <- function(x, refLine, addDensity, ...)
+{
+	refVal <- switch(refLine,
+			"none"   = NULL,
+			"mean"   = mean(x, na.rm = TRUE),
+			"median" = median(x, na.rm = TRUE))
+	panel.histogram(x, ...)
+	if(addDensity)
+		panel.densityplot(x, col = "black", ...)
+	reflineOpts <- getGraphParams("refline")
+	panel.abline(v = refVal, col = reflineOpts$col, lwd = reflineOpts$lwd, 
+			lty = reflineOpts$lty, ...)
+	
+}
+
+
 setGeneric("nmHistogram")
 setMethod("nmHistogram", signature(obj = "NMProblem"), nmHistogram.NMProblem)
+setMethod("nmHistogram", signature(obj = "NMRun"), nmHistogram.NMRun)
 setMethod("nmHistogram", signature(obj = "data.frame"), nmHistogram.data.frame)

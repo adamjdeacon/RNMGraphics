@@ -24,18 +24,35 @@
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		xRotAngle = 0,
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1, ...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
+
+nmBoxPlot.NMRun <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
+		xRotAngle = 0,
+		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1, ...)
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(nmBoxPlot, x[-1])
+}
+
+
 setGeneric("nmBoxPlot")	
 
-nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", 
+nmBoxPlot.NMProblem <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", 
 		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, ...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, 
+		subProblems = 1, ...)
 {
-	dat <- nmData(obj)
+	dat <- nmData(obj, subProblemNum = subProblems)
+	graphSubset(dat) <- graphSubset(obj)
 	x <- as.list(match.call())
 	x$obj <- dat
 	
@@ -46,7 +63,8 @@ nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "I
 nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", 
 		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1, ...)
+		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1, ...)
 {
 	
 	contVar <- CSLtoVector(contVar)
@@ -136,4 +154,5 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 }
 
 setMethod("nmBoxPlot", signature(obj = "data.frame"), nmBoxPlot.data.frame)
-setMethod("nmBoxPlot", signature(obj = "NMBasicModel"), nmBoxPlot.NMBasicModel)
+setMethod("nmBoxPlot", signature(obj = "NMRun"), nmBoxPlot.NMRun)
+setMethod("nmBoxPlot", signature(obj = "NMProblem"), nmBoxPlot.NMProblem)
