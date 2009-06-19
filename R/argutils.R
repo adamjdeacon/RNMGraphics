@@ -40,13 +40,13 @@ processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = "BI
 	return(list(data = outDf, columns = outputNames))
 }
 
-coerceToFactors <- function(df, columns, excludeClasses = "shingle")
+coerceToFactors <- function(df, columns, ordered = FALSE, excludeClasses = "shingle")
 {
 	columns <- intersect(columns, names(df))
 	for(n in columns) 
 	{
 		if(!inherits(df[[n]], excludeClasses))
-			df[[n]] <- as.factor(df[[n]])
+			df[[n]] <- factor(df[[n]], ordered = ordered)
 	}
 	df
 }
@@ -72,11 +72,14 @@ CSLtoVector <- function(txt, sep =",", removeBlank = TRUE, removeEmpty = FALSE)
 # assumes that settings has all of the settings
 mapTopar.settings <- function(settings = getAllGraphParams())
 {
-	
+	# TODO: this may need to vary by plots
 	with(settings, 
 			list(plot.symbol =plot.symbol, superpose.symbol = superpose.symbol,
 					par.xlab.text = axis.text, par.ylab.text = axis.text,
 					par.main.text = title.text, plot.line = plot.line,
 					add.line = refline, strip.background = strip.bg, 
-					layout.widths = layout.widths, layout.heights = layout.heights)) 
+					layout.widths = layout.widths, layout.heights = layout.heights, 
+					superpose.polygon = barchart, box.rectangle = boxplot[c("alpha","col","fill","lty","lwd")],
+					box.umbrella = list(col = boxplot$umb.col, lty = boxplot$umb.lty, 
+							lwd = boxplot$umb.lwd))) 
 }
