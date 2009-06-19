@@ -40,6 +40,7 @@ nmACPlot.NMBasicModel <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = 
 	
 	funcCall <- as.list(match.call())[-1]
 	dataSet <- nmData(obj)
+	graphSubset(dataSet) <- graphSubset(obj)
 	funcCall$obj <- dataSet
 	do.call(nmACPlot, funcCall)
 }
