@@ -11,7 +11,8 @@
 {
 	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")
-	gVars <- if(!is.null(gVars)) CSLtoVector(gVars)[1] else "NULL"
+	
+	obj <- applyGraphSubset(obj)
 	
 	plotFormulas <- paste(yVarsCollapsed, "~", xVars)
 	varCombos <- as.matrix(expand.grid(yVarsCollapsed, xVars))
@@ -81,7 +82,7 @@
 	result
 }
 
-# TODO: implement different plot types
+# TODO: allow different types for each variable
 
 panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE),
 		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, ...)
