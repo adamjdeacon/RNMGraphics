@@ -4,6 +4,7 @@
 # Author: fgochez
 ###############################################################################
 
+# This code may just alias RNMImport functions later
 
 defaultGraphSubset <- function()
 {
@@ -27,7 +28,7 @@ graphSubset <- function(x)
 	attr(x, "graphSubset")
 }
 
-applyGraphSubset <- function(obj, sub = NULL)
+applyGraphSubset <- function(obj, sub = graphSubset(obj))
 {
 	if(is.null(sub))
 		return(obj)
