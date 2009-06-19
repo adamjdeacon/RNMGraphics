@@ -22,6 +22,7 @@
 # TODO: contVarOnX does not work with overLaid = TRUE
 
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
+		xRotAngle = 0,
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
 		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,...)
 {
@@ -29,7 +30,8 @@ nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = 
 }
 setGeneric("nmBoxPlot")	
 
-nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", xLabs = NULL, 
+nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", 
+		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
 		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, ...)
 {
@@ -41,7 +43,8 @@ nmBoxPlot.NMBasicModel <- function(obj, contVar, factVar, bVars = NULL,iVar = "I
 	
 }
 
-nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
+nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", 
+		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL,
 		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1, ...)
 {
@@ -106,7 +109,7 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	else
 	{
 		stripfn = getStripFun()
-		scales <- list(x = list(), y = list())
+		scales <- list(x = list(rot = xRotAngle), y = list())
 		if(length(contVar) > 1 | length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
 		for(i in seq_along(plotFormulas))
 			plotList[[i]] <- 
