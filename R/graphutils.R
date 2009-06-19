@@ -1,11 +1,20 @@
-# TODO: Add comment
+
 # $Rev$
 # $LastChangedDate$
 # Author: fgochez
 ###############################################################################
 
-# safe version of getVarLabel - extracts the label associated to a variable, unless there is none
-# in which case the name of the varible is replaced
+
+#' safe version of getVarLabel - extracts the label associated to a variable, unless there is none
+#' in which case the name of the variable replaces it
+#' @name Get variable label
+#' @title Get variable label
+#' @param varName Name of NONMEM variable
+#' @param useVarNameifMissing If TRUE, returns the variable name as the label if the variable name does not have
+#' a label, else returns an empty character
+#' @return variable label, variable name or character(0) depending on parameters
+#' @author fgochez
+#' @keywords
 
 getVarLabel <- function(varName, useVarNameifMissing = TRUE)
 {
@@ -14,6 +23,15 @@ getVarLabel <- function(varName, useVarNameifMissing = TRUE)
 		return(varName)
 	lab
 }
+
+#' (currently deprecated)
+#' @name
+#' @title
+#' @param numPlots 
+#' @param maxColumns 
+#' @return 
+#' @author fgochez
+#' @keywords
 
 stdGridDims <- function(numPlots, maxColumns )
 {
@@ -24,6 +42,17 @@ stdGridDims <- function(numPlots, maxColumns )
 	gridDims
 }
 
+#' Generates a matrix of combinations of one set of set of variables "against" another set
+#' @name Matrix of vector combinations
+#' @title 
+#' @param xVars Vector or comma seperated list of x variable names
+#' @param yVars Vector or comma seperated list of y variable names
+#' @param collapseY Collapse Y variables using +? (meant to be used with extended lattice formulas)
+#' @param collapseX Collapse X variables using +? meant to be used with extended lattice formulas)
+#' @return matrix of all xVars against yVars
+#' @author fgochez
+#' @keywords
+
 varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 {
 	xVars <- CSLtoVector(xVars); yVars <- CSLtoVector(yVars)
@@ -33,20 +62,36 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 }
 
 
+#' Utility function that generates groupings for use with scatter plot types = l, i, o and t.
+#' Takes account of the fact that the subject identifier groupings should not vary line/text etc. colours, 
+#' @name Subject groupings
+#' @title Generate subject groupings
+#' @param idLabels subject identifier labels (e.g. from iVar) 
+#' @param group Additional grouping variable
+#' @param superposeElements list of styles which should be generated for each group (colours, line types, line widths etc)
+#' @param expandElements Should the superpose elements be reproduced for each element in the grouping, or each group level?
+#' @return a list of the grouping elements and the grouping variable that combines the identifier grouping with the other groups 
+#' @author fgochez
+#' @keywords
+
 subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandElements = FALSE)
 {
 	if(!is.null(group))
 	{
+		# create combined grouping variable
+		
 		grouping <- paste(group, idLabels, sep = ",")
 		groupTable <- cbind(as.factor(group), idLabels)
+		
+		# repeat for each element of the grouping, rather than group levels
 		if(!expandElements)
 		{
 			indices <- match(unique(grouping), grouping)
 			groupTable <- groupTable[indices,]
 			elts <- lapply(superposeElements, rep, length.out = length(unique(group)))
-			# cols <- rep(superposeCol, length.out = length(unique(group)))
+		
 			elts <- lapply(elts, function(x) x[as.numeric(groupTable[,1])])
-			# cols <- cols[as.numeric(groupTable[,1])]
+		
 		}
 		else
 		{
@@ -62,7 +107,7 @@ subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandEle
 	return(list(grouping = factor(grouping, ordered = TRUE, levels = unique(grouping)), elements = elts))
 }
 
-# this strip function is needed since if multiple y variables are used yet no
+# The default package strip function. This strip function is needed since if multiple y variables are used yet no
 # "by" variable is, a crash occurs if strip.names = c(TRUE, TRUE)
 
 defaultStrip <- function(..., var.name)
@@ -73,7 +118,7 @@ defaultStrip <- function(..., var.name)
 
 
 # Written by R. Pugh
-# reassigns panel layout based on a maximum number of panels
+# reassigns panel layout based on a maximum number of panels.
 calcMaxPanels <- function(obj, maxPanels = 8) 
 {
 	if (length(maxPanels) != 1 || maxPanels[1] < 1) RNMGraphicsStop("Illegal maxPanels value")	
