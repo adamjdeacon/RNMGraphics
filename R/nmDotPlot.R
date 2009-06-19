@@ -5,33 +5,38 @@
 ###############################################################################
 
 
-#' 
-#' @name
-#' @title
-#' @param obj 
-#' @param factVar 
-#' @param contVar 
-#' @param bVars 
-#' @param gVar 
-#' @param iVar 
-#' @param title 
-#' @param xLabs 
-#' @param yLabs 
-#' @param addLegend 
+
+#' Create a custom dotplot of one or more continuous variables against a categorical variable
+#' @name NONMEM dot plot
+#' @title NONMEM dot plot
+#' @param obj "NONMEM" object
+#' @param factVar Categorical variable name
+#' @param contVar One or more continuous variables (comma seperated list or vector)
+#' @param bVars One or more trellis/by variables
+#' @param iVar Subject identifier variable
+#' @param gVar Grouping variable
+#' @param title Plot main title
+#' @param xLabs X-axis label
+#' @param yLabs Y-axis label
+#' @param layout Trellis layout - is overwritteen by maxPanels
+#' @param maxPanels Max panels per page
+#' @param addLegend Add a legend?
+#' @param maxTLevels Bin trellis variable if it has more than this many levels
 #' @param ... 
 #' @return 
 #' @author fgochez
 #' @keywords
+
 nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
-		addLegend = TRUE, maxTLevels = Inf, ...)   
+		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, ...)   
 {
 	RNMGraphicsStop("Not implemented for this class yet \n")	
 }
-
+# TODO: unit test maxFactPerPanel
 nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
-		addLegend = TRUE, maxTLevels = Inf, ...)
+		addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  ...)
 {
 	dataSet <- nmData(obj)
 	graphSubset(dataSet) <- graphSubset(obj)
@@ -41,14 +46,13 @@ nmDotPlot.NMBasicModel <- function(obj, factVar, contVar, bVars = NULL, iVar = "
 	do.call(nmDotPlot, x[-1])
 }
 
-# TODO: allow multiple factVars and contVars
 
 nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID", gVar = "NULL", 
 					title = NULL, xLabs = NULL, yLabs = NULL,layout = NULL, maxPanels = numeric(0),	
-					addLegend = TRUE, maxTLevels = Inf, ...)   
+					addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  ...)   
 {
 
-	# TODO : an excess of copy-paste is cropping up - try to find a way to reduce this
+
 	contVar <- CSLtoVector(contVar)
 	factVar <- CSLtoVector(factVar)
 	
@@ -57,19 +61,42 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	
 	plotFormulas <- apply(varCombos, 1, paste, collapse = "~")
 	obj <- applyGraphSubset(obj, graphSubset(obj))
+	if(!is.null(bVars)) bVars <- CSLtoVector(bVars)
+	
+	scales <- list(x = list(), y = list())
+	# force factVar to be a factor
+	obj <- coerceToFactors(obj, factVar)
+	
+	# group the factor variable if there are too many levels, leading to "crammed" axis labels
+	if(length(unique(obj[[factVar]])) > maxFactPerPanel)
+	{
+		
+		# sort by factor first, if possible
+		obj <- obj[order(as.numeric(obj[[factVar]])),]
+		
+		x <- .factorTrellis(obj[[factVar]], factVar, maxFactPerPanel)
+		obj[[paste(factVar, "GRP", sep = ".")]] <- x
+		bVars <- c(bVars, paste(factVar, "GRP", sep = "."))
+		# need to free y axis relations to take advantage of this
+		
+		scales$y$relation <- "free"
+		
+	}
+	
 	if(!is.null(bVars))
 	{
-		bVars <-CSLtoVector(bVars)
+		
 		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
 		obj <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	
-	obj <- coerceToFactors(obj, factVar)
 	
 	plotList <- vector(mode = "list", length = numCombos)
+	
 	repeatVars(c("title"), list(title), numCombos)
+	
 	if(!is.null(xLabs))
 		xLabs <- rep(CSLtoVector(xLabs), length.out = numCombos)
 	else
@@ -94,7 +121,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	else maxPanels <- numeric(0)
 	# TODO: at the moment, title = gVar rather than its label.  This is because 
 	# the full description often causes overflows (e.g. when gVar = EVID)
-	auto.key <- if(addLegend) list(title =gVar, cex=.7, rows=10,space="right") else NULL
+	auto.key <- if(addLegend) list(title = gVar, cex=.7, rows=10,space="right") else NULL
 
 	for(i in seq_along(plotFormulas))
 	{
@@ -103,12 +130,30 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 				dotplot(as.formula(plotFormulas[i]), data = obj, main = title, xlab = xLabs[i], 
 						ylab = yLabs[i], auto.key = auto.key, groups = eval(parse(text = gVar)),
 						par.settings = par.settings, strip = getStripFun(), 
-						outer = TRUE, layout = layout, ...)
+						outer = TRUE, layout = layout, 
+						panel = panel.nmDotPlot, scales = scales, ...)
 	} 
 	gridDims <- stdGridDims(numCombos,3 )
 			# numeric(2)
 	multiTrellis(plotList, gridDims, maxPanels = maxPanels)
 	
+}
+
+.factorTrellis <- function(var,varName, maxPerPanel)
+{
+	varLevels <- unique(var)
+	parallelVec <- seq_along(varLevels)
+	names(parallelVec) <- as.character(varLevels)
+	numPanels <- floor(length(varLevels) / maxPerPanel) + (length(var) %% maxPerPanel) * 1
+	groupingVar <- rep(1:numPanels, length.out = length(varLevels)); groupingVar <- sort(groupingVar) 
+	
+	groupingVar[ parallelVec[as.character(var)] ]
+	
+}
+
+panel.nmDotPlot <- function(x, y, ... )
+{
+	panel.dotplot(x = x, y = y, ...)
 }
 
 setGeneric("nmDotPlot")
