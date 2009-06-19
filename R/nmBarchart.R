@@ -18,7 +18,7 @@
 #' @author fgochez
 #' @keywords hplot
 
-nmBarChart <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, addLegend = TRUE 
+nmBarChart <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = NULL, addLegend = TRUE 
 					   ,xBin = Inf ,...)
 {
 	RNMGraphicsStop("Not implemented for this class!", call = match.call())
@@ -26,7 +26,7 @@ nmBarChart <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NUL
 
 setGeneric("nmBarChart")
 
-nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = NULL, 
+nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0 , yLab = NULL, titles = NULL, 
 		addLegend = TRUE, xBin = Inf, ...)
 {
 	callList <- as.list(match.call())
@@ -38,7 +38,7 @@ nmBarChart.NMBasicModel <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL,
 # TODO: add bVars?
 # TODO: test xBin
 
-nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, titles = "", 
+nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = "", 
 		addLegend = TRUE, xBin = Inf, ...)
 {
 	xVars <- CSLtoVector(xVars)
@@ -69,21 +69,18 @@ nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, yLab = NULL, t
 		currentX <- varCombos[i,2]
 		currentY <- varCombos[i,1]
 		#if(is.numeric(obj[,currentX]))
-		# TODO: allow automated conversion to a factor
-		# TODO: replace this with a call to prop.table
+
 		tab <- table(obj[[currentX]], obj[[currentY]])
 		# tab[,1] <- tab[,1] / sum(tab[,1]); tab[,2] <- tab[,2]
 		tab <- sweep(tab, 1, rowSums(tab), "/")
 		if(addLegend) key <- list(title = getVarLabel(currentY), 
 					points = FALSE, rectangles = TRUE, space = "right", cex = 0.7)
 		else key <- NULL
-		plotList[[i]] <- 
-			with(graphParams, 	
-				barchart(tab, xlab = xLab[i], ylab = yLab[i], horizontal = FALSE, 
-							par.settings = list(par.xlab.text = axis.text, par.ylab.text = axis.text, 
-							par.main.text = title.text,	superpose.polygon = barchart), 
-					auto.key = key, main = titles, outer = TRUE, ...),
-			) # end with
+		scales <- list( x = list(rot = xRotAngle), y = list())
+		plotList[[i]] <- 	
+				barchart(tab, xlab = xLab[i], ylab = yLab[i], horizontal = FALSE, scales = scales,
+							par.settings = mapTopar.settings(graphParams), 
+					auto.key = key, main = titles, outer = TRUE, ...) # end with
 	}
 	
 	result <- multiTrellis(plotList, RNMGraphics:::stdGridDims( numCombos, 3))
