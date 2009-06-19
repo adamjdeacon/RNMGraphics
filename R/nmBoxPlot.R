@@ -71,6 +71,9 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	factVar <- CSLtoVector(factVar)
 	
 	RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
+	
+	obj <- applyGraphSubset(obj)
+	
 	# bin the x variable if necessary
 	if(length(unique(obj[[factVar]])) > factBin) {
 		obj <- addDerivedCategorical(obj, factVar, paste(factVar, "BINNED", sep = "."), 

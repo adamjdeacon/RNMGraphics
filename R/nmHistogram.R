@@ -76,7 +76,7 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 	plotFormulas <- paste(" ~ ", vars)
 	if(missing(xLabs)) xLabs <- vars
 	repeatVars(c("titles", "xLabs"), list(titles, xLabs), length.out = numCombos)
-	dataSet <- obj
+	dataSet <- applyGraphSubset(obj)
 	
 	if(!is.null(bVars))
 	{
