@@ -159,7 +159,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	varLevels <- unique(var)
 	parallelVec <- seq_along(varLevels)
 	names(parallelVec) <- as.character(varLevels)
-	numPanels <- floor(length(varLevels) / maxPerPanel) + (length(var) %% maxPerPanel) * 1
+	numPanels <- floor(length(varLevels) / maxPerPanel) + ifelse(length(var) %% maxPerPanel > 0,  1, 0)
 	groupingVar <- rep(1:numPanels, length.out = length(varLevels)); groupingVar <- sort(groupingVar) 
 	
 	groupingVar[ parallelVec[as.character(var)] ]
