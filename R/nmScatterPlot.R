@@ -178,7 +178,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	{
 		if(addLegend[i] & gVars != "NULL")
 		{
-			plotKey <- scatterPlotKey(getVarDescription(gVars)$Label, dataSet[[gVars]], type = types[i])
+			plotKey <- scatterPlotKey(getVarLabel(gVars), dataSet[[gVars]], type = types[i])
 					# list(title = getVarDescription(gVars)$Label, rows = 10, cex=.7, space="right")
 		}
 		else plotKey <- NULL
