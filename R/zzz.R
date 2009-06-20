@@ -34,8 +34,8 @@ initializeOptions <- function()
 	.RNMGraphicsEnv$graphPars <- 
 		list(superpose.symbol = superpose.symbol,
 			superpose.line = superpose.line,
-			plot.symbol = list(alpha = 0.75, cex = 0.8, col = "darkblue", fill = "black", pch = 1), 
-			plot.line = list(alpha = 0.8, col = "darkblue", lty = 1, lwd = 1),	
+			plot.symbol = list(alpha = 1, cex = 0.8, col = "darkblue", fill = "black", pch = 1), 
+			plot.line = list(alpha = 1, col = "darkblue", lty = 1, lwd = 1),	
 			plot.text = list(alpha = 1, cex = 1, col = "black"),
 			superpose.text = list(alpha = rep(1, 8), cex = rep(1, 8), col = superpose.line$col),
 			loess.line = list(lwd = 1.5, col = "darkred"),
