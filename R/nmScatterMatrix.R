@@ -70,12 +70,15 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "+"), sep = "|") 
 	}	
+	
 	graphParams <- getAllGraphParams()
+	stripfunc <- getStripFun()
 	plt <- splom(as.formula(plotFormulas), data = obj, main = title, panel = panel.nmScatterMatrix, addLoess = addLoess, 
 			par.settings = list(par.xlab.text = graphParams$"axis.text", 
 					par.ylab.text = graphParams$"axis.text", par.main.text = graphParams$title.text,
 					plot.symbol = graphParams$plot.symbol, strip.background = graphParams$strip.bg),
-			layout = layout, ...)
+			layout = layout, strip = stripfunc ,...)
+	
 	multiTrellis(list(plt), maxPanels = maxPanels)
 		
 }
