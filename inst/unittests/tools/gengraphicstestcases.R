@@ -160,8 +160,7 @@ gen.nmScatterPlot <- function(testDataList)
 	plots[[12]] <- nmScatterPlot(testDataList[[4]], "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
 	plots[[13]] <- nmScatterPlot(getProblem(testDataList[[4]],1), "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
 	
-	
-plots
+	plots
 	
 }
 
@@ -236,6 +235,7 @@ gen.nmScatterMatrix <- function(testDataList)
 	
 	plots[[4]] <- nmScatterMatrix(getProblem(testDataList[[4]]), 
 			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9, addLoess = TRUE)
+	plots
 }
 
 gen.nmQQNorm <- function(testData)
@@ -306,5 +306,6 @@ gen.timeEventPlots <- function(testData)
 	plots <- list()
 	plots[[1]] <- timeEventSPlot(x, title = "Time/event", xLab = "Time", yLab = "Concentration")
 	plots[[2]] <- timeEventDPlot(x, title = "Time/event", xLab = "Time", yLab = "Subject")
+	
 	plots
 }
