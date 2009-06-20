@@ -32,7 +32,7 @@ nmQQNorm.NMRun <-function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
 	x$obj <- prob
-	do.call(nmScatterMatrix, x[-1])
+	do.call(nmQQNorm, x[-1])
 }
 
 nmQQNorm.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
@@ -44,9 +44,8 @@ nmQQNorm.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", titles = ""
 	x <- as.list(match.call())
 	x$obj <- dataSet
 	
-	do.call(nmScatterMatrix, x[-1])
+	do.call(nmQQNorm, x[-1])
 	
-	RNMGraphicsStop("Not implemeneted for this class\n")
 }
 
 
@@ -92,7 +91,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
-	if (length(uncollapsedVars) > 1 | length(bVars) > 0) scales <- list(relation=yAxisScales)
+	if (length(uncollapsedVars) > 1 | length(bVars) > 0) scales <- list(relation= match.arg(yAxisScales))
 	else scales <- list()
 
 	plt <- with(graphParams,
@@ -109,7 +108,8 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 }
 
 setMethod("nmQQNorm", signature(obj = "data.frame") , nmQQNorm.data.frame)
-
+setMethod("nmQQNorm", signature(obj = "NMProblem") , nmQQNorm.NMProblem)
+setMethod("nmQQNorm", signature(obj = "NMRun") , nmQQNorm.NMRun)
 
 panel.nmQQNorm <- function(x, additions, ...)
 {
