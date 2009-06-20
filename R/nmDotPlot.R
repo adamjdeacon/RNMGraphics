@@ -154,6 +154,8 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	
 }
 
+# creates a grouping variable which splits the x-axis variable onto various panels.
+
 .factorTrellis <- function(var,varName, maxPerPanel)
 {
 	varLevels <- unique(var)
