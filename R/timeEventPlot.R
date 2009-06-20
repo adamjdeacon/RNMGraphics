@@ -1,10 +1,11 @@
-# TODO: Add comment
+
 # $Rev$
 # $LastChangedDate$
 # Author: fgochez
 ###############################################################################
  
 # TODO element comments, design docs
+# TODO: legend in timeEventSPlot does not capture the lty of the dose line
 
 #' 
 #' @name
@@ -23,22 +24,56 @@
 #' @author fgochez
 #' @keywords
 timeEventDPlot<- function(obj, tVar = "TIME", doseVar = "AMT", 
-		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID", addLegend = TRUE, ...) 
+		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID",
+		addLegend = TRUE, problemNum = 1, subProblems = 1, ...) 
 {
 	RNMGraphicsStop("Not implemented for this class\n")
 	
 }
 
+timeEventDPlot.NMRun <- function(obj, tVar = "TIME", doseVar = "AMT", 
+		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME",
+		yLab = "ID", addLegend = TRUE, problemNum = 1, subProblems = 1, ...) 
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(timeEventDPlot, x[-1])
+	
+	
+}
+
+timeEventDPlot.NMProblem <- function(obj, tVar = "TIME", doseVar = "AMT", 
+		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME",
+		yLab = "ID", addLegend = TRUE, problemNum = 1, subProblems = 1, ...) 
+{
+
+	dataSet <- nmData(obj, subProblemNum = subProblems)
+	graphSubset(dataSet) <- graphSubset(obj)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(timeEventDPlot, x[-1])
+	
+	
+}
+
+
 timeEventDPlot.data.frame <- function(obj, tVar = "TIME", doseVar = "AMT", 
-		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID", addLegend = TRUE, ...) 
+		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID", 
+		addLegend = TRUE, problemNum = 1, subProblems = 1, ...) 
 {
 		
 	nmDotPlot(obj, factVar = iVar, contVar = tVar, gVar = evtVar, xLab = xLab, yLab = yLab, addLegend = addLegend, 
-			title = title, ...)
+			title = title, problemNum = 1, subProblems = 1, ...)
 }
 
 setGeneric("timeEventDPlot")
+
 setMethod("timeEventDPlot", signature(obj = "data.frame"), timeEventDPlot.data.frame)
+
+setMethod("timeEventDPlot", signature(obj = "NMRun"), timeEventDPlot.NMRun)
+setMethod("timeEventDPlot", signature(obj = "NMProblem"), timeEventDPlot.NMProblem)
 
 
 #' 
@@ -62,7 +97,9 @@ setMethod("timeEventDPlot", signature(obj = "data.frame"), timeEventDPlot.data.f
 
 timeEventSPlot <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
-		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, layout = NULL, maxPanels = NULL,
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, 
+		layout = NULL, maxPanels = NULL,
+		problemNum = 1, subProblems = 1,
 		...) 
 {
 	RNMGraphicsStop("Not implemented for this class\n")
@@ -78,10 +115,44 @@ panel.timeEventSPlot <- function(x, y, subscripts, doseInfo, colNames = c("tVar"
 	
 }
 
+timeEventSPlot.NMRun <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
+		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, 
+		layout = NULL, maxPanels = NULL,
+		problemNum = 1, subProblems = 1,
+		...) 
+{
+	prob <- getProblem(obj, problemNum)
+	x <- as.list(match.call())
+	x$obj <- prob
+	do.call(timeEventSPlot, x[-1])
+	
+}
+
+timeEventSPlot.NMProblem <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
+		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE, 
+		layout = NULL, maxPanels = NULL,
+		problemNum = 1, subProblems = 1,
+		...) 
+{
+	dataSet <- nmData(obj, subProblemNum = subProblems)
+	graphSubset(dataSet) <- graphSubset(obj)
+	x <- as.list(match.call())
+	x$obj <- dataSet
+	
+	do.call(timeEventSPlot, x[-1])
+}
+
+
 timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
-		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE,layout = NULL, maxPanels = NULL, ...) 
+		title = NULL, xLab = NULL, yLab = NULL, addLegend = TRUE,layout = NULL, maxPanels = NULL, 
+		problemNum = 1, subProblems = 1, ...) 
 {
+	
+	obj <- applyGraphSubset(obj)
+	
 	if(is.null(xLab)) xLab <- "Time"
 	if(is.null(yLab)) yLab <- "Concentration"
 	if(is.null(title)) title <- "Concentration vs Time"
@@ -119,3 +190,5 @@ timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVa
 setGeneric("timeEventSPlot")
 
 setMethod("timeEventSPlot", signature(obj = "data.frame"), timeEventSPlot.data.frame)
+setMethod("timeEventSPlot", signature(obj = "NMRun"), timeEventSPlot.NMRun)
+setMethod("timeEventSPlot", signature(obj = "NMProblem"), timeEventSPlot.NMProblem)
