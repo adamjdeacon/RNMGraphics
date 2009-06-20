@@ -57,7 +57,7 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
 	
-	obj <- applyDataSubset(obj, graphSubset(obj))
+	obj <- applyGraphSubset(obj)
 	
 	# only one allowed at the moment
 	plotFormulas <- paste(" ~ obj[c(", paste(vars, collapse = ","), ")]")
@@ -80,7 +80,6 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 		
 }
 
-setMethod("nmScatterMatrix", signature(obj = "data.frame"), nmScatterMatrix.data.frame)
 setMethod("nmScatterMatrix", signature(obj = "data.frame"), nmScatterMatrix.data.frame)
 setMethod("nmScatterMatrix", signature(obj = "NMRun"), nmScatterMatrix.NMRun)
 setMethod("nmScatterMatrix", signature(obj = "NMProblem"), nmScatterMatrix.NMProblem)
