@@ -1,4 +1,7 @@
-#
+# TODO: test maxTLevels, maxPanels
+# TODO: maxTLevels + different iVar
+
+
 genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE, 
 		writeRData = FALSE, writeComparisonTable = FALSE, loadPack = TRUE)
 {
@@ -13,6 +16,9 @@ genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE,
 	
 	.dataList[[4]] <- importNm(system.file(package = "RNMImport", "unittests/testdata/TestRun/TestData1.ctl"))
 	.dataList[[5]] <- data.frame(X = rnorm(100), Y = 1)
+	.dataList[[6]] <- data.frame(X = rep(seq(1, 2, length.out = 4), times = 4) + rep(c(0, 5, 10, 15), each = 4 ), Y = rep(1:4, times = 4),
+			G = rep(letters[1:4], each = 4), H = rep(1:2, each = 8))
+	
 	if(loadPack)
 	{
 		require(RNMGraphics)
@@ -108,36 +114,55 @@ gen.nmScatterPlot <- function(testDataList)
 {
 	plots <- vector(length = 9, mode = "list")
 	testData <- testDataList[[1]]
-	plots[[1]] <- nmScatterPlot(testData, "X, W", c("Y", "Z"), bVar = "B", gVar = "G", addLegend = c(TRUE,FALSE,TRUE),
-			idLines = c(TRUE, TRUE, FALSE, FALSE), titles = LETTERS[1:4], xLab = "X label", yLab = "yLabel", 
-			pch = 1, equalYScales = FALSE)
+
+	# test type = "t"
+	test2 <- nmScatterPlot(testDataList[[1]], "X", "Y, W", iVar = "G", types = "t",
+			addGrid = FALSE, titles = "BAR", pch = 19, xLab = "XLAB", yLab = "YLAB")
 	
-	
-	test2 <- nmScatterPlot(testData, "X", "Y, W", doPlot = FALSE, iVar = "G", types = c("p", "l"), addLoess = TRUE, 
-			addGrid = c(FALSE, TRUE), titles = "BAR", pch = 19, equalYScales = FALSE)
-	plots[[2]] <- test2
+	plots[[1]] <- test2
 	
 	testData2 <- testDataList[[2]]
 	
-	test3 <- nmScatterPlot(testData2, "X", "Y", doPlot = FALSE, bVar = "B")
-	plots[[3]] <- test3
+	# test simple use of by variable
+	test3 <- nmScatterPlot(testData2, "X", "Y",bVar = "B")
+	plots[[2]] <- test3
+	
 	# test very simple case
-	test4 <- nmScatterPlot(testData2, "X", "Z", doPlot = FALSE)
-	plots[[4]] <- test4
-	
-	test5 <- nmScatterPlot(testData2, "X", "Z", doPlot = FALSE, iVar = "G", type = "l")
-	plots[[5]] <- test5
-	
-	test6 <- nmScatterPlot(testData2, "X", "Y", iVar = "B", type = "i")
-	plots[[6]] <- test6
-	plots[[7]] <- nmScatterPlot(testData2, "X", "Y", doPlot = FALSE, bVar = "B")
-	# test equal axis scales
-	plots[[8]] <-  nmScatterPlot(testData2, "X", "Z", doPlot = FALSE, equalAxisScales = TRUE)
-	# test overlaid
-	plots[[9]] <- nmScatterPlot(testData2, "X", "Y, Z", doPlot = FALSE,  overlaid = TRUE, idLine = TRUE, addLegend = TRUE )
+	test4 <- nmScatterPlot(testData2, "X", "Z")
+	plots[[3]] <- test4
+		# test equal axis scales
+	plots[[4]] <-  nmScatterPlot(testData2, "X", "Z", equalAxisScales = TRUE)
 	# test overlaid + bVar
-	plots[[10]] <- nmScatterPlot(testDataList[[4]], "TIME", "PRED, IPRED", overlaid = TRUE, bVars = "SEX") 
-	plots
+	# TODO: might be worth trying other types
+	
+	plots[[5]] <- nmScatterPlot(subset(nmData(testDataList[[4]]), ID %in% 1:10), "TIME", "PRED, IPRED", 
+			overlaid = TRUE, bVars = "SEX", addLegend = TRUE, type = "o") 
+	# free y axis relations
+	plots[[6]] <-  nmScatterPlot(testDataList[[1]], "X", "Y, W", bVar = "B", gVar = "G", type = "p", addLegend = TRUE, yAxisRelations = "free")
+	
+	# test the different types
+	
+	plots[[7]] <- nmScatterPlot(testDataList[[6]], "X", "Y", iVar = "G", gVar = "H",
+				type = "l", addLegend = TRUE)
+	plots[[8]] <- nmScatterPlot(testDataList[[6]], "X", "Y", iVar = "G", gVar = "H",
+				type = "p", addLegend = TRUE)
+	plots[[9]] <- nmScatterPlot(testDataList[[6]], "X", "Y", iVar = "G", gVar = "H",
+				type = "t", addLegend = TRUE)
+	plots[[10]] <- nmScatterPlot(testDataList[[6]], "X", "Y", iVar = "G", gVar = "H",
+				type = "i", addLegend = TRUE)
+	plots[[11]] <- nmScatterPlot(testDataList[[6]], "X", "Y", iVar = "G", gVar = "H",
+				type = "o", addLegend = TRUE)
+	
+	# finally, check maxTLevels and maxPanels, along with generics and subset
+	
+	graphSubset(testDataList[[4]]@problems[[1]]) <- "ID < 10"
+	
+	plots[[12]] <- nmScatterPlot(testDataList[[4]], "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
+	plots[[13]] <- nmScatterPlot(getProblem(testDataList[[4]],1), "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
+	
+	
+plots
+	
 }
 
 gen.nmBoxPlot <- function(testDataList)
@@ -145,17 +170,29 @@ gen.nmBoxPlot <- function(testDataList)
 	testData <- testDataList[[1]]
 	testData2 <- testDataList[[2]]
 	plots <- vector(mode = "list", length = 3)
-	plots[[1]] <- nmBoxPlot(sleep, contVar = "extra" , factVar = "group", titles = "Sleep data")
-	# check labels
-	plots[[3]] <- nmBoxPlot(sleep, contVar = "extra" , factVar = "group", titles = "Sleep data",
+	
+	# check labels / simple plot
+	plots[[1]] <- nmBoxPlot(sleep, contVar = "extra" , factVar = "group", titles = "Sleep data",
 			xLabs = "Group", yLabs = "Extra sleep")
-	# different styles, "bVar"
-	tmp <- getGraphParams("boxplot")
-	setGraphParams("boxplot", list(fill = "darkgreen", col = "green", umb.col = "black", umb.lwd = 2 ) )
+	
 	CO2.df <- as.data.frame(CO2)
-	plots[[2]] <- nmBoxPlot(CO2.df, contVar = "uptake", factVar = "Type", bVars = "Treatment")
-	setGraphParams("boxplot", tmp)
-	plots[[4]] <- nmBoxPlot(CO2.df, contVar = "uptake", factVar = "Type, Treatment")
+	
+	# free y axis relations, bVar
+	
+	plots[[2]] <- nmBoxPlot(CO2.df, contVar = "uptake, conc", factVar = "Type", bVars = "Treatment", 
+			yAxisRelations = "free")
+	# continuous variable on x axis
+	plots[[3]] <- nmBoxPlot(sleep, contVar = "extra" , factVar = "group", titles = "Sleep data",
+			xLabs = "Group", yLabs = "Extra sleep", contVarOnX = TRUE)
+		
+	
+	graphSubset(testDataList[[4]]@problems[[1]]) <- "ID < 10"
+	
+	# finally, check maxTLevels and maxPanels, along with generics and subset and factBin, xRotAngle
+	plots[[4]] <- nmBoxPlot(testDataList[[4]], contVar = "WRES", factVar = "PRED", factBin = 3,
+			bVar = "ID,TIME", maxTLevels = 2, maxPanels = 9, xRotAngle = 90)
+	plots[[5]] <- nmBoxPlot(getProblem(testDataList[[4]],1), contVar = "WRES", factVar = "PRED", factBin = 3,
+			bVar = "ID,TIME", maxTLevels = 2, maxPanels = 9, xRotAngle = 90)
 	plots
 }
 
@@ -165,7 +202,7 @@ gen.nmHistogram <- function(testDataList)
 	
 	testData2 <- testDataList[[2]]
 	plots <- vector(mode = "list", length = 4)
-	test1 <- nmHistogram(testData, vars = "X, Z", bVar = "B", xLabs = c("HELLO", "WORLD"), titles = c("TITLE1", "TITLE2"))
+	test1 <- nmHistogram(testData, vars = "X, Z", bVar = "B", xLabs = "HELLO", titles = "TITLE")
 	plots[[1]] <- test1
 	
 	test2 <- nmHistogram(testData, vars = "X, Z", bVar = "B", refLine = "median")
@@ -177,17 +214,28 @@ gen.nmHistogram <- function(testDataList)
 	test4 <- nmHistogram(testData, vars = "X, Z", bVar = "B", refLine = "median", addDensity = TRUE, type = "density")
 	plots[[4]] <- test4
 	
+	# finally, check maxTLevels and maxPanels, along with generics and subset and factBin, xRotAngle
+	
+	
 	plots
 }
+
 
 gen.nmScatterMatrix <- function(testDataList)
 {
 	testData2 <- testDataList[[2]]
 	plots <- vector(mode = "list", length = 2)
-	plots[[1]] <- nmScatterMatrix(testData2, "X,Y")
+	
+	plots[[1]] <- nmScatterMatrix(testData2, "X,Y", bVars = "B")
 	# check the try/catch loess failure logic
 	plots[[2]] <- nmScatterMatrix(testData2, "X,Y", addLoess = TRUE, title = "Foo")
-	plots
+	
+	graphSubset(testDataList[[4]]@problems[[1]]) <- "ID < 10"
+	plots[[3]] <- nmScatterMatrix(testDataList[[4]], 
+			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9, addLoess = TRUE)
+	
+	plots[[4]] <- nmScatterMatrix(getProblem(testDataList[[4]]), 
+			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9, addLoess = TRUE)
 }
 
 gen.nmQQNorm <- function(testData)
@@ -195,47 +243,58 @@ gen.nmQQNorm <- function(testData)
 	plots <- vector(mode = "list", length = 3)
 	test1 <- nmQQNorm(sleep, "extra", bVar = "group", xLabs = "Normal distribution", titles = "Sleep data", yLabs = "Extra sleep")
 	plots[[1]] <- test1
-	# TODO: not working?
-	oldSettings <- getGraphParams("refline")
-	setGraphParams("refline", list(col = "black", lty = 2, lwd = 2))
+	
 	
 	plots[[2]]<- nmQQNorm(sleep, "extra")
 	plots[[3]] <- nmQQNorm(sleep, "extra", qqLine = FALSE)
 	
-	setGraphParams("refline", oldSettings)
 	
-	#####okimberlin#####
+	#####okimberlin: tests the scale argument
 	
 	plots[[4]]<- nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="free")
-	plots[[5]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="sliced")
-	plots[[6]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="same")
-	plots[[7]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education"),yAxisScales="same")
-	plots[[8]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education"),yAxisScales="free")
-	plots[[9]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="free")
-	plots[[10]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="sliced")
-	plots[[11]]<-nmQQNorm(swiss,c("Fertility","Infant.Mortality","Education","Agriculture"),yAxisScales="same")
-	plots[[11]]<-nmQQNorm(quakes,c("depth","mag"),yAxisScales="free")
+	plots[[5]]<- nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="sliced")
+	plots[[6]]<- nmQQNorm(swiss,c("Fertility","Infant.Mortality"),yAxisScales="same")
 	
-	
-	
+	# test generic, etc 
+	graphSubset(testData[[4]]@problems[[1]]) <- "ID < 10"
+	plots[[7]] <- nmQQNorm(testData[[4]], "IWRES", bVars = "ID,TIME",
+			maxTLevels = 2,maxPanels = 9 )
+	plots[[8]] <- nmQQNorm(getProblem(testData[[4]]), "IWRES", bVars = "ID,TIME",
+			maxTLevels = 2,maxPanels = 9 )
 	plots
 }
+
+# minimal test, other features should be tested by nmScatterPlot tests
 
 gen.nmACPlot <- function(testDataList)
 {
 	testData3 <- testDataList[[3]]
-	test1 <- nmACPlot(testData3, "X")
-	list(test1)
+	plots <- list()
+	plots[[1]]<- nmACPlot(testData3, "X")
+	
+	plots
 }
 
 gen.nmDotPlot <- function(testData)
 {
 	plots <- list()
 	plots[[1]] <- nmDotPlot(testData[[1]], factVar = "B", contVar = "X,W")
-	plots[[2]] <- nmDotPlot(testData[[1]], factVar = "B", contVar = "X,W", bVars = "G", title = "Test",
+	plots[[2]] <- nmDotPlot(testData[[1]], factVar = "B", contVar = "X,W", bVars = "G", title = "Test 2",
 			 xLab = "xlabel", yLab = "ylabel")
-	plots[[3]] <- nmDotPlot(testData[[1]], factVar = "B", contVar = "X", gVar = "G", title = "Test",
+	plots[[3]] <- nmDotPlot(testData[[1]], factVar = "B", contVar = "X", gVar = "G", title = "Test 3",
 			 xLab = "xlabel", yLab = "ylabel")
+	plots[[4]] <- nmDotPlot(testData[[1]], factVar = "Y", contVar = "X", title = "Test 4",
+			 xLab = "xlabel", yLab = "ylabel", maxFactPerPanel = 5)
+	
+	graphSubset(testData[[4]]@problems[[1]]) <- "ID < 10"
+	
+	plots[[5]] <- nmDotPlot(testData[[4]], factVar = "ID", contVar = "WT", bVars = "TIME", 
+			maxTLevels = 4, title = "Test 5", gVar = "SEX", addLegend = TRUE )
+	
+	plots[[6]] <- nmDotPlot(getProblem(testData[[4]]), factVar = "ID", contVar = "WT", bVars = "TIME", 
+			maxTLevels = 4, title = "Test 5", gVar = "SEX", addLegend = TRUE )
+	
+	# check maxFactPerPanel, generics, etc
 	plots
 	
 }
