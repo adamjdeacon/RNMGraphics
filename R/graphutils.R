@@ -12,15 +12,28 @@
 #' @param varName Name of NONMEM variable
 #' @param useVarNameifMissing If TRUE, returns the variable name as the label if the variable name does not have
 #' a label, else returns an empty character
+#' @param maxLength : if label is longer than this, insert line-feeds to break
 #' @return variable label, variable name or character(0) depending on parameters
 #' @author fgochez
 #' @keywords
 
-getVarLabel <- function(varName, useVarNameifMissing = TRUE)
+# TODO: unit test
+
+getVarLabel <- function(varName, useVarNameifMissing = TRUE, maxLength = getGraphParams("legend")$maxTitleLength)
 {
 	lab <- getVarDescription(varName)$Label
 	if(length(lab) == 0 && useVarNameifMissing)
-		return(varName)
+		lab <- varName
+	# handle long names by splicing in line feeds 
+	if(nchar(lab) > maxLength)
+	{
+		splitPoints <- seq(from = 0, to = nchar(lab), by = maxLength )
+		substrings <- substring(lab, head(splitPoints, -1) + 1,tail(splitPoints, -1 ))
+		# add remaining chunk
+		if(nchar(lab) %% maxLength > 0)
+			substrings <- c(substrings, substring(lab, tail(splitPoints, 1) + 1, nchar(lab)))
+		lab <- paste(substrings, collapse = "\n")
+	}
 	lab
 }
 
