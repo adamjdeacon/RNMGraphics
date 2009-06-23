@@ -1,9 +1,8 @@
-# TODO: test maxTLevels, maxPanels
-# TODO: maxTLevels + different iVar
 
-
-genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE, 
-		writeRData = FALSE, writeComparisonTable = FALSE, loadPack = TRUE)
+genExpectedGraphs <- function(outputDir = "./", writeImages = TRUE, 
+		writeRData = FALSE, writeComparisonTable = FALSE, loadPack = TRUE, 
+		resultDir = outputDir,	expectedDir = file.path("..", "expected/"),
+		comparisonTable = "testcases.csv")
 {
 	
 	.dataList <- list()
@@ -89,9 +88,9 @@ genExpectedGraphs <- function(outputDir = "../expected/", writeImages = TRUE,
 			outfileNames <- paste(plotNames, ".png", sep = "")
 		else
 			outfileNames <- paste(plotNames, ".jpg", sep = "")
-		outtable <- data.frame(filePath1 = paste(getwd(), "/", sep = ""), filePath2 = outputDir,
+		outtable <- data.frame(filePath1 = resultDir, filePath2 = expectedDir,
 				file1 = outfileNames, file2 = outfileNames, outFile = paste("_", outfileNames, sep = ""))
-		write.csv(outtable, "testcases.csv", row.names = FALSE)
+		write.csv(outtable, comparisonTable, row.names = FALSE)
 	}
 	RNMGraphics:::initializeOptions()
 	
@@ -231,10 +230,10 @@ gen.nmScatterMatrix <- function(testDataList)
 	
 	graphSubset(testDataList[[4]]@problems[[1]]) <- "ID < 10"
 	plots[[3]] <- nmScatterMatrix(testDataList[[4]], 
-			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9, addLoess = TRUE)
+			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9)
 	
 	plots[[4]] <- nmScatterMatrix(getProblem(testDataList[[4]]), 
-			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9, addLoess = TRUE)
+			"DV,PRED,IPRED","TIME,ID", iVar = "SUBJ", maxTLevels = 4, maxPanel = 9)
 	plots
 }
 
