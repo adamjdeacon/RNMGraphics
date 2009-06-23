@@ -28,7 +28,7 @@ initializeOptions <- function()
 		axis.right = 1, axis.left = 0.9)
 	layout.heights <- list(bottom.padding = 1, top.padding = 1, axis.xlab.padding = 0.8,
 			axis.top = 0.8, axis.bottom = 0.9) 
-	legend = list(position = "right", cex = 0.7)
+	legend = list(position = "right", cex = 0.7, maxTitleLength = Inf)
 	panelLayout = list(layout = numeric(0))
 	
 	.RNMGraphicsEnv$graphPars <- 
@@ -52,7 +52,8 @@ initializeOptions <- function()
 			layout.widths = layout.widths,
 			layout.heights = layout.heights,
 			panelLayout = panelLayout,
-			panelMisc = list("as.table" = TRUE), 
+			panelMisc = list("as.table" = TRUE),
+			legend = legend,
 			strip = list(stripfun = defaultStrip, strip.bg = rev(grey.colors(4)))
 		)
 	.RNMGraphicsEnv$defaultSubset <- c("MDV != 1", "EVID == 0", "AMT <= 0") 
