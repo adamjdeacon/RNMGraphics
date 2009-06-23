@@ -71,9 +71,17 @@ nmACPlot.data.frame <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NU
 	# lag while preserving the ID structure
 	# only one variable allowed at the moment
 	var <- var[1]
+	
+	# remove any IDs with only one entry
+	IDcounts <- table(obj[[iVar]])
+	IDStoRemove <- names(IDcounts)[IDcounts < 2]
+	obj <- obj[!(obj[[iVar]] %in% IDStoRemove), ] 
+	
 	laggedVar <- paste(var, ".LAGGED", sep = "")
 	lagRecords <- function(x)
 	{
+		if(nrow(x) < 2)
+			return(NULL)
 		x <- x[order(x[[tVar]]),]
 		y <- rbind(  tail(x, -1), rep(NA, length.out = ncol(x)))
 		
