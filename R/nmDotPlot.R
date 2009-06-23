@@ -136,7 +136,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	else maxPanels <- numeric(0)
 	# TODO: at the moment, title = gVar rather than its label.  This is because 
 	# the full description often causes overflows (e.g. when gVar = EVID)
-	auto.key <- if(addLegend) list(title = gVar, cex=.7, rows=10,space="right") else NULL
+	auto.key <- if(addLegend) list(title = getVarLabel(gVar), cex=.7, rows=10,space="right") else NULL
 
 	for(i in seq_along(plotFormulas))
 	{
