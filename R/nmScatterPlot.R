@@ -103,7 +103,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	else maxPanels <- numeric(0)
 	
 	xVars <- CSLtoVector(xVars)
-	#RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
+	RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
 	# TODO eliminate this copy
 	dataSet <- applyGraphSubset(obj, graphSubset(obj))
@@ -141,11 +141,11 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	# are currently deleted by CSLtoVector.  A workaround is needed for this, and documentation should
 	# make clear thet CSLs are not allowed
 	if(!is.null(xLab))
-		xLab <- rep(CSLtoVector(xLab), length.out = numCombos)
+		xLab <- rep(xLab, length.out = numCombos)
 	else
 		xLab <- varCombos[,1]
 	if(!is.null(yLab))
-		yLab <- rep(CSLtoVector(yLab), length.out = numCombos)
+		yLab <- rep(yLab, length.out = numCombos)
 	else
 		yLab <- varCombos[,2]
 	
