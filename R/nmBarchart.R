@@ -81,24 +81,32 @@ nmBarChart.data.frame <- function(obj, xVars, yVars, xLab = NULL, xRotAngle = 0,
 	{
 		currentX <- varCombos[i,2]
 		currentY <- varCombos[i,1]
-		#if(is.numeric(obj[,currentX]))
 
 		tab <- table(obj[[currentX]], obj[[currentY]])
-		# tab[,1] <- tab[,1] / sum(tab[,1]); tab[,2] <- tab[,2]
+		
 		tab <- sweep(tab, 1, rowSums(tab), "/")
 		if(addLegend) key <- list(title = getVarLabel(currentY), 
-					points = FALSE, rectangles = TRUE, space = "right", cex = 0.7)
+					points = FALSE, rectangles = TRUE, space = "right", cex = 0.7, 
+					columns = .legendColumns(length(unique(obj[[yVars[i]]] )) ))
 		else key <- NULL
 		scales <- list( x = list(rot = xRotAngle), y = list())
-		plotList[[i]] <- 	
-				barchart(tab, xlab = xLab[i], ylab = yLab[i], horizontal = FALSE, scales = scales,
-							par.settings = mapTopar.settings(graphParams), 
+		plotList[[i]] <- barchart(tab, xlab = xLab[i], ylab = yLab[i], horizontal = FALSE, 
+				scales = scales, par.settings = mapTopar.settings(graphParams), 
 					auto.key = key, main = titles, outer = TRUE, ...) # end with
 	}
 	
 	result <- multiTrellis(plotList, RNMGraphics:::stdGridDims( numCombos, 3))
 	result
 	
+}
+
+
+
+.legendColumns <- function(numLevels)
+{
+	MAXROWS <- 25
+	
+	floor(numLevels / MAXROWS) + ifelse(numLevels %% MAXROWS > 0, 1, 0)
 }
 
 setMethod("nmBarChart", signature(obj = "data.frame"), nmBarChart.data.frame)
