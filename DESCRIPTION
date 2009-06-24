@@ -1,8 +1,8 @@
 Package: RNMGraphics
 Type: Package
 Title: NONMEM graphics
-Version: 0.1.16
-Date: 2009-06-23
+Version: 0.1.17
+Date: 2009-06-24
 Author: Mango Solutions
 Maintainer: <support@mango-solutions.com>
 Suggests: RUnit
