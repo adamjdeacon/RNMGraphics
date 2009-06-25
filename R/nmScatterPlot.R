@@ -108,7 +108,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	# TODO eliminate this copy
 	dataSet <- applyGraphSubset(obj, graphSubset(obj))
 	
-	if(overlaid)
+	if(overlaid && length(yVars) > 1)
 	{
 		return(.overlaidScatter(obj =dataSet, xVars = xVars, yVars = yVars, bVars = bVars, 
 						gVars = gVars, iVars = iVars, 
@@ -119,14 +119,13 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, ...))
 	}
 	# bin the xVariable if it has more than a certain number of levels, and then use boxplot if this is the case.  Note:
-	# TODO: move this behaviour into a different package!
-	# TODO: UNITTESTS
-	if(length(unique(obj[,xVars])) > xBin)
-	{
-		newObj <- addDerivedCategorical(obj, xVars, paste(xVars, "CUT", sep = "."), breaks = xBin)
-		return(nmBoxPlot(newObj, contVar = yVars, factVar = paste(xVars, "CUT", sep = "."), xLabs =NULL, yLabs = NULL,
-						ovelaid = overlaid, titles = titles, bVars = bVars))
-	}
+#	# TODO: move this behaviour into a different package!
+#	if(length(unique(obj[,xVars])) > xBin)
+#	{
+#		newObj <- addDerivedCategorical(obj, xVars, paste(xVars, "CUT", sep = "."), breaks = xBin)
+#		return(nmBoxPlot(newObj, contVar = yVars, factVar = paste(xVars, "CUT", sep = "."), xLabs =NULL, yLabs = NULL,
+#						ovelaid = overlaid, titles = titles, bVars = bVars))
+#	}
 	# take all combinations of x variables against y variables
 	varCombos <- varComboMatrix(xVars, yVars)
 	numCombos <- nrow(varCombos)
@@ -152,7 +151,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	# repeat these variables so that there is one entry for each combination. 
 	repeatVars(c("addLegend", "addGrid", "addLoess", "titles", "logX", "logY", "idLines","types", "equalAxisScales"),
 				list(addLegend, addGrid, addLoess, titles, logX, logY, idLines ,types, equalAxisScales), length.out = numCombos )
-	# retrieve iVar
+
 	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
 	
 	plotFormulas <- apply(cbind(varCombos[,2], varCombos[,1] ), 1, paste, collapse = "~")
@@ -187,13 +186,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], length(yVars) ) 
 		
 		scales <- list(x = list(), y = list())
-		# log axes if necessary
-		# TODO: update for multiple y vars
+	
 		if(logX[i]) scales$x <- list(log = "e", at = pretty(dataSet[[xVars[i]]]))
-		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[1]]]))
-		# Set axes equal if required
-		# TODO check that this really works with multiple y axes
-		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
+		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[i]]]))
+				
+		if(equalAxisScales[i]) scales$limits <- padLimits(range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T))
+		
 		if(length(yVars) > 1 || length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
@@ -203,7 +201,6 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 					data = dataSet, panel = panel.nmScatterPlot, featuresToAdd = featuresToAdd, 
 					key = plotKey, main = titles[[i]], idLabels = idLabels, scales =scales,
 					xlab = xLab[i],	ylab = yLab[i],	type = types[i], 
-					# TODO: move this logic out of the loop.  Also, wrap this in a function
 					par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, 
 					layout = layout, multiYVar = length(yVars) > 1,...)
  				) # end with
@@ -218,7 +215,6 @@ setMethod("nmScatterPlot", signature(obj = "data.frame"), nmScatterPlot.data.fra
 
 setMethod("nmScatterPlot", signature(obj = "NMProblem"), nmScatterPlot.NMProblem)
 
-# TODO: gVar not implemented correctly for all types other than "p"
 
 panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE), 
 		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, multiYVar = FALSE, ...)

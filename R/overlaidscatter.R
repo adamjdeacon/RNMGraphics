@@ -59,8 +59,7 @@
 		# log axes if necessary
 		if(logX[i]) scales$x <- list(log = "e", at = pretty(obj[[xVars[i]]]))
 		if(logY[i]) scales$y <- list(log = "e", at = pretty(obj[[yVars[1]]]))
-		# TODO: this will not quite work when there are multiple yVars
-		if (equalAxisScales[i]) scales$limits <- range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T)
+		if (equalAxisScales[i]) scales$limits <- padLimits(range(unlist(obj[c(xVars[i], yVars)]), na.rm=T))
 		
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		

@@ -58,3 +58,9 @@ scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
 	}
 	result
 }
+
+
+padLimits <- function(range, amount = 0.05) {
+	magnitude = diff(range) * amount
+	c(range[1] - magnitude , range[2] + magnitude )
+}
