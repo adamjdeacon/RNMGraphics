@@ -185,10 +185,13 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		# get idLabels.  Note that these will have to be repeated if there is more than one yvar
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], length(yVars) ) 
 		
-		scales <- list(x = list(), y = list())
-	
-		if(logX[i]) scales$x <- list(log = "e", at = pretty(dataSet[[xVars[i]]]))
-		if(logY[i]) scales$y <- list(log = "e", at = pretty(dataSet[[yVars[i]]]))
+		
+		scales <- list(x = list(at = pretty(dataSet[[xVars[i]]])), y = list(pretty(dataSet[[yVars[i]]])))
+		if(all(dataSet[[xVars[i]]] == round(dataSet[[xVars[i]]])))
+			scales$x$at <- unique(round(scales$x$at))
+		
+		if(logX[i]) scales$x <- list(log = "e")
+		if(logY[i]) scales$y <- list(log = "e")
 				
 		if(equalAxisScales[i]) scales$limits <- padLimits(range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T))
 		
