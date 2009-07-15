@@ -36,8 +36,6 @@
 #' @author fgochez
 #' @keywords hplot
 
-# TODO: take out "doPlot" (code review)
-
 nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
@@ -86,10 +84,6 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 	
 }
 
-# TODO: implement multiple grouping variables
-# TODO: repetition of legend for each plot doesn't look great, but is difficult to solve. Consider
-# moving this using grid graphics
-
 nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
@@ -118,14 +112,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						yLab = yLab, types = types, equalAxisScales = equalAxisScales,
 						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, ...))
 	}
-	# bin the xVariable if it has more than a certain number of levels, and then use boxplot if this is the case.  Note:
-#	# TODO: move this behaviour into a different package!
-#	if(length(unique(obj[,xVars])) > xBin)
-#	{
-#		newObj <- addDerivedCategorical(obj, xVars, paste(xVars, "CUT", sep = "."), breaks = xBin)
-#		return(nmBoxPlot(newObj, contVar = yVars, factVar = paste(xVars, "CUT", sep = "."), xLabs =NULL, yLabs = NULL,
-#						ovelaid = overlaid, titles = titles, bVars = bVars))
-#	}
+	
 	# take all combinations of x variables against y variables
 	varCombos <- varComboMatrix(xVars, yVars)
 	numCombos <- nrow(varCombos)
@@ -155,7 +142,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
 	
 	plotFormulas <- apply(cbind(varCombos[,2], varCombos[,1] ), 1, paste, collapse = "~")
-	# if there are "by variables", adjust the plotting formuals passed to xyplot
+	# if there are "by variables", adjust the plotting formulas passed to xyplot
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
@@ -184,12 +171,19 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		
 		# get idLabels.  Note that these will have to be repeated if there is more than one yvar
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], length(yVars) ) 
+				
+		scales <- list(x = list(), y = list())
 		
-		
-		scales <- list(x = list(at = pretty(dataSet[[xVars[i]]])), y = list(pretty(dataSet[[yVars[i]]])))
-		if(all(dataSet[[xVars[i]]] == round(dataSet[[xVars[i]]])))
-			scales$x$at <- unique(round(scales$x$at))
-		
+		# Here we check for integer data on the x-axis.  If so, use integer tick marks.  
+		# We remove missing data first just in case prior to performing this
+		# currently unused
+	
+#		if(!equalAxisScales[i] && !is.factor(dataSet[[xVars[i]]]) && 
+#				all(na.omit(dataSet[[xVars[i]]] == round(dataSet[[xVars[i]]]))))
+#		{
+#			# scales <- list(x = list(at = pretty(dataSet[[xVars[i]]])), y = list(pretty(dataSet[[yVars[i]]])))
+#			scales$x$at <- unique(round(pretty(dataSet[[xVars[i]]])))
+#		}
 		if(logX[i]) scales$x <- list(log = "e")
 		if(logY[i]) scales$y <- list(log = "e")
 				
@@ -238,12 +232,13 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	# grab "superpose.line" styles
 	superpose.line.col <- getGraphParams("superpose.line")$col
 	
-	# TODO: add more comments
+	
 	if(type == "p")
 	{
-
+		# points only
 		panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, groups,
 					...)
+			
 	}
 	# TODO: capture all line parameters
 	else if(type == "l")
