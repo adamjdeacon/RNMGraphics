@@ -174,16 +174,21 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 				
 		scales <- list(x = list(), y = list())
 		
-		# Here we check for integer data on the x-axis.  If so, use integer tick marks.  
-		# We remove missing data first just in case prior to performing this
-		# currently unused
+		# Here we check for integer data on the x-axis and y-axis.  If so, use integer tick marks.  
+		# We remove missing data first just in case prior to performing this.  Note that the y-axis
+		# is only handled if there is a single y variable, and this code is only executed if equal axis-scales
+		# is set to false.
 	
-#		if(!equalAxisScales[i] && !is.factor(dataSet[[xVars[i]]]) && 
-#				all(na.omit(dataSet[[xVars[i]]] == round(dataSet[[xVars[i]]]))))
-#		{
-#			# scales <- list(x = list(at = pretty(dataSet[[xVars[i]]])), y = list(pretty(dataSet[[yVars[i]]])))
-#			scales$x$at <- unique(round(pretty(dataSet[[xVars[i]]])))
-#		}
+		if(!equalAxisScales)
+		{
+		
+			if(!is.factor(dataSet[[xVars[i]]]) &&	all(na.omit(dataSet[[xVars[i]]] == round(dataSet[[xVars[i]]]))))			
+				scales$x$at <- unique(round(pretty(dataSet[[xVars[i]]])))
+			if(length(yVars) == 1 &&  !is.factor(dataSet[[yVars]]) &&	
+					all(na.omit(dataSet[[yVars]] == round(dataSet[[yVars]]))))
+				scales$y$at <- unique(round(pretty(dataSet[[yVars]])))
+		
+		}
 		if(logX[i]) scales$x <- list(log = "e")
 		if(logY[i]) scales$y <- list(log = "e")
 				
