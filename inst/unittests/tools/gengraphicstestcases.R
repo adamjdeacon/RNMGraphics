@@ -18,6 +18,12 @@ genExpectedGraphs <- function(outputDir = "./", writeImages = TRUE,
 	.dataList[[6]] <- data.frame(X = rep(seq(1, 2, length.out = 4), times = 4) + rep(c(0, 5, 10, 15), each = 4 ), Y = rep(1:4, times = 4),
 			G = rep(letters[1:4], each = 4), H = rep(1:2, each = 8))
 	
+	# final data set for checking algorithm to force integer axes to only have integer tick marks
+	.dataList[[7]] <- data.frame(Y = c(2, 3, 1, 3, 3, 1, 3, 2, 1, 3), 
+								X = c(1.3520803, 0.6580209, -1.3252070, 0.6388983, 0.4507879,  
+						0.5380433, 1.1361281, 0.3263466, 1.2457650, 0.9912256), 
+				Z = c(1, 3, 1, 2, 4, 2, 4, 1, 2, 1))		
+	
 	if(loadPack)
 	{
 		require(RNMGraphics)
@@ -158,7 +164,9 @@ gen.nmScatterPlot <- function(testDataList)
 	
 	plots[[12]] <- nmScatterPlot(testDataList[[4]], "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
 	plots[[13]] <- nmScatterPlot(getProblem(testDataList[[4]],1), "DV", "PRED", maxTLevels = 2, maxPanels = 9, bVars = "ID,TIME")
-	
+	plots[[14]] <- nmScatterPlot(testDataList[[7]], "X", "Y", titles = "Y axis should be integer only")
+	plots[[15]] <- nmScatterPlot(testDataList[[7]], "Y", "X", titles = "X axis should be integer only")
+	plots[[16]] <- nmScatterPlot(testDataList[[7]], "X", "Y,Z", titles = "Two y variables, behavior is ignored", yAxisRelations = "free")
 	plots
 	
 }
