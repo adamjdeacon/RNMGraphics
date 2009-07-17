@@ -155,14 +155,22 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 }
 
 # creates a grouping variable which splits the x-axis variable onto various panels.
-
+# TODO: at the moment this algorithm works in the sense that no more individuals are allowed on 
+# each panel than indicated, but sometimes allows considerably less.
 .factorTrellis <- function(var,varName, maxPerPanel)
 {
 	varLevels <- unique(var)
 	parallelVec <- seq_along(varLevels)
 	names(parallelVec) <- as.character(varLevels)
-	numPanels <- floor(length(varLevels) / maxPerPanel) + ifelse(length(var) %% maxPerPanel > 0,  1, 0)
-	groupingVar <- rep(1:numPanels, length.out = length(varLevels)); groupingVar <- sort(groupingVar) 
+	
+	# TODO: add a test case for bugfix
+	
+	numPanels <- floor(length(varLevels) / maxPerPanel) + ifelse(length(varLevels) %% maxPerPanel > 0,  1, 0)
+	# groupingVar <- rep(1:numPanels, length.out = length(varLevels)); groupingVar <- sort(groupingVar) 
+	
+	# replace the above line with the following ?:
+	 groupingVar <- rep(1:numPanels, each = maxPerPanel)
+	 groupingVar <- groupingVar[1:length(var)]
 	
 	groupingVar[ parallelVec[as.character(var)] ]
 	
