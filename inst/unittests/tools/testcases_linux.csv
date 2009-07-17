@@ -12,6 +12,9 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot11.png,nmScatterPlot11.png,_nmScatterPlot11.png
 ./,../expected/linux/,nmScatterPlot12.png,nmScatterPlot12.png,_nmScatterPlot12.png
 ./,../expected/linux/,nmScatterPlot13.png,nmScatterPlot13.png,_nmScatterPlot13.png
+./,../expected/linux/,nmScatterPlot14.png,nmScatterPlot14.png,_nmScatterPlot14.png
+./,../expected/linux/,nmScatterPlot15.png,nmScatterPlot15.png,_nmScatterPlot15.png
+./,../expected/linux/,nmScatterPlot16.png,nmScatterPlot16.png,_nmScatterPlot16.png
 ./,../expected/linux/,nmQQNorm1.png,nmQQNorm1.png,_nmQQNorm1.png
 ./,../expected/linux/,nmQQNorm2.png,nmQQNorm2.png,_nmQQNorm2.png
 ./,../expected/linux/,nmQQNorm3.png,nmQQNorm3.png,_nmQQNorm3.png
@@ -63,6 +66,9 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot_st11.png,nmScatterPlot_st11.png,_nmScatterPlot_st11.png
 ./,../expected/linux/,nmScatterPlot_st12.png,nmScatterPlot_st12.png,_nmScatterPlot_st12.png
 ./,../expected/linux/,nmScatterPlot_st13.png,nmScatterPlot_st13.png,_nmScatterPlot_st13.png
+./,../expected/linux/,nmScatterPlot_st14.png,nmScatterPlot_st14.png,_nmScatterPlot_st14.png
+./,../expected/linux/,nmScatterPlot_st15.png,nmScatterPlot_st15.png,_nmScatterPlot_st15.png
+./,../expected/linux/,nmScatterPlot_st16.png,nmScatterPlot_st16.png,_nmScatterPlot_st16.png
 ./,../expected/linux/,nmQQNorm_st1.png,nmQQNorm_st1.png,_nmQQNorm_st1.png
 ./,../expected/linux/,nmQQNorm_st2.png,nmQQNorm_st2.png,_nmQQNorm_st2.png
 ./,../expected/linux/,nmQQNorm_st3.png,nmQQNorm_st3.png,_nmQQNorm_st3.png
