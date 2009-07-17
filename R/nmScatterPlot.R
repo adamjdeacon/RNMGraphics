@@ -26,11 +26,12 @@
 #' @param doPlot Should the plot be plotted immediately, before returning it as an object?
 #' @param types Plot types to use for each x/y pair.  Allowed types are "p" (for standard points), "l" (lines connected by the variable
 #' specified in "iVars", "i" for points labeled by "iVars", and "t" for labels connected by lines grouped by "iVars"
-#' @param overlaid Logical flag.  If TRUE, for each fixed x, the y variables will be overlaid onto a single plot
-#' @param problemNum
-#' @param subProblems
-#' @param equalAxisScales
-#' @param equaltYScales
+#' @param overlaid Logical flag. If TRUE, for each fixed x, the y variables will be overlaid onto a single plot
+#' @param problemNum Number of the problem (applicable to NMRun class only)
+#' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes obly)
+#' @param yAxisRelations *
+#' @param maxPanels *
+#' @param maxTLevels *
 #' @param ... Additonal variables passed to the xyplot function 
 #' @return An object of class multiTrellis holding the plot
 #' @author fgochez
@@ -39,9 +40,8 @@
 nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
-		types = "p", overlaid = FALSE, equalAxisScales = FALSE, equalYScales = TRUE,
-		xBin = Inf, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
-		yAxisRelations = c("same", "free", "sliced"),
+		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, 
+		maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
 		problemNum = 1, subProblems = 1,
 		...)
 {
@@ -95,13 +95,14 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	if(length(maxPanels) > 0) layout <- NULL
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
-	
+	# extract xVars - currently only one is allowed
 	xVars <- CSLtoVector(xVars)
 	RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
 	yVars <- CSLtoVector(yVars)
-	# TODO eliminate this copy
+	# extract the desired subset
 	dataSet <- applyGraphSubset(obj, graphSubset(obj))
-	
+	# if the y-axis variables should be overlaid (rather than displayed side-by-side on lattice panels),
+	# go straight to the .overlaidScatter function and return the result
 	if(overlaid && length(yVars) > 1)
 	{
 		return(.overlaidScatter(obj =dataSet, xVars = xVars, yVars = yVars, bVars = bVars, 
@@ -114,6 +115,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	}
 	
 	# take all combinations of x variables against y variables
+	# NOTE: this logic is outdated and is related to the fact that lattice's extended formula functionality
+	# was not being used to plot multiple x/y variables, but is now.  numCombos should always be 1 at the
+	# moment
+	# It is benign at the moment but confusing.
+	# TODO: remove this
+	
 	varCombos <- varComboMatrix(xVars, yVars)
 	numCombos <- nrow(varCombos)
 	
@@ -125,7 +132,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	# assign and y labels, taking care to handle the case where they are missing
 	# TODO: There is a quirk here in that xLab and yLab _cannot_ be a comma seperated list since empty strings
 	# are currently deleted by CSLtoVector.  A workaround is needed for this, and documentation should
-	# make clear thet CSLs are not allowed
+	# make clear thet CSLs are not allowed.  In any case, this is irrelevant since numCombos can only be 1
 	if(!is.null(xLab))
 		xLab <- rep(xLab, length.out = numCombos)
 	else
@@ -146,19 +153,19 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
+		# bin the by-variables as necessary
 		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVars)
 		bVars <- temp$columns
 		# coerce each "by" variable to a factor
 		dataSet <- coerceToFactors(temp$data, bVars)
+		# post-process the plot formulas by adding the trellis variables
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
-	# This function is used in order to allow for "NULL" x and y labels
 	
 	par.settings <- mapTopar.settings()
 	stripfn <- getStripFun()
-	# at the moment, maxPanels overrides the layout
 	
 	for(i in seq_along(plotFormulas))
 	{
@@ -193,7 +200,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		if(logY[i]) scales$y <- list(log = "e")
 				
 		if(equalAxisScales[i]) scales$limits <- padLimits(range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T))
-		
+		# only apply the yAxisRelations if there is reason to 
 		if(length(yVars) > 1 || length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
@@ -217,6 +224,22 @@ setMethod("nmScatterPlot", signature(obj = "data.frame"), nmScatterPlot.data.fra
 
 setMethod("nmScatterPlot", signature(obj = "NMProblem"), nmScatterPlot.NMProblem)
 
+
+#' nmScatterPlot panel function - this is used only when overlaid = FALSE 
+#' @name panel.nmScatterPlot
+#' @title nmScatterPlot panel function (1 of 2)
+#' @param x (usual)
+#' @param y  (usual)
+#' @param subscripts (usual) 
+#' @param featuresToAdd named logical vector of features to add (grid, loess, idLine) 
+#' @param idLabels Identifier labels 
+#' @param type one of "p", "i", "l", "o", "t"
+#' @param groups (usual)
+#' @param multiYVar currently unused
+#' @param ... additional parameters to panel.xyplot
+#' @return none
+#' @author fgochez
+#' @keywords
 
 panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE), 
 		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, multiYVar = FALSE, ...)
