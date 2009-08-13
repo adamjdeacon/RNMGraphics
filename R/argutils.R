@@ -17,10 +17,9 @@ repeatVars <- function(assignTo, valsToRepeat, length.out = 1)
 }
 
 # this function does all processing of trellis variables.  It partitions those having a more than "maxLevels",
-# coerces others to factors, 
-# and returns a list of the processed data frame
+# coerces others to factors, and returns a list of the processed data frame
 
-processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = "BINNED", exemptColumns = "ID")
+processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = NULL, exemptColumns = "ID")
 {
 	# TODO: UNITTEST
 	columns <- intersect(columns, names(df))
@@ -32,9 +31,10 @@ processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = "BI
 		# if numeric and has too many levels, bin it
 		if(class(df[[column]]) == "numeric" && length(unique(df[[column]])) > maxLevels && !(column %in% exemptColumns))
 		{
-			outDf <- addDerivedCategorical(outDf, column, paste(column, postFix, sep = "."), breaks = maxLevels)
+			if(!is.null(postFix)) newVarName <- paste(column, postFix, sep = ".") else newVarName <- column
+			outDf <- addDerivedCategorical(outDf, column, newVarName, breaks = maxLevels)
 		# reference the binned variable
-			outputNames[n] <-  paste(column, postFix, sep = ".") 
+			outputNames[n] <-  newVarName 
 		}
 	}
 	return(list(data = outDf, columns = outputNames))
