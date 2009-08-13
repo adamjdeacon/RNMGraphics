@@ -2,21 +2,27 @@
 # $LastChangedDate$
 
 
-#' craetes histograms of one or more NONMEM variables
+#' creates histograms of one or more NONMEM variables
 #' @name nmHistogram
-#' @title NONMEM histogram
+#' @title NONMEM data histogram
 #' @param obj The object from which data will be plotted (NMRun, NMProblem or data.frame)
 #' @param vars Variables from which to generate a histogram (character vector or comma seperate string of names)
 #' @param bVars “Trellis” variables on which to split data.  
-#' @param refLine Controls addition of a reference line to the histogram(s).  Use is self-explanatory.
+#' @param iVar Subject identifier variable
+#' @param refLine Controls addition of a reference line to the histogram(s).  Choices are "none", "mean" or "median".
 #' @param type Determines the style of y-axis that is used for the plot (percentages, frequencies, or proportions)
 #' @param addDensity Logical flag.  Should a density estimate be plotted? Only relevant for type = "density"
-#' @param titles Plot titles
-#' @param xLabs x axis labels
+#' @param titles Plot title
+#' @param xLabs x axis label
 #' @param extraSubset Currently unused
 #' @param addGrid Currently unused
-#' @param nint Number of intervals for the creation of X axis bars.  It functions identically to the nint parameter of the histogram function from the lattice package.
+#' @param nint Number of intervals for the creation of X axis bars.  It functions identically to the nint parameter of the histogram function from the lattice package
 #' @param breaks Control the calculation of breakpoints for the histogram.  It functions identically to the breaks parameter of the histogram function from the lattice package.
+#' @param layout *
+#' @param maxPanels *
+#' @param maxTLevels *
+#' @param problemNum *
+#' @param subProblems *
 #' @param ... Additional parameters passed to panel.histogram 
 #' @return An object of class multiTrellis
 #' @author fgochez
