@@ -8,23 +8,22 @@
 #' @param obj An object of class NMRun, NMProblem, or data.frame. The object from which data will be plotted.
 #' @param xVars A character vector or comma-seperated string of x-variables. Names of the variables to plot on x-axes.
 #' @param yVars Variables to plot on the y-axes, specified the same way as xVars
-#' @param bVars “Trellis” variables on which to split data.  Will be recycled for each x/y variable pair.
+#' @param bVars “Trellis” variables on which to split data.
 #' @param gVars “Grouping” variable – used to group points by colour, for legends and so on.  
-#' Will be recycled for each x/y variable pair.
 #' @param iVars Variable name of the “inherent grouping” variable.  This affects plots whose type is "l", "i" or "t".
 #' @param addLegend Should legends be added?
 #' @param addGrid should grids be added?
 #' @param addLoess should a loess smoother line be added? 
-#' @param titles Plot title for each x/y pair.  Optional
-#' @param logX Should the x-axis be logged?  Recycled for each x/y pair 
+#' @param titles Plot title 
+#' @param logX Should the x-axis be logged?
 #' @param logY similar to logX for y axis
-#' @param idLines Should reference lines of slope 1 and y-intercept 0 be added? Recycled for each x/y pair
+#' @param idLines Should reference lines of slope 1 and y-intercept 0 be added?
 #' @param abLines Unused at the moment.
 #' @param xLab x-axis labels.  By default, will use the names of the x-axis variables and their descriptions if any are available
 #' via getVarDescription in RNMImport
 #' @param yLab similar to the above, but for y-axis labels
 #' @param doPlot Should the plot be plotted immediately, before returning it as an object?
-#' @param types Plot types to use for each x/y pair.  Allowed types are "p" (for standard points), "l" (lines connected by the variable
+#' @param types Plot types to use.  Allowed types are "p" (for standard points), "l" (lines connected by the variable
 #' specified in "iVars", "i" for points labeled by "iVars", and "t" for labels connected by lines grouped by "iVars"
 #' @param overlaid Logical flag. If TRUE, for each fixed x, the y variables will be overlaid onto a single plot
 #' @param problemNum Number of the problem (applicable to NMRun class only)
@@ -40,7 +39,7 @@
 nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
-		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, 
+		types = "p", overlaid = FALSE, equalAxisScales = FALSE ,layout = NULL, maxPanels = NULL, 
 		maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
 		problemNum = 1, subProblems = 1,
 		...)
@@ -53,7 +52,7 @@ nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, 
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="" , 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
 							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
-							equalYScales = TRUE, xBin = Inf, layout = NULL, maxPanels = NULL, 
+							layout = NULL, maxPanels = NULL, 
 							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
@@ -70,7 +69,7 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
 							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
-							equalYScales = TRUE, xBin = Inf,layout = NULL, maxPanels = NULL , 
+							layout = NULL, maxPanels = NULL , 
 							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
 							problemNum = 1, subProblems = 1,
 							...)
@@ -88,7 +87,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  types = "p", overlaid = FALSE , 
-		 equalAxisScales = FALSE, equalYScales = TRUE,xBin = Inf, layout = NULL, maxPanels = NULL ,  
+		 equalAxisScales = FALSE,  layout = NULL, maxPanels = NULL ,  
 		 maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), 
 		 problemNum = 1, subProblems = 1, ...)
 {
@@ -196,8 +195,12 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 				scales$y$at <- unique(round(pretty(dataSet[[yVars]])))
 		
 		}
+		# log axes if necessary
 		if(logX[i]) scales$x <- list(log = "e")
 		if(logY[i]) scales$y <- list(log = "e")
+		
+		# if we are forcing the axis scales to be identical, we must pad out the range of the data since otherwise
+		# clipping occurs
 				
 		if(equalAxisScales[i]) scales$limits <- padLimits(range(unlist(dataSet[c(xVars[i], yVars)]), na.rm=T))
 		# only apply the yAxisRelations if there is reason to 
