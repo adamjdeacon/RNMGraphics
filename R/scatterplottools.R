@@ -42,6 +42,7 @@ scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
 		# x$text <- list(as.character(sort(gVarLevels)))
 		result <- c(list(text = list(as.character(sort(gVarLevels)))), x)
 	}
+	# else we have a plot type that uses identifier text
 	else
 	{
 		result <- with(graphParams,
@@ -59,6 +60,9 @@ scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
 	result
 }
 
+# utility function
+# pads out the limits of scatter plot when equalAxisScales = TRUE.  Without this padding, clipping of plot points
+# occurs at the edges of the plot area
 
 padLimits <- function(range, amount = 0.05) {
 	magnitude = diff(range) * amount
