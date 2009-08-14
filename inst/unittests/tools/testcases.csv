@@ -50,6 +50,7 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/,nmDotPlot4.jpg,nmDotPlot4.jpg,_nmDotPlot4.jpg
 ./,../expected/,nmDotPlot5.jpg,nmDotPlot5.jpg,_nmDotPlot5.jpg
 ./,../expected/,nmDotPlot6.jpg,nmDotPlot6.jpg,_nmDotPlot6.jpg
+./,../expected/,nmDotPlot7.jpg,nmDotPlot7.jpg,_nmDotPlot7.jpg
 ./,../expected/,timeEventPlots1.jpg,timeEventPlots1.jpg,_timeEventPlots1.jpg
 ./,../expected/,timeEventPlots2.jpg,timeEventPlots2.jpg,_timeEventPlots2.jpg
 ./,../expected/,nmScatterPlot_st1.jpg,nmScatterPlot_st1.jpg,_nmScatterPlot_st1.jpg
@@ -94,12 +95,12 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/,nmBoxPlot_st3.jpg,nmBoxPlot_st3.jpg,_nmBoxPlot_st3.jpg
 ./,../expected/,nmBoxPlot_st4.jpg,nmBoxPlot_st4.jpg,_nmBoxPlot_st4.jpg
 ./,../expected/,nmBoxPlot_st5.jpg,nmBoxPlot_st5.jpg,_nmBoxPlot_st5.jpg
-./,../expected/,nmBoxPlot_st6.jpg,nmBoxPlot_st6.jpg,_nmBoxPlot_st6.jpg
 ./,../expected/,nmDotPlot_st1.jpg,nmDotPlot_st1.jpg,_nmDotPlot_st1.jpg
 ./,../expected/,nmDotPlot_st2.jpg,nmDotPlot_st2.jpg,_nmDotPlot_st2.jpg
 ./,../expected/,nmDotPlot_st3.jpg,nmDotPlot_st3.jpg,_nmDotPlot_st3.jpg
 ./,../expected/,nmDotPlot_st4.jpg,nmDotPlot_st4.jpg,_nmDotPlot_st4.jpg
 ./,../expected/,nmDotPlot_st5.jpg,nmDotPlot_st5.jpg,_nmDotPlot_st5.jpg
 ./,../expected/,nmDotPlot_st6.jpg,nmDotPlot_st6.jpg,_nmDotPlot_st6.jpg
+./,../expected/,nmDotPlot_st7.jpg,nmDotPlot_st7.jpg,_nmDotPlot_st7.jpg
 ./,../expected/,timeEventPlots_st1.jpg,timeEventPlots_st1.jpg,_timeEventPlots_st1.jpg
 ./,../expected/,timeEventPlots_st2.jpg,timeEventPlots_st2.jpg,_timeEventPlots_st2.jpg
