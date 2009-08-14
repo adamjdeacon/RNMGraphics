@@ -4,16 +4,22 @@
 #' Creates a boxplot of continuous variables against factor variables
 #' @name nmBoxPlot
 #' @title NONMEM box plot
-#' @param obj NMRun, NMProblem or data.frame object from which to plot
-#' @param contVar continuous variables
-#' @param factVar factor variables
-#' @param bVars "by" variables
-#' @param titles Plot titles
-#' @param xLabs x-axis labels
-#' @param yLabs y-axis labels
+#' @param *
+#' @param contVar Character vector or comma-seperated list of continuous variables from which boxplots are created
+#' @param factVar factor variable (single string)
+#' @param bVars "by"/trellis variables
+#' @param iVar 
+#' @param titles *
+#' @param xLabs *
+#' @param yLabs *
+#' @param xRotAngle 
+#' @param maxPanels *
+#' @param maxTLevels *
+#' @param yAxisRelations  
+#' @param subProblems * 
 #' @param overlaid logical flag. Should multiple factor variables be plotted on a single plot, or should 
-#' multiple subplots with different factors be generated?
-#' @param problemNum Number of the problem to use if obj is of class NMRun
+#' multiple subplots with different factors be generated?  
+#' @param problemNum *
 #' @param ... additional parameters passed to bwplot
 #' @return A multiTrellis object
 #' @author fgochez
@@ -21,6 +27,18 @@
 
 # TODO: contVarOnX does not work with overLaid = TRUE
 
+#' 
+#' @param yLabs 
+#' @param overlaid 
+#' @param contVarOnX 
+#' @param layout 
+#' @param factBin 
+#' @param problemNum 
+
+#' @param ... 
+#' @return 
+#' @author fgochez
+#' @keywords
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		xRotAngle = 0,
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
