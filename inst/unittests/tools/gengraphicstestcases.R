@@ -294,14 +294,17 @@ gen.nmDotPlot <- function(testData)
 			 xLab = "xlabel", yLab = "ylabel", maxFactPerPanel = 5)
 	
 	graphSubset(testData[[4]]@problems[[1]]) <- "ID < 10"
-	
+	# check maxFactPerPanel, generics, etc
 	plots[[5]] <- nmDotPlot(testData[[4]], factVar = "ID", contVar = "WT", bVars = "TIME", 
 			maxTLevels = 4, title = "Test 5", gVar = "SEX", addLegend = TRUE )
 	
 	plots[[6]] <- nmDotPlot(getProblem(testData[[4]]), factVar = "ID", contVar = "WT", bVars = "TIME", 
 			maxTLevels = 4, title = "Test 5", gVar = "SEX", addLegend = TRUE )
 	
-	# check maxFactPerPanel, generics, etc
+	# Tests that the maxFactPerPanel algorithm has now been corrected.
+	testDf <- data.frame(X = rep(1:2, each = 10), ID = rep(1:10, length.out = 20))
+	plots[[7]] <- nmDotPlot(testDf, factVar = "ID", contVar = "X", maxFactPerPanel = 4)
+
 	plots
 	
 }
