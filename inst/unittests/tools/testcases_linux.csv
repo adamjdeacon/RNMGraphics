@@ -44,13 +44,13 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmBoxPlot3.png,nmBoxPlot3.png,_nmBoxPlot3.png
 ./,../expected/linux/,nmBoxPlot4.png,nmBoxPlot4.png,_nmBoxPlot4.png
 ./,../expected/linux/,nmBoxPlot5.png,nmBoxPlot5.png,_nmBoxPlot5.png
-./,../expected/linux/,nmBoxPlot6.png,nmBoxPlot6.png,_nmBoxPlot6.png
 ./,../expected/linux/,nmDotPlot1.png,nmDotPlot1.png,_nmDotPlot1.png
 ./,../expected/linux/,nmDotPlot2.png,nmDotPlot2.png,_nmDotPlot2.png
 ./,../expected/linux/,nmDotPlot3.png,nmDotPlot3.png,_nmDotPlot3.png
 ./,../expected/linux/,nmDotPlot4.png,nmDotPlot4.png,_nmDotPlot4.png
 ./,../expected/linux/,nmDotPlot5.png,nmDotPlot5.png,_nmDotPlot5.png
 ./,../expected/linux/,nmDotPlot6.png,nmDotPlot6.png,_nmDotPlot6.png
+./,../expected/linux/,nmDotPlot7.png,nmDotPlot7.png,_nmDotPlot7.png
 ./,../expected/linux/,timeEventPlots1.png,timeEventPlots1.png,_timeEventPlots1.png
 ./,../expected/linux/,timeEventPlots2.png,timeEventPlots2.png,_timeEventPlots2.png
 ./,../expected/linux/,nmScatterPlot_st1.png,nmScatterPlot_st1.png,_nmScatterPlot_st1.png
@@ -105,5 +105,6 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmDotPlot_st4.png,nmDotPlot_st4.png,_nmDotPlot_st4.png
 ./,../expected/linux/,nmDotPlot_st5.png,nmDotPlot_st5.png,_nmDotPlot_st5.png
 ./,../expected/linux/,nmDotPlot_st6.png,nmDotPlot_st6.png,_nmDotPlot_st6.png
+./,../expected/linux/,nmDotPlot_st7.png,nmDotPlot_st7.png,_nmDotPlot_st7.png
 ./,../expected/linux/,timeEventPlots_st1.png,timeEventPlots_st1.png,_timeEventPlots_st1.png
 ./,../expected/linux/,timeEventPlots_st2.png,timeEventPlots_st2.png,_timeEventPlots_st2.png
