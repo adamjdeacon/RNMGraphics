@@ -13,32 +13,26 @@ nmBoxPlot(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs =
   \item{obj}{ * }
   \item{contVar}{ Character vector or comma-seperated list of continuous variables from which boxplots are created }
   \item{factVar}{ Character vector or comma-seperated list of factor variables against which boxplots are created  }
-  \item{bVars}{ ~~Describe \code{bVars} here~~ }
-  \item{iVar}{ ~~Describe \code{iVar} here~~ }
-  \item{titles}{ ~~Describe \code{titles} here~~ }
-  \item{xLabs}{ ~~Describe \code{xLabs} here~~ }
-  \item{xRotAngle}{ ~~Describe \code{xRotAngle} here~~ }
-  \item{yLabs}{ ~~Describe \code{yLabs} here~~ }
-  \item{overlaid}{ ~~Describe \code{overlaid} here~~ }
-  \item{contVarOnX}{ ~~Describe \code{contVarOnX} here~~ }
-  \item{layout}{ ~~Describe \code{layout} here~~ }
-  \item{maxPanels}{ ~~Describe \code{maxPanels} here~~ }
-  \item{maxTLevels}{ ~~Describe \code{maxTLevels} here~~ }
-  \item{yAxisRelations}{ ~~Describe \code{yAxisRelations} here~~ }
-  \item{factBin}{ ~~Describe \code{factBin} here~~ }
-  \item{problemNum}{ ~~Describe \code{problemNum} here~~ }
-  \item{subProblems}{ ~~Describe \code{subProblems} here~~ }
-  \item{\dots}{ ~~Describe \code{\dots} here~~ }
+  \item{bVars}{ * }
+  \item{iVar}{ * }
+  \item{titles}{ * }
+  \item{xLabs}{ * }
+  \item{xRotAngle}{ Angle by which to rotate x-angle tick labels }
+  \item{yLabs}{* }
+  \item{overlaid}{ If multiple contVars are specified, should they appear side by side, or on one panel? }
+  \item{contVarOnX}{ If TRUE, will flip axes so that continuous variable is on the y-axis }
+  \item{layout}{ * }
+  \item{maxPanels}{ * }
+  \item{maxTLevels}{ * }
+  \item{yAxisRelations}{ * }
+  \item{factBin}{ If any of the factVars have more levels than factBin, they will be binned down to this amount }
+  \item{problemNum}{ * }
+  \item{subProblems}{ * }
+  \item{\dots}{ Additional parameters to bwplot }
 }
-\details{
-  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+	multiTrellis class object containing the plot
 }
 
 \author{ Mango Solutions }
