@@ -2,12 +2,12 @@
 # $LastChangedDate$
 
 # TODO: logX, logY not used
-# TODO: take out "doPlot"
 
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
-		yLab = NULL, types = "p", equalAxisScales = FALSE, maxPanels = NULL, layout = NULL, maxTLevels, ...)
+		yLab = NULL, types = "p", equalAxisScales = FALSE, maxPanels = NULL, layout = NULL,
+		maxTLevels, xRotAngle = 0, ...)
 {
 	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")
@@ -55,10 +55,11 @@
 		else plotKey <- NULL
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(obj[[iVars[i]]], times = length(yVars))
 		
-		scales <- list()
+		scales <- list(x = list(rot = xRotAngle), y = list())
 		# log axes if necessary
-		if(logX[i]) scales$x <- list(log = "e", at = pretty(obj[[xVars[i]]]))
-		if(logY[i]) scales$y <- list(log = "e", at = pretty(obj[[yVars[1]]]))
+		if(logX[i]) scales$x <- c(scales$x, list(log = "e", at = pretty(obj[[xVars[i]]])))
+		if(logY[i]) scales$y <- c(scales$y, list(log = "e", at = pretty(obj[[yVars[1]]])))
+		
 		if (equalAxisScales[i]) scales$limits <- padLimits(range(unlist(obj[c(xVars[i], yVars)]), na.rm=T))
 		
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])

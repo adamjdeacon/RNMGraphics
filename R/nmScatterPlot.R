@@ -30,6 +30,7 @@
 #' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes obly)
 #' @param yAxisRelations *
 #' @param maxPanels *
+#' @param xRotAngle Angle by which to rotate the x-axis tick marks
 #' @param maxTLevels *
 #' @param ... Additonal variables passed to the xyplot function 
 #' @return An object of class multiTrellis holding the plot
@@ -40,7 +41,7 @@ nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars 
 		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
 		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
 		types = "p", overlaid = FALSE, equalAxisScales = FALSE ,layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
+		maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), xRotAngle = 0,
 		problemNum = 1, subProblems = 1,
 		...)
 {
@@ -53,7 +54,8 @@ nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, 
 							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
 							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
 							layout = NULL, maxPanels = NULL, 
-							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), problemNum = 1, subProblems = 1, ...)
+							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), 
+							xRotAngle = 0, problemNum = 1, subProblems = 1, ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -71,7 +73,7 @@ nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NUL
 							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
 							layout = NULL, maxPanels = NULL , 
 							maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
-							problemNum = 1, subProblems = 1,
+							xRotAngle = 0, problemNum = 1, subProblems = 1,
 							...)
 {
 	
@@ -88,7 +90,8 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL,  types = "p", overlaid = FALSE , 
 		 equalAxisScales = FALSE,  layout = NULL, maxPanels = NULL ,  
-		 maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"), 
+		 maxTLevels = Inf, yAxisRelations = c("same", "free", "sliced"),
+		 xRotAngle = 0,
 		 problemNum = 1, subProblems = 1, ...)
 {
 	if(length(maxPanels) > 0) layout <- NULL
@@ -110,7 +113,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						addLoess = addLoess, titles = titles, logX = logX, 
 						logY = logY, idLines = idLines, xLab = xLab,
 						yLab = yLab, types = types, equalAxisScales = equalAxisScales,
-						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, ...))
+						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, xRotAngle = xRotAngle, ...))
 	}
 	
 	# take all combinations of x variables against y variables
@@ -177,8 +180,8 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		
 		# get idLabels.  Note that these will have to be repeated if there is more than one yvar
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], length(yVars) ) 
-				
-		scales <- list(x = list(), y = list())
+		# initialize x axis label rotation to xRotAngle		
+		scales <- list(x = list(rot = xRotAngle), y = list())
 		
 		# Here we check for integer data on the x-axis and y-axis.  If so, use integer tick marks.  
 		# We remove missing data first just in case prior to performing this.  Note that the y-axis
@@ -196,8 +199,8 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		
 		}
 		# log axes if necessary
-		if(logX[i]) scales$x <- list(log = "e")
-		if(logY[i]) scales$y <- list(log = "e")
+		if(logX[i]) scales$x <- c( scales$x, list(log = "e"))
+		if(logY[i]) scales$y <- c(scales$y, list(log = "e"))
 		
 		# if we are forcing the axis scales to be identical, we must pad out the range of the data since otherwise
 		# clipping occurs
