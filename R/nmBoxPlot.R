@@ -12,7 +12,7 @@
 #' @param titles *
 #' @param xLabs *
 #' @param yLabs *
-#' @param xRotAngle 
+#' @param xRotAngle Angle by which to rotate the x-axis tick marks
 #' @param maxPanels *
 #' @param maxTLevels *
 #' @param yAxisRelations  
