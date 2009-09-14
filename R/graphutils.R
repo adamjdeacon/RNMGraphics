@@ -123,12 +123,32 @@ subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandEle
 # The default package strip function. This strip function is needed since if multiple y variables are used yet no
 # "by" variable is, a crash occurs if strip.names = c(TRUE, TRUE)
 
+
 defaultStrip <- function(..., var.name)
 {
 	if(is.null(var.name)) strip.names = c(FALSE, TRUE) else strip.names = c(TRUE, TRUE)
 	strip.default(..., var.name = var.name, strip.names = strip.names)
 }
 
+# a second default strip function, to be used in a later release of RNMGraphics
+
+.defaultStrip <- function(..., sep, var.name)
+{
+	strip.names <- c(TRUE, TRUE)
+	sep <- ":"
+	if(is.null(var.name)) {
+		strip.names <- c(FALSE, TRUE)
+		sep <- ""
+	}
+	else if(var.name == "NSIM")
+	{
+		var.name <- ""
+		sep <- ""
+	}
+	strip.default(..., var.name = var.name, strip.names = strip.names, 
+			sep = sep)
+	
+}
 
 # Written by R. Pugh
 # reassigns panel layout based on a maximum number of panels.
