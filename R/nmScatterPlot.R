@@ -183,11 +183,17 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		# initialize x axis label rotation to xRotAngle		
 		scales <- list(x = list(rot = xRotAngle), y = list())
 		
+		# log axes if necessary
+		# TODO: handle errors in case xVars or yVars is a factor
+		# note that logging is only done against the first y variable if there is more than one
+		if(logX[i]) scales$x <- c( scales$x, list(log = "e", at = pretty(dataSet[[xVars[1]]])))
+		if(logY[i]) scales$y <- c(scales$y, list(log = "e", at = pretty(dataSet[[yVars[1]]])))
+		
 		# Here we check for integer data on the x-axis and y-axis.  If so, use integer tick marks.  
 		# We remove missing data first just in case prior to performing this.  Note that the y-axis
 		# is only handled if there is a single y variable, and this code is only executed if equal axis-scales
 		# is set to false.
-	
+		
 		if(!equalAxisScales)
 		{
 		
@@ -198,9 +204,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 				scales$y$at <- unique(round(pretty(dataSet[[yVars]])))
 		
 		}
-		# log axes if necessary
-		if(logX[i]) scales$x <- c( scales$x, list(log = "e"))
-		if(logY[i]) scales$y <- c(scales$y, list(log = "e"))
+		
 		
 		# if we are forcing the axis scales to be identical, we must pad out the range of the data since otherwise
 		# clipping occurs
