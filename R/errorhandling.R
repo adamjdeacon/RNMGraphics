@@ -38,3 +38,5 @@ RNMGraphicsStopifnot <-function(condition, msg = NULL, call = NULL)
 }
 
 assertClass <- RNMImport:::assertClass
+
+# TODO: implement "assertColumns"
