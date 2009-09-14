@@ -1,4 +1,27 @@
 
+runGraphicalComparisonTests <- function(winResultPath = "windowstestresult",
+		                                 linuxResultPath = "linuxtestresult")
+{
+	oldDir <- getwd()
+	if(Sys.info()["sysname"] != "Linux" )
+	{
+		artifactExtension <- "jpg"
+		resultPath <- winResultPath
+	}
+	else
+	{
+		artifactExtension <- "png"
+		resultPath <- linuxResultPath
+	}
+	setwd(resultPath)
+	
+	source(system.file(package = "RNMGraphics", "unittests/tools/gengraphicstestcases.R"))
+	file.remove(dir(pattern = paste(paste("\\\\", artifactExtension, sep = "."), "$" , sep = "") ))
+	genExpectedGraphs()
+	setwd(oldDir)
+	
+}
+
 runRNMGraphicsTests <- function(
 		testDataPaths = c(system.file(package="RNMGraphics", "unittests"), 
 				"\\\\Mango-data1\\mangowork\\MangoProjects\\RNONMEM2\\data"), 
