@@ -167,6 +167,18 @@ gen.nmScatterPlot <- function(testDataList)
 	plots[[14]] <- nmScatterPlot(testDataList[[7]], "X", "Y", titles = "Y axis should be integer only")
 	plots[[15]] <- nmScatterPlot(testDataList[[7]], "Y", "X", titles = "X axis should be integer only")
 	plots[[16]] <- nmScatterPlot(testDataList[[7]], "X", "Y,Z", titles = "Two y variables, behavior is ignored", yAxisRelations = "free")
+	
+	nmPlotData <- nmData(testDataList[[4]])
+	
+	nmPlotData <- addDerivedCategorical(nmPlotData, "TIME", "TIME.CUT")
+	graphSubset(nmPlotData) <- "ID < 10"
+	plots[[17]] <- nmScatterPlot(nmPlotData, "TIME.CUT", "PRED, IPRED", xRotAngle=90, bVar = "SEX", logY = TRUE)
+	plots[[18]] <- nmScatterPlot(nmPlotData, "TIME.CUT", "PRED, IPRED", xRotAngle=90, bVar = "SEX", logY = TRUE, overlaid = TRUE)
+	
+	# logX test needed
+	plots[[19]] <- nmScatterPlot(nmPlotData, yVars = "DV", xVars =  "TIME", logX = TRUE, type = "l")
+	# logX and logY
+	plots[[20]] <- nmScatterPlot(nmPlotData, yVars = "DV", xVars = "TIME", logX = TRUE, logY = TRUE, type = "l")
 	plots
 	
 }
