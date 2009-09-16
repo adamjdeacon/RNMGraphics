@@ -43,7 +43,7 @@ genExpectedGraphs <- function(outputDir = "./", writeImages = TRUE,
 	plots <- list("nmScatterPlot" = gen.nmScatterPlot(.dataList), "nmQQNorm" = gen.nmQQNorm(.dataList), 
 			"nmBoxPlot" = gen.nmBoxPlot(.dataList), "nmScatterMatrix" = gen.nmScatterMatrix(.dataList), 
 			"nmHistogram" = gen.nmHistogram(.dataList), "nmACPlot" = gen.nmACPlot(.dataList),
-			"nmBarChart" = gen.nmBarChart(.dataList), "nmBoxPlot" = gen.nmDotPlot(.dataList),
+			"nmBarChart" = gen.nmBarChart(.dataList),
 			"nmDotPlot" = gen.nmDotPlot(.dataList), "timeEventPlots" = gen.timeEventPlots(.dataList))
 	
 	
@@ -54,7 +54,7 @@ genExpectedGraphs <- function(outputDir = "./", writeImages = TRUE,
 	plots2 <- list("nmScatterPlot" = gen.nmScatterPlot(.dataList), "nmQQNorm" = gen.nmQQNorm(.dataList), 
 			"nmBoxPlot" = gen.nmBoxPlot(.dataList), "nmScatterMatrix" = gen.nmScatterMatrix(.dataList), 
 			"nmHistogram" = gen.nmHistogram(.dataList), "nmACPlot" = gen.nmACPlot(.dataList),
-			"nmBarChart" = gen.nmBarChart(.dataList), "nmBoxPlot" = gen.nmDotPlot(.dataList),
+			"nmBarChart" = gen.nmBarChart(.dataList), 
 			"nmDotPlot" = gen.nmDotPlot(.dataList), "timeEventPlots" = gen.timeEventPlots(.dataList))
 	# append to the names of the list elements
 	names(plots2) <- paste(names(plots2), "_st", sep = "" )
