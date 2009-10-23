@@ -1,11 +1,11 @@
 Package: RNMGraphics
 Type: Package
 Title: NONMEM graphics
-Version: 0.2.2
+Version: 0.2.3
 Date: 2009-09-14
 Author: Mango Solutions
 Maintainer: <support@mango-solutions.com>
 Suggests: RUnit
-Depends: grid, lattice, RNMImport
+Depends: grid, lattice, RNMImport (>= 0.2.2) 
 Description: Conveniently generates graphics from NONMEM objects imported via the RNMImport package
 License: GPL 2
