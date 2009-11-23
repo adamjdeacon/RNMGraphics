@@ -50,7 +50,7 @@
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[1])
-			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i])
+			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i], sortLevels = FALSE)
 					# list(title = "Variable", cex=.7, rows = 10, space = "right")
 		else plotKey <- NULL
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(obj[[iVars[i]]], times = length(yVars))
