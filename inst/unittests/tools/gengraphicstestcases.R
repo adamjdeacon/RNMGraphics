@@ -22,7 +22,9 @@ genExpectedGraphs <- function(outputDir = "./", writeImages = TRUE,
 	.dataList[[7]] <- data.frame(Y = c(2, 3, 1, 3, 3, 1, 3, 2, 1, 3), 
 								X = c(1.3520803, 0.6580209, -1.3252070, 0.6388983, 0.4507879,  
 						0.5380433, 1.1361281, 0.3263466, 1.2457650, 0.9912256), 
-				Z = c(1, 3, 1, 2, 4, 2, 4, 1, 2, 1))		
+				Z = c(1, 3, 1, 2, 4, 2, 4, 1, 2, 1))	
+		
+	
 	
 	if(loadPack)
 	{
@@ -179,6 +181,9 @@ gen.nmScatterPlot <- function(testDataList)
 	plots[[19]] <- nmScatterPlot(nmPlotData, yVars = "DV", xVars =  "TIME", logX = TRUE, type = "l")
 	# logX and logY
 	plots[[20]] <- nmScatterPlot(nmPlotData, yVars = "DV", xVars = "TIME", logX = TRUE, logY = TRUE, type = "l")
+	# clear check that the legend for overlaid variables is correct (mantis issue 1758)
+	plots[[21]] <- nmScatterPlot(testDataList[[1]], "X", "Z, Y", overlaid = TRUE, addLegend = TRUE, addGrid = FALSE, title = "Legend for overlaid variables is correct")
+	
 	plots
 	
 }
