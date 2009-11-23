@@ -1,10 +1,14 @@
-# TODO: Add comment
-# 
-# Author: fgochez
-###############################################################################
 
-
-scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
+#' 
+#' @param gVar 
+#' @param gVarValues 
+#' @param type 
+#' @param sortLevels 
+#' @return 
+#' @author fgochez
+#' @export
+scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"), 
+							sortLevels = TRUE)
 {
 	graphParams <- getAllGraphParams()
 	gVarLevels <- unique(gVarValues)
@@ -40,7 +44,10 @@ scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"))
 		x$space <- "right"	
 		x$title <- gVar
 		# x$text <- list(as.character(sort(gVarLevels)))
-		result <- c(list(text = list(as.character(sort(gVarLevels)))), x)
+		if(sortLevels)
+			result <- c(list(text = list(as.character(sort(gVarLevels)))), x)
+		else
+			result <- c(list(text = list(as.character(gVarLevels))), x)
 	}
 	# else we have a plot type that uses identifier text
 	else
