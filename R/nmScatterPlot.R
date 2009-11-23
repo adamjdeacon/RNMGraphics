@@ -94,6 +94,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		 xRotAngle = 0,
 		 problemNum = 1, subProblems = 1, ...)
 {
+
 	if(length(maxPanels) > 0) layout <- NULL
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
@@ -173,7 +174,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	{
 		if(addLegend[i] & gVars != "NULL")
 		{
-			plotKey <- scatterPlotKey(getVarLabel(gVars), dataSet[[gVars]], type = types[i])
+			plotKey <- scatterPlotKey(getVarLabel(gVars), dataSet[[gVars]], type = types[i], sortLevels = FALSE)
 					# list(title = getVarDescription(gVars)$Label, rows = 10, cex=.7, space="right")
 		}
 		else plotKey <- NULL
