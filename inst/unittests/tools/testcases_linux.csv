@@ -19,6 +19,7 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot18.png,nmScatterPlot18.png,_nmScatterPlot18.png
 ./,../expected/linux/,nmScatterPlot19.png,nmScatterPlot19.png,_nmScatterPlot19.png
 ./,../expected/linux/,nmScatterPlot20.png,nmScatterPlot20.png,_nmScatterPlot20.png
+./,../expected/linux/,nmScatterPlot21.png,nmScatterPlot21.png,_nmScatterPlot21.png
 ./,../expected/linux/,nmQQNorm1.png,nmQQNorm1.png,_nmQQNorm1.png
 ./,../expected/linux/,nmQQNorm2.png,nmQQNorm2.png,_nmQQNorm2.png
 ./,../expected/linux/,nmQQNorm3.png,nmQQNorm3.png,_nmQQNorm3.png
@@ -43,13 +44,6 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmACPlot1.png,nmACPlot1.png,_nmACPlot1.png
 ./,../expected/linux/,nmBarChart1.png,nmBarChart1.png,_nmBarChart1.png
 ./,../expected/linux/,nmBarChart2.png,nmBarChart2.png,_nmBarChart2.png
-./,../expected/linux/,nmBoxPlot1.png,nmBoxPlot1.png,_nmBoxPlot1.png
-./,../expected/linux/,nmBoxPlot2.png,nmBoxPlot2.png,_nmBoxPlot2.png
-./,../expected/linux/,nmBoxPlot3.png,nmBoxPlot3.png,_nmBoxPlot3.png
-./,../expected/linux/,nmBoxPlot4.png,nmBoxPlot4.png,_nmBoxPlot4.png
-./,../expected/linux/,nmBoxPlot5.png,nmBoxPlot5.png,_nmBoxPlot5.png
-./,../expected/linux/,nmBoxPlot6.png,nmBoxPlot6.png,_nmBoxPlot6.png
-./,../expected/linux/,nmBoxPlot7.png,nmBoxPlot7.png,_nmBoxPlot7.png
 ./,../expected/linux/,nmDotPlot1.png,nmDotPlot1.png,_nmDotPlot1.png
 ./,../expected/linux/,nmDotPlot2.png,nmDotPlot2.png,_nmDotPlot2.png
 ./,../expected/linux/,nmDotPlot3.png,nmDotPlot3.png,_nmDotPlot3.png
@@ -79,6 +73,7 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot_st18.png,nmScatterPlot_st18.png,_nmScatterPlot_st18.png
 ./,../expected/linux/,nmScatterPlot_st19.png,nmScatterPlot_st19.png,_nmScatterPlot_st19.png
 ./,../expected/linux/,nmScatterPlot_st20.png,nmScatterPlot_st20.png,_nmScatterPlot_st20.png
+./,../expected/linux/,nmScatterPlot_st21.png,nmScatterPlot_st21.png,_nmScatterPlot_st21.png
 ./,../expected/linux/,nmQQNorm_st1.png,nmQQNorm_st1.png,_nmQQNorm_st1.png
 ./,../expected/linux/,nmQQNorm_st2.png,nmQQNorm_st2.png,_nmQQNorm_st2.png
 ./,../expected/linux/,nmQQNorm_st3.png,nmQQNorm_st3.png,_nmQQNorm_st3.png
@@ -103,13 +98,6 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmACPlot_st1.png,nmACPlot_st1.png,_nmACPlot_st1.png
 ./,../expected/linux/,nmBarChart_st1.png,nmBarChart_st1.png,_nmBarChart_st1.png
 ./,../expected/linux/,nmBarChart_st2.png,nmBarChart_st2.png,_nmBarChart_st2.png
-./,../expected/linux/,nmBoxPlot_st1.png,nmBoxPlot_st1.png,_nmBoxPlot_st1.png
-./,../expected/linux/,nmBoxPlot_st2.png,nmBoxPlot_st2.png,_nmBoxPlot_st2.png
-./,../expected/linux/,nmBoxPlot_st3.png,nmBoxPlot_st3.png,_nmBoxPlot_st3.png
-./,../expected/linux/,nmBoxPlot_st4.png,nmBoxPlot_st4.png,_nmBoxPlot_st4.png
-./,../expected/linux/,nmBoxPlot_st5.png,nmBoxPlot_st5.png,_nmBoxPlot_st5.png
-./,../expected/linux/,nmBoxPlot_st6.png,nmBoxPlot_st6.png,_nmBoxPlot_st6.png
-./,../expected/linux/,nmBoxPlot_st7.png,nmBoxPlot_st7.png,_nmBoxPlot_st7.png
 ./,../expected/linux/,nmDotPlot_st1.png,nmDotPlot_st1.png,_nmDotPlot_st1.png
 ./,../expected/linux/,nmDotPlot_st2.png,nmDotPlot_st2.png,_nmDotPlot_st2.png
 ./,../expected/linux/,nmDotPlot_st3.png,nmDotPlot_st3.png,_nmDotPlot_st3.png
