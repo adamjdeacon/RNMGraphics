@@ -1,9 +1,9 @@
-# Autocorrelation plots
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
 # 
-# $Rev$
-# $LastChangedDate$
-#
-# Author: fgochez
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
 ###############################################################################
 
 
