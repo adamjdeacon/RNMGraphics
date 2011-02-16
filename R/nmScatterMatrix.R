@@ -1,5 +1,10 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
 
 #' Generates a scatterplot matrix of a set of variables from a PK/PD dataset
@@ -10,6 +15,12 @@
 #' @param bVars character vector or comma-seperated list of trellis variables
 #' @param addLoess Logical flag. Should a loess smoother curve be added to the scatter-plots? 
 #' @param title Plot's main title
+#' @param addLoess Add a loess smoother? 
+#' @param layout *
+#' @param maxPanels *
+#' @param maxTLevels *
+#' @param problemNum *
+#' @param subProblems *
 #' @param ... Additional parameters passed to the splom function
 #' @return An object of class multiTrellis 
 #' @author fgochez
@@ -62,6 +73,9 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 	# only one allowed at the moment
 	plotFormulas <- paste(" ~ obj[c(", paste(vars, collapse = ","), ")]")
 	
+	# standard logic - process the by variables
+	# this will add the by variables to the lattice formula, and convert to factors as necessary
+	
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
@@ -86,6 +100,9 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 setMethod("nmScatterMatrix", signature(obj = "data.frame"), nmScatterMatrix.data.frame)
 setMethod("nmScatterMatrix", signature(obj = "NMRun"), nmScatterMatrix.NMRun)
 setMethod("nmScatterMatrix", signature(obj = "NMProblem"), nmScatterMatrix.NMProblem)
+
+# scatter matrix panel function
+# This simply adds a loess smoother in a special manner with error handling
 
 panel.nmScatterMatrix <- function(x,y, addLoess = FALSE, ...)
 {
