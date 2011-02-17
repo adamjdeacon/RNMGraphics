@@ -1,6 +1,27 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
+
+
+#' Set all graphical style options
+#' @param settings A full list of graphical parameters.  See the documentation for RNMGraphics.
+#' @title Set all graphical parameters
+#' @return None
+#' @author fgochez
+#' @keywords utilities
+#' @export
+
+setAllGraphParams <- function(settings)
+{
+	for(i in seq_along(settings)) {
+		setGraphParams(names(settings)[i], settings[[i]])
+	}
+}
 
 getAllGraphParams <- function()
 {

@@ -1,18 +1,24 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
-# TODO: logX, logY not used
+LOGAXISLIMIT <- 0.01
 
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
 		yLab = NULL, types = "p", equalAxisScales = FALSE, maxPanels = NULL, layout = NULL,
-		maxTLevels, xRotAngle = 0, ...)
+		maxTLevels, xRotAngle = 0, graphParams = getAllGraphParams(), xAxisScaleRelations, 
+        yAxisScaleRelations, ...)
 {
 	yVars <- CSLtoVector(yVars)
 	yVarsCollapsed <- paste(yVars, collapse = "+")
 	
-	obj <- applyGraphSubset(obj)
+	dataSet <- applyGraphSubset(obj)
 	
 	plotFormulas <- paste(yVarsCollapsed, "~", xVars)
 	varCombos <- as.matrix(expand.grid(yVarsCollapsed, xVars))
@@ -21,11 +27,11 @@
 	plotList <- vector(mode = "list", length = numCombos)
 	
 	if(!is.null(xLab))
-		xLab <- rep(CSLtoVector(xLab), length.out = numCombos)
+		xLab <- rep(xLab, length.out = numCombos)
 	else
 		xLab <- varCombos[,2]
 	if(!is.null(yLab))
-		yLab <- rep(CSLtoVector(yLab), length.out = numCombos)
+		yLab <- rep(yLab, length.out = numCombos)
 	else
 		yLab <- varCombos[,1]
 	
@@ -33,45 +39,67 @@
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVars)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVars)
 		bVars <- temp$columns
 		# coerce each "by" variable to a factor
-		obj <- coerceToFactors(temp$data, bVars)
+		dataSet <- coerceToFactors(temp$data, bVars)
 		# coerce each "by" variable to a factor
 		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	repeatVars(c("addLegend", "addGrid", "addLoess", "titles", "logX", "logY", "idLines","types", "yVarsCollapsed", "equalAxisScales"),
 			list(addLegend, addGrid, addLoess, titles, logX, logY, idLines ,types,yVarsCollapsed, equalAxisScales), length.out = numCombos )
 	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
-	graphParams <- getAllGraphParams()
 
 	par.settings <- mapTopar.settings(graphParams)
-
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[1])
-			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i], sortLevels = FALSE)
+			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i], sortLevels = FALSE,
+					graphParams = graphParams)
 					# list(title = "Variable", cex=.7, rows = 10, space = "right")
 		else plotKey <- NULL
-		idLabels <- if(iVars[i] == "NULL") NULL else rep(obj[[iVars[i]]], times = length(yVars))
+		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], times = length(yVars))
 		
-		scales <- list(x = list(rot = xRotAngle), y = list())
+		scales <- list(x = list(rot = xRotAngle, relation = xAxisScaleRelations),
+                y = list(relation = yAxisScaleRelations))
+		
 		# log axes if necessary
-		if(logX[i]) scales$x <- c(scales$x, list(log = "e", at = pretty(obj[[xVars[i]]])))
-		if(logY[i]) scales$y <- c(scales$y, list(log = "e", at = pretty(obj[[yVars[1]]])))
+		# note that this only works with a single y axis variable, unless the scatter plot is overlaid
 		
-		if (equalAxisScales[i]) scales$limits <- padLimits(range(unlist(obj[c(xVars[i], yVars)]), na.rm=T))
+		if(logX[i]) scales$x <- c(scales$x, list(log = "e", at = pretty(dataSet[[xVars[i]]])))
+		if(logY[i]) scales$y <- c(scales$y, list(log = "e", at = pretty(dataSet[[yVars[1]]])))
 		
+		# if axis scales are matched, set the limits and pad to avoid clipping
+		
+		if (equalAxisScales[i])
+		{
+			
+			# changes made in response to issue 2755
+			# if we are forcing the axis scales to be identical, we must pad out the range of the data since otherwise
+			# clipping occurs.  However, care must be taken if logged axes were requested	
+			
+			if(logX | logY) 
+			{
+				
+				# Here we use a minimum to avoid 0 or negative axes with logging
+				
+				scales$limits <- padLimits(range(unlist(dataSet[,c(xVars[1],yVars)]), na.rm=TRUE), min = LOGAXISLIMIT)
+				RNMGraphicsWarning("Matching scales and logging requested - axis limits will be bounded from below by 0.01 which may caused data to be clipped\n")			
+			}
+			else
+				scales$limits <- padLimits(range(unlist(dataSet[,c(xVars[1],yVars)]), na.rm=TRUE))
+			
+		}
 		featuresToAdd <- c("grid" = addGrid[i], "loess" = addLoess[i], "idLine" = idLines[i])
 		
 		plotList[[i]] <- 
 				with(graphParams, 
 				xyplot(as.formula(plotFormulas[[i]]), stack = TRUE,
-						data = obj, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
+						data = dataSet, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
 						key = plotKey, main = titles[[i]], idLabels = idLabels,
 						xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
 						par.settings = par.settings, 
-				strip = strip$stripfun, layout = layout, ...)
+				strip = strip$stripfun, layout = layout, graphParams = graphParams, abLines = abLines, ...)
 )
 	}
 	gridDims <- numeric(2)
@@ -82,19 +110,35 @@
 	result
 }
 
-# TODO: allow different types for each variable
+#' nmScatterPlot panel function - this is used only when overlaid = TRUE. 
+#' @name panel.overlaidscatter
+#' @title nmScatterPlot panel function (2 of 2) used when overlaid y axis variables are requested
+#' @param x (usual)
+#' @param y (usual)
+#' @param subscripts (usual) 
+#' @param featuresToAdd named logical vector of features to add (grid, loess, idLine) 
+#' @param idLabels Identifier labels 
+#' @param type one of "p", "i", "l", "o", "t"
+#' @param groups (usual)
+#' @param ... additional parameters to panel.xyplot / panel.superpose
+#' @param graphParams Full list of RNMGraphics graphical settings
+#' @return none
+#' @nord
+#' @author fgochez
+#' @keywords
 
 panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE),
-		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, ...)
+		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, 
+		graphParams, abLines = NULL, ...)
 {
 	type <- match.arg(type)
 	if(featuresToAdd["grid"])
 	{
-		gridOpts <- getGraphParams("grid")
+		gridOpts <- graphParams$grid
 		panel.grid(h = -1, v = -1, col = gridOpts$col, alpha = gridOpts$alpha, lty = gridOpts$lty, 
 				lwd = gridOpts$lwd)
 	}
-	reflineOpts <- getGraphParams("refline")
+	reflineOpts <- graphParams$"refline"
 	if(featuresToAdd["idLine"])
 		panel.abline(a = 0, b = 1)
 	
@@ -104,21 +148,21 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	{
 		#TODO: fix colours here, as they ignore the different y-variables
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.text"), expand= TRUE)
-		textopt <- getGraphParams("superpose.text")
+		groupInfo <- subjectGrouping(idLabels, groups, graphParams$"superpose.text", expand= TRUE)
+		textopt <- graphParams$"superpose.text"
 		ltext(x, y, idLabels[subscripts], col = groupInfo$elements$col[subscripts] , cex = groupInfo$elements$cex[subscripts] , ...)
 	}
 	else if(type == "l")
 	{
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line"))
+		groupInfo <- subjectGrouping(idLabels, groups, graphParams$"superpose.line")
 		panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
 				col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)		
 	}
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		textopt <- getGraphParams("superpose.text")
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line") )
+		textopt <- graphParams$superpose.text
+		groupInfo <- subjectGrouping(idLabels, groups, graphParams$superpose.line )
 		groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expand = TRUE) 
 		
 		ltext(x, y, idLabels[subscripts], col = groupInfo2$elements$col[subscripts] ,
@@ -132,7 +176,7 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	{
 		
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, getGraphParams("superpose.line") )
+		groupInfo <- subjectGrouping(idLabels, groups, graphParams$superpose.line )
 
 		panel.superpose(x, y, groups = groups, type = "p", subscripts = subscripts, ...)
 		panel.superpose(x, y, groups = groupInfo$grouping, type = "l", subscripts = subscripts, 
@@ -140,10 +184,27 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	}
 	if(featuresToAdd["loess"])
 	{
-		loessOpts <- getGraphParams("loess.line")
+		loessOpts <- graphParams$loess.line
 		# implement a try-catch just in case loess curve fails to compute correctly
 		tryLoess <- try(panel.loess(x,y, col = loessOpts$col, lwd = loessOpts$lwd))
 		if(inherits(tryLoess, "try-error"))
 			RNMGraphicsWarning("Failed to calculate loess curve, omitting from this panel\n")
 	}
+
+    if(!is.null(abLines))
+    {
+        # check that abLines is a list of vectors of length 1 or 2
+        if(!(is(abLines, "list") & all(sapply(abLines, length) %in% c(1,2))))
+        {
+            RNMGraphicsWarning("Reference line parameter (abLines) is invalid")
+            return()
+        }
+        
+        for(x in abLines)
+        {
+            tryCatch(panel.abline(x), 
+                    error = function(e) RNMGraphicsWarning(paste("Failed to plot a reference line, error message is:", e)))
+        }
+        
+    }
 }

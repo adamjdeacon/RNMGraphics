@@ -1,58 +1,70 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
 #' Creates a boxplot of continuous variables against factor variables
 #' @name nmBoxPlot
 #' @title NONMEM box plot
-#' @param *
+#' @param obj An object of class \code{NMRun}, \code{NMProblem}, or \code{data.frame}. The object from which data will be plotted.
 #' @param contVar Character vector or comma-seperated list of continuous variables from which boxplots are created
-#' @param factVar factor variable (single string)
-#' @param bVars "by"/trellis variables
-#' @param iVar 
-#' @param titles *
-#' @param xLabs *
-#' @param yLabs *
+#' @param factVar Factor variable (single string)
+#' @param bVars Trellis variables, specified as characters (or \code{NULL}, which is the default).
+#' @param iVar ubject identifier variable.
+#' @param titles Main title. 
+#' @param xLabs X-axis label.
+#' @param yLabs Y-axis label.
 #' @param xRotAngle Angle by which to rotate the x-axis tick marks
-#' @param maxPanels *
-#' @param maxTLevels *
-#' @param yAxisRelations  
-#' @param subProblems * 
+#' @param maxPanels Maximum number of panels that should appear on each page of a graph.
+#' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
+#'                      If a character vector or a vector of length greater than one, the explicit breakpoints.
+#' @param yAxisScaleRelations Axis scale relations when multiple y-variables exist. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
+#' @param subProblems The sub problem of a run with simulations. 
 #' @param overlaid logical flag. Should multiple factor variables be plotted on a single plot, or should 
-#' multiple subplots with different factors be generated?  
-#' @param problemNum *
-#' @param ... additional parameters passed to bwplot
-#' @return A multiTrellis object
-#' @author fgochez
+#' multiple subplots with different factors be generated? 
+#' @param problemNum The problem number, required for a \code{NMRun} object.
+#' @param contVarOnX If \code{TRUE}, will flip axes so that the continuous variable is on the x-axis.
+#' @param layout Numeric vector giving the number of columns, rows and pages in a multipanel display.
+#' @param factBin Single numeric. Factor variable will be binned to this many levels if it has more levels than this value.
+#' Binning done according to "counts".
+#' @param balancedContAxis Single logical. If TRUE, axis with continuous variable will extend equally in both directions 
+#' @param medianLines Single logical. If TRUE, will plot median lines inside boxes instead of points (pch = 19)
+#' @param modifyOnResidual Single logical. If TRUE, will force balanced continuous variable axis and a horizontal line 
+#' at y = 0 IF there is only one continuous variable AND it is contained in residVars.
+#' @param hLines Numeric vector. If not empty (NULL or zero length vector), horizontal lines will be added at y = (all values)
+#' @param residVars A vector of character names to count as residual variables (for use with \code{modifyOnResidual})
+#' @param xAxisScaleRelations Axis scale relations when multiple x-variables exist. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
+#' @param ... Additional parameters to \code{bwplot}. 
+#' @return Multitrellis class object containing the plot.
+#' @author Mango Solutions
+#' @examples
+#' Theoph.df <- as.data.frame(Theoph)
+#' nmBoxPlot(Theoph.df, contVar = "conc", factVar = "Time", factBin = 6)
 #' @keywords hplot
 
 # TODO: contVarOnX does not work with overLaid = TRUE
 
-#' 
-#' @param yLabs 
-#' @param overlaid 
-#' @param contVarOnX 
-#' @param layout 
-#' @param factBin 
-#' @param problemNum 
-
-#' @param ... 
-#' @return 
-#' @author fgochez
-#' @keywords
 nmBoxPlot <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
-		xRotAngle = 0,
-		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
-		subProblems = 1, ...)
+		xRotAngle = 0, yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
+		maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1, hLines = NULL, balancedContAxis = FALSE, 
+		medianLines = TRUE, modifyOnResidual = TRUE, residVars = c("WRES", "IWRE", "IWRES"), 
+        xAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	RNMGraphicsStop("Not implemented for this class!")
 }
 
-nmBoxPlot.NMRun <- function(obj,contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
+nmBoxPlot.NMRun <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", xLabs = NULL, 
 		xRotAngle = 0,
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
-		subProblems = 1, ...)
+		maxTLevels = Inf, 	yAxisScaleRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1, hLines = NULL, balancedContAxis = FALSE, 
+		medianLines = TRUE, modifyOnResidual = TRUE, residVars =  c("WRES", "IWRE", "IWRES"),
+        xAxisScaleRelations = c("same", "free", "sliced"),
+        ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -66,8 +78,10 @@ setGeneric("nmBoxPlot")
 nmBoxPlot.NMProblem <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID", titles = "", 
 		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE,layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, 
-		subProblems = 1, ...)
+		maxTLevels = Inf, 	yAxisScaleRelations = c("same", "free", "sliced"),factBin = Inf, problemNum = 1, 
+		subProblems = 1,  hLines = NULL ,balancedContAxis = FALSE,  
+		medianLines = TRUE, modifyOnResidual = TRUE, residVars =  c("WRES", "IWRE", "IWRES"),
+        xAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	dat <- nmData(obj, subProblemNum = subProblems)
 	graphSubset(dat) <- graphSubset(obj)
@@ -81,60 +95,101 @@ nmBoxPlot.NMProblem <- function(obj, contVar, factVar, bVars = NULL,iVar = "ID",
 nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID", titles = "", 
 		xLabs = NULL, xRotAngle = 0, 
 		yLabs = NULL, overlaid = FALSE, contVarOnX = FALSE, layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf, 	yAxisRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
-		subProblems = 1, ...)
+		maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"), factBin = Inf, problemNum = 1,
+		subProblems = 1,  hLines = NULL, balancedContAxis = FALSE, 
+		medianLines = TRUE, modifyOnResidual = TRUE, residVars =  c("WRES", "IWRE", "IWRES"), 
+        xAxisScaleRelations = c("same", "free", "sliced"),
+        ...)
 {
+	# max length of a NONMEM variable/column
 	
-	contVar <- CSLtoVector(contVar)
-	factVar <- CSLtoVector(factVar)
+	NONMEMVARLENGTH <- 4
 	
-	RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
+	# turn variables into vectors instead of comma seperated strings
+	
+	contVars <- CSLtoVector(contVar)
+	
+    RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
 	
 	obj <- applyGraphSubset(obj)
 	
 	# bin the x variable if necessary
-	if(length(unique(obj[[factVar]])) > factBin) {
+	
+    if(length(unique(obj[[factVar]])) > factBin)
+    {
 		obj <- addDerivedCategorical(obj, factVar, paste(factVar, "BINNED", sep = "."), 
 				breaks = factBin, binType = "counts")
 	
 		factVar <- paste(factVar, "BINNED", sep = ".")
 	}
 	
-	contVarCollapsed <- paste(contVar, collapse = "+")
+	contVarsCollapsed <- paste(contVars, collapse = "+")
 	if(!contVarOnX)
-		varCombos <-  expand.grid(contVarCollapsed, factVar)
+    {	
+        plotFormula <- paste(contVarsCollapsed, factVar, sep = "~")
+    }    
 	else 
-		varCombos <-  expand.grid(factVar, contVarCollapsed)
-	numCombos <- nrow(varCombos)
-	
-	plotFormulas <- apply(varCombos, 1, paste, collapse = "~")
-	
+    {
+		plotFormula <-  paste( factVar, contVarsCollapsed, sep = "~")        
+    }
+			
 	if(!is.null(bVars))
 	{
 		bVars <-CSLtoVector(bVars)
 		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
 		obj <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
-		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
-	}
-	obj <- coerceToFactors(obj, factVar)
-	plotList <- vector(mode = "list", length = numCombos)
-	repeatVars(c("titles"), list(titles), numCombos)
-	if(!is.null(xLabs))
-		xLabs <- rep(CSLtoVector(xLabs), length.out = numCombos)
-	else
-		xLabs <- as.character(varCombos[,2])
+		
+	    plotFormula <- paste(plotFormula, paste(bVars, collapse = "+"), sep = "|" )
+    }
 	
-	if(!is.null(yLabs))
-		yLabs <- rep(CSLtoVector(yLabs), length.out = numCombos)
-	else
-		yLabs <- as.character(varCombos[,1])
+    obj <- coerceToFactors(obj, factVar)
+    	
 	
-	if(length(maxPanels) > 0) layout <- NULL
-	# ensure that maxPanels is numeric, even if empty
+    if(is.null(xLabs))
+    {
+		if(contVarOnX)
+        {
+            xLabs <- contVarsCollapsed
+        }
+        
+        else
+        {
+            xLabs <- factVar
+        }            
+    }
+	
+	if(is.null(yLabs))
+    {
+        if(contVarOnX)
+        {
+            yLabs <- factVar
+        }
+        
+        else
+        {
+            yLabs <- contVarsCollapsed
+        }      
+    }
+	
+	if(length(maxPanels) > 0) layout <- NULL	
+	# ensure that maxPanels is numeric, even if empty	
 	else maxPanels <- numeric(0)
-	graphParams <- getAllGraphParams()
-	# TODO: fix this
+	
+    graphParams <- getAllGraphParams()
+	
+	# if modifyOnResidual is TRUE, then we force a balanced continous axis and a horizontal line at y = 0.  Note that
+	# This will NOT work for contVarOnX = TRUE OR if there are multiple continuous variables
+
+	if(modifyOnResidual && (length(contVar) == 1) && !contVarOnX &&	contVar %in% residVars)
+	{
+		balancedContAxis = TRUE
+		hLines <- c(hLines, 0)
+	}
+	
+	
+	# TODO: fix this.  For now, it is disabled
+	
 	if(overlaid && length(contVar) > 1 && all(sapply(obj[, contVar], class) == "numeric"))
 	{
 		stackedData <- stack(obj[, contVar])
@@ -149,15 +204,22 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	{
 		stripfn = getStripFun()
 		scales <- list(x = list(rot = xRotAngle), y = list())
-		if(length(contVar) > 1 | length(bVars) > 0) scales$y$relation <- match.arg(yAxisRelations)
-		for(i in seq_along(plotFormulas))
-			plotList[[i]] <- 
-			with(graphParams,
+		
+        scales$y$relation <- match.arg(yAxisScaleRelations)
+        scales$x$relation <- match.arg(xAxisScaleRelations)
+	
+		# if median lines were requested, use them, else median points
+	
+		if(medianLines) pch <- "|" else pch <- 19	
+		
+        boxPlot <- with(graphParams,
 				# TODO: passing options this way is getting unwieldy
-				bwplot(as.formula(plotFormulas[[i]]), data = obj, main = titles[[i]], 
-						xlab = xLabs[i], horizontal = contVarOnX, scales = scales, 
-					 ylab = yLabs[i], par.settings = list(plot.symbol = plot.symbol,
-				 		par.xlab.text = axis.text,
+				bwplot(as.formula(plotFormula), data = obj, main = titles, 
+						xlab = xLabs, horizontal = contVarOnX, scales = scales, 
+					 ylab = yLabs,  hLines = hLines,  panel = panel.nmBoxPlot,
+					 prepanel = prepanel.nmBoxPlot, balanced = balancedContAxis, pch = pch,
+					 par.settings = list(plot.symbol = plot.symbol, add.line = refline, 
+				 		par.xlab.text = axis.text, 
 						par.ylab.text = axis.text,par.main.text = title.text,
 						box.rectangle = boxplot[c("alpha","col","fill","lty","lwd")],
 						box.umbrella = list(col = boxplot$umb.col, lty = boxplot$umb.lty, 
@@ -165,13 +227,61 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 									strip.background = strip.bg), 
 								strip = stripfn, outer = TRUE, layout = layout, ...)
 				) # end with(graphParams, 
-	
-		gridDims <- numeric(2)
-		gridDims[2] <- min(3, length(plotList))
-		gridDims[1] <- ceiling(numCombos / gridDims[2])
-	
-		multiTrellis(plotList, gridDims, maxPanels = maxPanels)
+		
+		multiTrellis(list(boxPlot), c(1,1), maxPanels = maxPanels)
 	} # end else
+}
+
+#' nmBoxPlot custom panel function.  Mainly used to add reference lines
+#' @param x passed straight to panel.bwplot
+#' @param y passed straight to panel.bwplot
+#' @param hLines Vector of horizontal reference lines
+#' @param ... 
+#' @title nmBoxPlot panel function
+#' @return None
+#' @author Mango Solutions
+#' @nord
+
+panel.nmBoxPlot <- function(x, y, hLines = NULL, ...)
+{
+	
+	panel.bwplot(x = x, y = y, ...)
+	# 
+	if(length(hLines) > 0 & is.numeric(hLines))
+		panel.abline(h = hLines)
+}
+
+#' prepanel function for nmBoxPlot.  It is needed because in certain cases we want the axis holding the continous 
+#' to be "balanced"
+#' @param x passed straight to prepanel.default.bwplot
+#' @param y passed straight to prepanel.default.bwplot
+#' @param horizontal logical flag.  Passed straight to prepanel.default.bwplot
+#' @param balanced If TRUE, will "balance" the axis with the continuous variable on it
+#' @param ... Additional arguments passed to prepanel.default.bwplot
+#' @title nmBoxPlot prepanel function
+#' @return None
+#' @author Mango Solutions
+#' @nord
+
+
+prepanel.nmBoxPlot <-function(x, y, horizontal, balanced = FALSE, ...)
+{
+	prePan <- prepanel.default.bwplot(x,y, horizontal = horizontal, ...)
+	if(balanced)
+	{
+		# force the axis limits to be (-a, a)
+		if(horizontal)
+		{
+			limMax <- max(abs(prePan$xlim))
+			prePan$xlim <- c(-limMax, limMax)
+		}
+		else
+		{
+			limMax <- max(abs(prePan$ylim))
+			prePan$ylim <- c(-limMax, limMax)
+		}
+	}
+	prePan
 }
 
 setMethod("nmBoxPlot", signature(obj = "data.frame"), nmBoxPlot.data.frame)

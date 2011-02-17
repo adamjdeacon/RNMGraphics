@@ -1,5 +1,10 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
 .RNMGraphicsEnv <- new.env()
 
@@ -54,12 +59,10 @@ initializeOptions <- function()
 			panelLayout = panelLayout,
 			panelMisc = list("as.table" = TRUE),
 			legend = legend,
-			strip = list(stripfun = defaultStrip, strip.bg = rev(grey.colors(4)))
+			strip = list(stripfun = defaultStrip)
 		)
 	.RNMGraphicsEnv$defaultSubset <- c("MDV != 1", "EVID == 0", "AMT <= 0") 
 }
-
-# TODO: move this to the header of PopPKPD
 
 updateRNMImportSettings <- function()
 {

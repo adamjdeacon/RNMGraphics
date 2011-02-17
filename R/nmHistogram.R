@@ -1,9 +1,13 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
 
 #' creates histograms of one or more NONMEM variables
-#' @name nmHistogram
 #' @title NONMEM data histogram
 #' @param obj The object from which data will be plotted (NMRun, NMProblem or data.frame)
 #' @param vars Variables from which to generate a histogram (character vector or comma seperate string of names)
@@ -18,26 +22,36 @@
 #' @param addGrid Currently unused
 #' @param nint Number of intervals for the creation of X axis bars.  It functions identically to the nint parameter of the histogram function from the lattice package
 #' @param breaks Control the calculation of breakpoints for the histogram.  It functions identically to the breaks parameter of the histogram function from the lattice package.
-#' @param layout *
-#' @param maxPanels *
-#' @param maxTLevels *
-#' @param problemNum *
-#' @param subProblems *
-#' @param ... Additional parameters passed to panel.histogram 
+#' @param layout A length 2 vector which is passed in as the layout parameter to xyplot
+#' @param maxPanels Maximum number of panels that should appear on each page of a graph.
+#' @param maxTLevels f a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
+#'        If a character vector or a vector of length greater than one, the explicit breakpoints.
+#' @param problemNum Number of the problem (applicable to NMRun class only)
+#' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes obly)
+#' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
+#' @param xAxisScaleRelations X-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
+#' @param ... Additional parameters passed to histogram
+#' @examples
+#'  Theoph.df <- as.data.frame(Theoph)
+#'  nmScatterPlot(Theoph.df, vars = "conc", title = "Theophiline concentration histogram", type = "density") 
 #' @return An object of class multiTrellis
 #' @author fgochez
 #' @keywords hplot
 
 nmHistogram <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
 				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
-				 maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
+				 maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
+                 xAxisScaleRelations = c("same", "free", "sliced"), 
+                 yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	RNMGraphicsStop("Not implemented for this class at the moment")
 }
 
 nmHistogram.NMRun <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
 		addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
+		maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
+        xAxisScaleRelations = c("same", "free", "sliced"), 
+        yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 
 	prob <- getProblem(obj, problemNum)
@@ -50,7 +64,10 @@ nmHistogram.NMRun <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "n
 
 nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
 							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL,
-							maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
+							maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
+                            xAxisScaleRelations = c("same", "free", "sliced"), 
+                            yAxisScaleRelations = c("same", "free", "sliced"),
+                            ...)
 {
 	dataSet <- nmData(obj, subProblemNum = subProblems )
 	
@@ -63,27 +80,57 @@ nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine 
 
 nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
 							addGrid = TRUE, nint = 12, breaks, layout = NULL,
-							maxPanels = NULL,maxTLevels = Inf,  problemNum = 1, subProblems = 1, ...)
+							maxPanels = NULL,maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
+                            xAxisScaleRelations = c("same", "free", "sliced"), 
+                            yAxisScaleRelations = c("same", "free", "sliced"),
+                            ...)
 {
 	if(!(is.element(refLine, c("none", "mean", "median"))))
+    {
 		RNMGraphicsStop("Reference line parameter not valid!")
-	if(!(is.element(type, c("count", "percent", "density"))))
+    }
+	
+    if(!(is.element(type, c("count", "percent", "density"))))
+    {
 		RNMGraphicsStop("Type parameter not valid!")
-	if(type != "density")
-		addDensity <- FALSE
-	if(length(maxPanels) > 0) layout <- NULL
-	# ensure that maxPanels is numeric, even if empty
-	else maxPanels <- numeric(0)
+    }
 	
-	vars <- paste(CSLtoVector(vars), collapse = "+")
-	numCombos <- length(vars)
-	titles <- rep(titles,numCombos)
+    # the density line / curve will only be added if the y-axis is also of density
+    # type
+    
+    if(type != "density")
+    {
+		# addDensity : logical flag indicating whether or not a density line should be added
+        addDensity <- FALSE
+    }
+    
+    # layout is determined by the maxPanels parameter if it is 
+    # nonzero
+    
+	if(length(maxPanels) > 0)
+    {
+        layout <- NULL
+    }
+    
+    # ensure that maxPanels is numeric, even if empty
 	
-	plotFormulas <- paste(" ~ ", vars)
-	if(missing(xLabs)) xLabs <- vars
-	repeatVars(c("titles", "xLabs"), list(titles, xLabs), length.out = numCombos)
+    else maxPanels <- numeric(0)
+		
+    # the formula passed to histogram will be built by collapsing the vars vector
+    # e.g. if vars = c("WRES", "IWRES"), the formula will be
+    # ~ WRES + IWRES
+    
+	plotFormulas <- paste(" ~ ", paste(CSLtoVector(vars), collapse = "+") )
+	if(missing(xLabs)) 
+    {  
+        xLabs <- paste(CSLtoVector(vars), collapse = "+")
+    }
+    
+    # dataSet is the final data.frame to plot
+    
 	dataSet <- applyGraphSubset(obj)
 	
+    # if there is a set of by variables, process them
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
@@ -92,37 +139,65 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|")
 	}
-	plotList <- vector(mode = "list", length = numCombos)
-	stripfn = getStripFun()
+	
+    # set scales as necessary
+
+    scales <- list( x = list(relation = match.arg(xAxisScaleRelations)), 
+                    y = list(relation = match.arg(yAxisScaleRelations))) 
+    
+    #extract the currently configured strip function
+    
+	stripfn <- getStripFun()
+	# obtain a full set of graphical parameters
+    graphParams <- getAllGraphParams()
 	exp <- quote(histogram(as.formula(plotFormulas), main = titles, data = dataSet, xlab = xLabs, 
-					par.settings = list(plot.polygon = getGraphParams("histogram"), par.xlab.text = getGraphParams("axis.text"), 
-					par.ylab.text = getGraphParams("axis.text"),
-					strip.background = getGraphParams("strip.bg")), 
+					par.settings = list(plot.polygon = graphParams$histogram, par.xlab.text = graphParams$"axis.text", 
+					par.ylab.text = graphParams$"axis.text", par.main.text = graphParams$title.text,
+					strip.background = graphParams$"strip.bg"), 
 					refLine = refLine, type = type, addDensity = addDensity, panel = panel.nmHistogram, outer = TRUE, 
-					strip = stripfn, nint = nint, ...))
+					strip = stripfn, nint = nint, graphParams = graphParams,
+                    scales = scales,
+                    ...))
 	
 	if(!missing(breaks))
+    {
 		exp$breaks <- breaks	
-	
+    }
 	plt <- eval(exp)
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 
-panel.nmHistogram <- function(x, refLine, addDensity, ...)
+#' A custom panel function for nmHistogram.  In essence it just adds a density line and a reference line if needed
+#' @param x Basic parameter passed straight to panel.histogram
+#' @param refLine "none", "mean", or "median" - where to add a reference line
+#' @param addDensity logical flag.  If TRUE, density estimate curve will be generated
+#' @param graphParams Full set (list) of RNMGraphics graphical parameters 
+#' @param ... 
+#' @title nmHistogram panel function
+#' @return Nothing 
+#' @author Mango Solutions
+#' @nord
+
+panel.nmHistogram <- function(x, refLine, addDensity, graphParams, ...)
 {
-	refVal <- switch(refLine,
+	# refVal will hold the value at which a reference line will be added 
+    
+    refVal <- switch(refLine,
 			"none"   = NULL,
 			"mean"   = mean(x, na.rm = TRUE),
 			"median" = median(x, na.rm = TRUE))
 	panel.histogram(x, ...)
-	if(addDensity)
-		panel.densityplot(x, col = "black", ...)
-	reflineOpts <- getGraphParams("refline")
+	
+    if(addDensity) 
+    {
+		panel.densityplot(x, col = graphParams$histogram$dens.col, lty = graphParams$histogram$dens.lty, lwd = graphParams$histogram$dens.lwd, ...)
+    }
+    reflineOpts <- graphParams$"refline"
 	panel.abline(v = refVal, col = reflineOpts$col, lwd = reflineOpts$lwd, 
 			lty = reflineOpts$lty, ...)
+
 	
 }
-
 
 setGeneric("nmHistogram")
 setMethod("nmHistogram", signature(obj = "NMProblem"), nmHistogram.NMProblem)

@@ -1,6 +1,6 @@
 exportMethods(nmScatterPlot, nmHistogram, nmBoxPlot, nmQQNorm, show, nmACPlot)
 exportMethods(nmScatterMatrix, nmBarChart, timeEventSPlot, timeEventDPlot, nmDotPlot)
-export(setGraphParams, getGraphParams, getAllGraphParams)
-export("graphSubset", "graphSubset<-", "applyGraphSubset", defaultGraphSubset, setDefaultGraphSubset)
+export(setGraphParams, getGraphParams, getAllGraphParams, setAllGraphParams)
+export("graphSubset", "graphSubset<-")
 exportClass(multiTrellis)
 export("panelLayout<-")

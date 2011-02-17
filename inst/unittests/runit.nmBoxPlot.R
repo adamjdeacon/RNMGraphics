@@ -1,9 +1,20 @@
+# $LastChangedDate: 2010-08-25 10:53:09 +0100 (Wed, 25 Aug 2010) $
+# $LastChangedBy: fgochez $
+# $Rev: 20714 $
+# 
+# Author: fgochez
+###############################################################################
 
-test.nmBoxPlot.df <- function()
-{
+test.nmBoxPlot <- function()
+{	
+	RNMGraphics:::createTestPlots(RNMGraphics:::gen.nmBoxPlot, 
+			.RNMGraphicsTestEnv$testDataList, 
+			match.fun( .RNMGraphicsTestEnv$testDevice),
+					.RNMGraphicsTestEnv$imgExtension, "nmBoxPlot", 
+					.RNMGraphicsTestEnv$testOutputPath, styles = .RNMGraphicsTestEnv$newStyles) 
+			
+	x <- RNMGraphics:::getExpectedAndActual(.RNMGraphicsTestEnv$testOutputPath,"nmBoxPlot",	.RNMGraphicsTestEnv$imgExtension, 
+					.RNMGraphicsTestEnv$manifest["nmBoxPlot", "amount"]) 
 
-	testPath <- .innerTestEnv$testScriptPaths[1]
-	test1 <- nmBoxPlot(sleep, contVar = "extra" , factVar = "group", xLab = "Extra sleep", titles = "Sleep data")
-	load(file.path(.innerTestEnv$expectedPath, "nmBoxPlot1.RData" ), envir = .innerTestEnv)
-	checkEquals(test1, .innerTestEnv$x, "sleep data example, boxplot")
+	checkTrue(setequal( x$expected, x$actual), msg = " all expected graphs produced")
 }

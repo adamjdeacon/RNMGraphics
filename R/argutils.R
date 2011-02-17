@@ -1,5 +1,11 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
+
 
 #' 
 #' @param assignTo 
@@ -22,6 +28,13 @@ repeatVars <- function(assignTo, valsToRepeat, length.out = 1)
 processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = NULL, exemptColumns = "ID")
 {
 	# TODO: UNITTEST
+	if (is.character(maxLevels)) {  # Character parsing
+		nowWarn <- options()$warn
+		options(warn = 2)
+		maxLevels <- try(as.numeric(CSLtoVector(maxLevels)), silent = TRUE)
+		if (class(maxLevels) == "try-error") RNMGraphicsStop("Could not parse maximum levels input")
+		options(warn = nowWarn)
+	}
 	columns <- intersect(columns, names(df))
 	outputNames <- columns
 	outDf <- df
@@ -29,11 +42,17 @@ processTrellis <- function(df, columns, excludeClasses, maxLevels, postFix = NUL
 	{
 		column <- columns[[n]]
 		# if numeric and has too many levels, bin it
-		if(class(df[[column]]) == "numeric" && length(unique(df[[column]])) > maxLevels && !(column %in% exemptColumns))
-		{
-			if(!is.null(postFix)) newVarName <- paste(column, postFix, sep = ".") else newVarName <- column
-			outDf <- addDerivedCategorical(outDf, column, newVarName, breaks = maxLevels)
-		# reference the binned variable
+		if(is.numeric(df[[column]]) && !(column %in% exemptColumns)) {
+			if (!is.null(postFix)) newVarName <- paste(column, postFix, sep = ".") else newVarName <- column
+			if (length(maxLevels) == 1) {
+				if (length(unique(df[[column]])) > maxLevels ) {
+					outDf <- addDerivedCategorical(outDf, column, newVarName, breaks = maxLevels, binType = "counts")
+				}
+			}
+			else {
+				outDf <- addDerivedCategorical(outDf, column, newVarName, breaks = maxLevels, binType = "explicitcuts")
+			}
+			# reference the binned variable
 			outputNames[n] <-  newVarName 
 		}
 	}

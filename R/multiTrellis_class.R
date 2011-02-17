@@ -1,33 +1,57 @@
-# TODO: Add comment
-# 
+ 
 # Author: fgochez
 # $Rev$
 # $LastChangedDate$
-#
+# $LastChangedBy$
 ###############################################################################
+
+# NOTE: Originally, it was envisioned that multiple y (or x) axis variables would be plotted
+# across multiple plots stored in a single "multiTrellis" object.  Each x/y combo would be stored 
+# as a seperate plot.  However, the underlying architecture was changed so that the extended lattice
+# formula interface would be used.  Thus the ability to have multiple plots in a single object is currently
+# deprecated, and will not be exposed for now
+
+# Instantiates a multi-trellis class object
+# @param plotSet A list of trellis plots.  Currently, it should be of length 1 
+# @param gridDims (not implemented)
+# @param mainTitle (not implemented)
+# @param panelLayout layout (# of rows and columns) of panels of each plot.  Can be a length 2 numeric vector
+# or a length 0 vector, in which case it is not used
+# @param gridLayout (not implented)
+# @param maxPanels [N,1] - Maximum number of panels to display on each page 
+# @title Multi trellis object constructor
+# @return Multi-trellis object holding plots
+# @author fgochez
 
 
 multiTrellis <- function(plotSet, gridDims = c(1,1), mainTitle = "", 
 		panelLayout = getGraphParams("panelLayout")$layout, gridLayout = numeric(0), 
 		maxPanels = numeric(0))
 {
+	if(length(plotSet) > 1)
+	{
+		RNMGraphicsWarning("Only one plot currently supported in multiTrellis objects, will subset")
+		plotSet <- plotSet[1]
+		gridDims <- c(1,1)
+	}
+	
 	new("multiTrellis", plots = plotSet, 
 			layout = gridDims, mainTitle = mainTitle, 
 			panelLayout = panelLayout, maxPanels = maxPanels)
 }
-
-# TODO: finish
 
 validity.multiTrellis <- function(object)
 {
 	
 	if(length(object@layout) != 2)
 		return("Layout dimensions incorrect")
-	if(length(object@plots) > object@layout[1] * object@layout[2])
-		return("Number of plots and layout dimensions are not compatible")
+	if(length(object@plots) > 1 )
+		return("At the moment, only one plot is allowed")
 
 	TRUE
 }
+
+
 
 setClass("multiTrellis", representation(plots = "list", layout = "numeric", 
 				mainTitle = "character", panelLayout = "numeric", maxPanels = "numeric"), 
@@ -51,9 +75,9 @@ plotSingletonmultiTrellis <- function(object)
 	print(object@plots[[1]])
 }
 
-# TODO: this is becoming convoluted
+# Currently unused
 
-show.multiTrellis <- function(object)
+.show.multiTrellis <- function(object)
 {
 	if(length(object@plots) == 1)
 	{
@@ -93,7 +117,7 @@ show.multiTrellis <- function(object)
 	}
 }
 
-setMethod("show", signature(object = "multiTrellis"), show.multiTrellis)
+setMethod("show", signature(object = "multiTrellis"), plotSingletonmultiTrellis)
 
 # TODO: input validity checking
 

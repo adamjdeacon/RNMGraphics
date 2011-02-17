@@ -1,33 +1,47 @@
-# $Rev$
-# $LastChangedDate$
+# SVN revision: $Rev$
+# Date of last change: $LastChangedDate$
+# Last changed by: $LastChangedBy$
+# 
+# Original author: fgochez
+# Copyright Mango Solutions, Chippenham, UK
+###############################################################################
 
 #' Generates a qq-plot (for the normal distribution) from one or more NONMEM variables
-#' @name nmQQNorm
 #' @title NONMEM qqplot 
 #' @param obj NMRun, NMProblem, or data.frame object
-#' @param vars Vector or comma-seperated list of variables to plot 
-#' @param bVars Vector or comma-seperated list of "by" variables
-#' @param titles plot titles
-#' @param xLabs x-axis labels
-#' @param yLabs y-axis labels
+#' @param vars Vector or comma-separated list of variables to plot 
+#' @param bVars Vector or comma-separated list of "by" variables
+#' @param titles Main title
+#' @param xLabs x-axis label
+#' @param yLabs y-axis label
 #' @param addGrid unused
 #' @param qqLine logical flag.  Should a reference line be added?
-#' @param yAxisScales One of "same" "free" "sliced". How panel y axis are scaled in relation to each other 
+#' @param yAxisScaleRelations One of "same" "free" "sliced". How panel y axes are scaled in relation to each other 
+#' @param layout Numeric vector giving the number of columns, rows and pages in a multipanel display. 
+#' @param maxPanels Maximum number of panels that should appear on each page of a graph. 
+#' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
+#'                      If a character vector or a vector of length greater than one, the explicit breakpoints.
+#' @param problemNum  The problem required for a \code{NMRun} object. 
+#' @param subProblems The sub problem of a run with simulations. 
+#' @param yAxisScaleRelations One of "same" "free" "sliced". How panel x axes are scaled in relation to each other
 #' @param ... additional parameters to pass to qqmath
-#' @return Multi-trellis class object
-#' @author fgochez
+#' @return Multi-trellis class object containing the plot
+#' @author Mango Solutions
+#' @examples
+#' nmQQNorm(ChickWeight.df,"weight", bVar =  "Diet", xAxisScaleRelations="free")
 #' @keywords hplot
 
 nmQQNorm <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
-		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+		addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
+		maxTLevels = Inf, problemNum = 1, subProblems = 1, xAxisScaleRelations = c("same","free","sliced"), ...)
 {
 	RNMGraphicsStop("Not implemeneted for this class\n")
 }
 
 nmQQNorm.NMRun <-function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
-		xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
-		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+		xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), 
+		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, 
+        xAxisScaleRelations = c("same","free","sliced"), ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
@@ -36,8 +50,8 @@ nmQQNorm.NMRun <-function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
 }
 
 nmQQNorm.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
-		addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
-		maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+		addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
+		maxTLevels = Inf, problemNum = 1, subProblems = 1, xAxisScaleRelations = c("same","free","sliced"),  ...)
 {
 	dataSet <- nmData(obj, subProblemNum = subProblems)
 	graphSubset(dataSet) <- graphSubset(obj)
@@ -48,19 +62,18 @@ nmQQNorm.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", titles = ""
 	
 }
 
-
 setGeneric("nmQQNorm")
 
 
 
 nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "",
-			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScales = c("same","free","sliced"), 
-			layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
+			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), 
+			layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, xAxisScaleRelations = c("same","free","sliced"),  ...)
 {   
 	vars <- CSLtoVector(vars)
 	obj <- applyGraphSubset(obj)
 	# we now filter variables that do not have more than one level
-	# TODO: UNITTEST
+
 	hasSeveralValues <- sapply(vars, function(n) length(unique(obj[,n])) > 1)
 	if(!all(hasSeveralValues))
 		RNMGraphicsWarning("Several columns have been detected with only a single value, dropping\n")
@@ -77,7 +90,6 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 	else maxPanels <- numeric(0)
 	if(missing(yLabs)) yLabs <- vars
 	
-
 	plotFormulas <- paste(" ~ ", vars)
 	
 	if(!is.null(bVars))
@@ -91,8 +103,11 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 	plotList <- vector(mode = "list", length = numCombos)
 	graphParams <- getAllGraphParams()
 	additions <- c("qqLine" = qqLine)
-	if (length(uncollapsedVars) > 1 | length(bVars) > 0) scales <- list(relation= match.arg(yAxisScales))
-	else scales <- list()
+	
+
+	
+	# if (length(uncollapsedVars) > 1 | length(bVars) > 0) 
+    scales <- list( y = list(relation= match.arg(yAxisScaleRelations)), x = list(relation = match.arg(xAxisScaleRelations)))	
 
 	plt <- with(graphParams,
 		qqmath(as.formula(plotFormulas), main = titles, data = dataSet, 
@@ -102,8 +117,8 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 		par.settings = list(par.xlab.text = axis.text, 
 		par.ylab.text = axis.text, par.main.text = title.text, 
 		plot.symbol = plot.symbol, strip.background = strip.bg), 
-		 strip = getStripFun(), 
-		..., layout = layout))
+		 strip = getStripFun(),graphParams = graphParams, 
+		..., layout = layout ) )
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 
@@ -111,9 +126,9 @@ setMethod("nmQQNorm", signature(obj = "data.frame") , nmQQNorm.data.frame)
 setMethod("nmQQNorm", signature(obj = "NMProblem") , nmQQNorm.NMProblem)
 setMethod("nmQQNorm", signature(obj = "NMRun") , nmQQNorm.NMRun)
 
-panel.nmQQNorm <- function(x, additions, ...)
+panel.nmQQNorm <- function(x, additions, graphParams, ...)
 {
-	reflineOpts <- getGraphParams("refline")
+	reflineOpts <- graphParams$"refline"
 	panel.qqmath(x,...)
 	if(additions["qqLine"])
 		panel.qqmathline(x, col = reflineOpts$col, lwd = reflineOpts$lwd, lty = reflineOpts$lty)
