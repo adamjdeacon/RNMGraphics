@@ -35,7 +35,8 @@
 #' @param overlaid Logical flag. If TRUE, for each fixed x, the y variables will be overlaid onto a single plot
 #' @param problemNum Number of the problem (applicable to NMRun class only)
 #' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes obly)
-#' @param uniqueX Number of unique values for the X axis.  If number of uniques is less than or equal to this, a boxplot is created instead
+#' @param uniqueX If the number of unique values of the x-axis variable is less than this number, a boxplot will be generated instead.  Must be an integer value between 
+#' 0 and 100, or Inf.
 #' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
 #' @param maxPanels Maximum number of panels that should appear on each page of a graph.
 #' @param xRotAngle Angle by which to rotate the x-axis tick marks

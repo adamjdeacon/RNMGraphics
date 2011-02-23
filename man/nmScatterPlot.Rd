@@ -31,7 +31,8 @@ specified in "iVars", "i" for points labeled by "iVars"), "o" (lines and points)
 \item{overlaid}{Logical flag. If TRUE, for each fixed x, the y variables will be overlaid onto a single plot}
 \item{problemNum}{Number of the problem (applicable to NMRun class only)}
 \item{subProblems}{Number of the simulation subproblems to use (applicable to the NMSim* classes obly)}
-\item{uniqueX}{Number of unique values for the X axis.  If number of uniques is less than or equal to this, a boxplot is created instead}
+\item{uniqueX}{If the number of unique values of the x-axis variable is less than this number, a boxplot will be generated instead.  Must be an integer value between 
+0 and 100, or Inf.}
 \item{yAxisScaleRelations}{Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}.}
 \item{maxPanels}{Maximum number of panels that should appear on each page of a graph.}
 \item{xRotAngle}{Angle by which to rotate the x-axis tick marks}
