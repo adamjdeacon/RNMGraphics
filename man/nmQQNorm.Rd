@@ -23,7 +23,7 @@
 If a character vector or a vector of length greater than one, the explicit breakpoints.}
 \item{problemNum}{The problem required for a \code{NMRun} object.}
 \item{subProblems}{The sub problem of a run with simulations.}
-\item{yAxisScaleRelations}{One of "same" "free" "sliced". How panel x axes are scaled in relation to each other}
+\item{xAxisScaleRelations}{One of "same" "free" "sliced". How panel x axes are scaled in relation to each other}
 \item{...}{additional parameters to pass to qqmath}
 }
 \examples{nmQQNorm(ChickWeight.df,"weight", bVar =  "Diet", xAxisScaleRelations="free")}
