@@ -26,7 +26,7 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 			W = 20:1, G = rep(LETTERS[1:2], 10), B = rep(letters[1:2], each = 10))
 	.dataList[[3]] <-  data.frame(X = 1:50, TIME = rep(1:25, 2), ID = rep(1:2, each = 25))
 	
-	.dataList[[4]] <- importNm(system.file(package = "RNMImport", "unittests/testdata/TestRun/TestData1.ctl"))
+	.dataList[[4]] <- importNm("TestData1.ctl", path = file.path( testDataPath, "TestRun"))
 	.dataList[[5]] <- data.frame(X = rnorm(100), Y = 1)
 	.dataList[[6]] <- data.frame(X = rep(seq(1, 2, length.out = 4), times = 4) + rep(c(0, 5, 10, 15), each = 4 ), Y = rep(1:4, times = 4),
 			G = rep(letters[1:4], each = 4), H = rep(1:2, each = 8))
