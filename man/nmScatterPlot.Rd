@@ -47,6 +47,5 @@ Will override global settings. By default, these will be the global settings}
 \examples{Theoph.df <- as.data.frame(Theoph)
 nmScatterPlot(Theoph.df, xVar = "Time", yVar = "conc", iVar = "Subject", type = "l", title = "Theophiline", xLab = "conc") 
 Indometh.df <- as.data.frame(Indometh)
-nmScatterPlot(Indometh.df, xVar = "time", yVar = "conc", bVar = "Subject")       
-}}
+nmScatterPlot(Indometh.df, xVar = "time", yVar = "conc", bVar = "Subject")}
 
