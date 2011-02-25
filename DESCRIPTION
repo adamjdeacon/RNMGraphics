@@ -1,7 +1,7 @@
 Package: RNMGraphics
 Type: Package
 Title: NONMEM graphics (ModReport branch)
-Version:  3.2.1
+Version:  3.7.1
 Date: $LastChangedDate$
 Author: Mango Solutions
 Maintainer: <support@mango-solutions.com>
