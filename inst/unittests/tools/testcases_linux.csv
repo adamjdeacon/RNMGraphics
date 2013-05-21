@@ -20,6 +20,7 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot19.png,nmScatterPlot19.png,_nmScatterPlot19.png
 ./,../expected/linux/,nmScatterPlot20.png,nmScatterPlot20.png,_nmScatterPlot20.png
 ./,../expected/linux/,nmScatterPlot21.png,nmScatterPlot21.png,_nmScatterPlot21.png
+./,../expected/linux/,nmScatterPlot22.png,nmScatterPlot22.png,_nmScatterPlot22.png
 ./,../expected/linux/,nmQQNorm1.png,nmQQNorm1.png,_nmQQNorm1.png
 ./,../expected/linux/,nmQQNorm2.png,nmQQNorm2.png,_nmQQNorm2.png
 ./,../expected/linux/,nmQQNorm3.png,nmQQNorm3.png,_nmQQNorm3.png
@@ -33,6 +34,10 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmBoxPlot3.png,nmBoxPlot3.png,_nmBoxPlot3.png
 ./,../expected/linux/,nmBoxPlot4.png,nmBoxPlot4.png,_nmBoxPlot4.png
 ./,../expected/linux/,nmBoxPlot5.png,nmBoxPlot5.png,_nmBoxPlot5.png
+./,../expected/linux/,nmBoxPlot6.jpg,nmBoxPlot6.jpg,_nmBoxPlot6.jpg
+./,../expected/linux/,nmBoxPlot7.jpg,nmBoxPlot7.jpg,_nmBoxPlot7.jpg
+./,../expected/linux/,nmBoxPlot8.jpg,nmBoxPlot8.jpg,_nmBoxPlot8.jpg
+./,../expected/linux/,nmBoxPlot9.jpg,nmBoxPlot9.jpg,_nmBoxPlot9.jpg
 ./,../expected/linux/,nmScatterMatrix1.png,nmScatterMatrix1.png,_nmScatterMatrix1.png
 ./,../expected/linux/,nmScatterMatrix2.png,nmScatterMatrix2.png,_nmScatterMatrix2.png
 ./,../expected/linux/,nmScatterMatrix3.png,nmScatterMatrix3.png,_nmScatterMatrix3.png
@@ -74,6 +79,7 @@ filePath1,filePath2,file1,file2,outFile
 ./,../expected/linux/,nmScatterPlot_st19.png,nmScatterPlot_st19.png,_nmScatterPlot_st19.png
 ./,../expected/linux/,nmScatterPlot_st20.png,nmScatterPlot_st20.png,_nmScatterPlot_st20.png
 ./,../expected/linux/,nmScatterPlot_st21.png,nmScatterPlot_st21.png,_nmScatterPlot_st21.png
+./,../expected/linux/,nmScatterPlot_st22.png,nmScatterPlot_st22.png,_nmScatterPlot_st22.png
 ./,../expected/linux/,nmQQNorm_st1.png,nmQQNorm_st1.png,_nmQQNorm_st1.png
 ./,../expected/linux/,nmQQNorm_st2.png,nmQQNorm_st2.png,_nmQQNorm_st2.png
 ./,../expected/linux/,nmQQNorm_st3.png,nmQQNorm_st3.png,_nmQQNorm_st3.png

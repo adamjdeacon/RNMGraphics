@@ -24,6 +24,7 @@
 #' @param problemNum  The problem required for a \code{NMRun} object. 
 #' @param subProblems The sub problem of a run with simulations. 
 #' @param xAxisScaleRelations One of "same" "free" "sliced". How panel x axes are scaled in relation to each other
+#' @param yAxisScaleRelations One of "same" "free" "sliced". How panel x axes are scaled in relation to each other
 #' @param ... additional parameters to pass to qqmath
 #' @return Multi-trellis class object containing the plot
 #' @author Mango Solutions

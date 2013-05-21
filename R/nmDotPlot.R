@@ -38,6 +38,7 @@ nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
 		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, problemNum = 1, subProblems = 1,
         xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"),
+		xAxisPlotStyle = c("data", "cont", "cat"),
 		...)   
 {
 	RNMGraphicsStop("Not implemented for this class yet \n")	
@@ -47,6 +48,7 @@ nmDotPlot.NMRun <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gV
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
 		addLegend = TRUE, maxTLevels = Inf, maxFactPerPanel = Inf, problemNum = 1, subProblems = 1,
         xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"),
+		xAxisPlotStyle = c("data", "cont", "cat"),
 		...)   
 {
 	prob <- getProblem(obj, problemNum)
@@ -60,7 +62,8 @@ nmDotPlot.NMProblem  <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID
 		addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  
 		problemNum = 1, subProblems = 1,
         xAxisScaleRelations = c("same", "free", "sliced"), 
-        yAxisScaleRelations = c("same", "free", "sliced"),...)
+        yAxisScaleRelations = c("same", "free", "sliced"),
+		xAxisPlotStyle = c("data", "cont", "cat"), ...)
 {
 	dataSet <- nmData(obj, sumProblemNum = subProblems)
 	graphSubset(dataSet) <- graphSubset(obj)
@@ -76,13 +79,20 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 					addLegend = TRUE, maxTLevels = Inf,  maxFactPerPanel = Inf,  
 					problemNum = 1, subProblems = 1, 
                     xAxisScaleRelations = c("same", "free", "sliced"), 
-                    yAxisScaleRelations = c("same", "free", "sliced"), ...)   
+                    yAxisScaleRelations = c("same", "free", "sliced"), 
+					xAxisPlotStyle = c("data", "cont", "cat"), ...)   
 {
 
 
 	contVars <- paste(CSLtoVector(contVar), collapse = "+")
 	factVars <- paste(CSLtoVector(factVar), collapse = "+")
-			
+
+	xAxisPlotStyle <- match.arg(xAxisPlotStyle)
+	if (xAxisPlotStyle == "cat") {
+		contVars <- paste("as.factor(", contVars, ")")
+		factVars <- paste("as.numeric(", factVars, ")")
+	}
+	
 	plotFormula <- paste(factVars, "~", contVars)
         
     
@@ -160,6 +170,14 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 						outer = TRUE, layout = layout, 
 						panel = panel.nmDotPlot, scales = scales, ...) 
 	
+	if (xAxisPlotStyle == "cat") {
+		dPlot <- bwplot(as.formula(plotFormula), data = obj, main = title, xlab = xLabs, 
+				ylab = yLabs, auto.key = auto.key, groups = eval(parse(text = gVar)),
+				par.settings = par.settings, strip = getStripFun(), 
+				outer = TRUE, layout = layout, 
+				panel = panel.nmBwPlot, scales = scales, ...) 
+	}
+				
 			# numeric(2)
 	multiTrellis(list(dPlot), gridDims = c(1,1), maxPanels = maxPanels)
 	
@@ -197,6 +215,12 @@ panel.nmDotPlot <- function(x, y, ... )
 {
 	panel.dotplot(x = x, y = y, ...)
 }
+
+panel.nmBwPlot <- function(x, y, ... )
+{
+	panel.bwplot(x = x, y = y, ...)
+}
+
 
 setGeneric("nmDotPlot")
 setMethod("nmDotPlot", signature(obj = "data.frame"), nmDotPlot.data.frame)

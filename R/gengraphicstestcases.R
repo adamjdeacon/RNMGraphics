@@ -360,6 +360,13 @@ gen.nmScatterPlot <- function(testDataList, secondaryGraphSettings = getAllGraph
         title = "Bad overlaid lines ignored for non-overlaid scatterplot", overlaid = FALSE,
         abLines = c(1,0), bVar = "G")
 
+	# test loess line	
+	oldLtySet <- getAllGraphParams()$superpose.line$lty
+	setGraphParams("superpose.line", list(lty = rep(1:4, 2)))
+
+	plots[[48]] <- nmScatterPlot(subset(nmData(testDataList[[4]]), ID %in% 1:10), "TIME", "PRED, IPRED", 
+			overlaid = TRUE, bVars = "ID", addLoess = TRUE, addLegend = TRUE, type = "p") 
+	setGraphParams("superpose.line", list(lty = oldLtySet))
     plots
 }
 

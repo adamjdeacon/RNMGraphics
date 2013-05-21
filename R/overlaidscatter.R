@@ -54,10 +54,17 @@ LOGAXISLIMIT <- 0.01
 	for(i in seq_along(plotFormulas))
 	{
 		if(addLegend[1])
-			plotKey <-  scatterPlotKey("Variable", yVars, type = types[i], sortLevels = FALSE,
-					graphParams = graphParams)
-					# list(title = "Variable", cex=.7, rows = 10, space = "right")
-		else plotKey <- NULL
+		{
+			plotKey <-  scatterPlotKey("Variable", yVars, type = ifelse(!addLoess[1], types[i], "o"), 
+				 sortLevels = FALSE, graphParams = graphParams)
+				 # list(title = "Variable", cex=.7, rows = 10, space = "right")
+			if(addLoess[1] & (types[i] %in% c("p", "i", "t", "l"))) 
+			{
+					if((types[i] %in% c("i", "t", "l")) & ("points" %in% names(plotKey))) 
+						plotKey <- plotKey[-which(names(plotKey)=="points")]
+					if((types[i] %in% c("i", "p"))) plotKey$lines$col <- graphParams$loess.line$col[1]
+			}
+		}  else plotKey <- NULL
 		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], times = length(yVars))
 		
 		scales <- list(x = list(rot = xRotAngle, relation = xAxisScaleRelations),
@@ -185,8 +192,12 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	if(featuresToAdd["loess"])
 	{
 		loessOpts <- graphParams$loess.line
+		subGroups <- groups[subscripts]
+		groupInfo <- unique(subGroups)
 		# implement a try-catch just in case loess curve fails to compute correctly
-		tryLoess <- try(panel.loess(x,y, col = loessOpts$col, lwd = loessOpts$lwd))
+		for(i in 1:length(groupInfo))
+			tryLoess <- try(panel.loess(x[subGroups==groupInfo[i]], y[subGroups==groupInfo[i]], 
+				lty =graphParams$superpose.line$lty[i], col = loessOpts$col[1], lwd = loessOpts$lwd))
 		if(inherits(tryLoess, "try-error"))
 			RNMGraphicsWarning("Failed to calculate loess curve, omitting from this panel\n")
 	}

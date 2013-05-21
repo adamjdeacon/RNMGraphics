@@ -18,6 +18,7 @@
 #' @param addDensity Logical flag.  Should a density estimate be plotted? Only relevant for type = "density"
 #' @param titles Plot title
 #' @param xLabs x axis label
+#' @param xRotAngle Angle by which to rotate the x-axis tick marks
 #' @param extraSubset Currently unused
 #' @param addGrid Currently unused
 #' @param nint Number of intervals for the creation of X axis bars.  It functions identically to the nint parameter of the histogram function from the lattice package
@@ -39,7 +40,7 @@
 #' @keywords hplot
 
 nmHistogram <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
+				 addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, xRotAngle = 0,
 				 maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
                  xAxisScaleRelations = c("same", "free", "sliced"), 
                  yAxisScaleRelations = c("same", "free", "sliced"), ...)
@@ -48,7 +49,7 @@ nmHistogram <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", 
 }
 
 nmHistogram.NMRun <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-		addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, 
+		addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, xRotAngle = 0,
 		maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
         xAxisScaleRelations = c("same", "free", "sliced"), 
         yAxisScaleRelations = c("same", "free", "sliced"), ...)
@@ -63,7 +64,7 @@ nmHistogram.NMRun <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "n
 # TODO: handle simulated data
 
 nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL,
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, xRotAngle = 0,
 							maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
                             xAxisScaleRelations = c("same", "free", "sliced"), 
                             yAxisScaleRelations = c("same", "free", "sliced"),
@@ -79,8 +80,8 @@ nmHistogram.NMProblem <- function(obj, vars, bVars = NULL, iVar = "ID", refLine 
 }
 
 nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine = "none", type = "percent", addDensity = FALSE, titles = "", xLabs, extraSubset, 
-							addGrid = TRUE, nint = 12, breaks, layout = NULL,
-							maxPanels = NULL,maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
+							addGrid = TRUE, nint = 12, breaks, layout = NULL, maxPanels = NULL, xRotAngle = 0,
+							maxTLevels = Inf,  problemNum = 1, subProblems = 1, 
                             xAxisScaleRelations = c("same", "free", "sliced"), 
                             yAxisScaleRelations = c("same", "free", "sliced"),
                             ...)
@@ -142,14 +143,17 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 	
     # set scales as necessary
 
-    scales <- list( x = list(relation = match.arg(xAxisScaleRelations)), 
-                    y = list(relation = match.arg(yAxisScaleRelations))) 
-    
-    #extract the currently configured strip function
-    
-	stripfn <- getStripFun()
+	scales <- list(x = list(rot = xRotAngle), y = list())
+	scales$y$relation <- match.arg(yAxisScaleRelations)
+	scales$x$relation <- match.arg(xAxisScaleRelations)
+	
+    # extract the currently configured strip function
+    stripfn <- getStripFun()
+
 	# obtain a full set of graphical parameters
     graphParams <- getAllGraphParams()
+	
+	# Create main plot using "histogram" lattice function
 	exp <- quote(histogram(as.formula(plotFormulas), main = titles, data = dataSet, xlab = xLabs, 
 					par.settings = list(plot.polygon = graphParams$histogram, par.xlab.text = graphParams$"axis.text", 
 					par.ylab.text = graphParams$"axis.text", par.main.text = graphParams$title.text,
@@ -159,10 +163,21 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
                     scales = scales,
                     ...))
 	
-	if(!missing(breaks))
-    {
-		exp$breaks <- breaks	
-    }
+	# Use break points if specified
+	if(!missing(breaks)) exp$breaks <- breaks	
+
+	# If X axis relation is set to "free" or "sliced" then set breaks to NULL (Mantis ticket 5130)
+	if (scales$x$relation %in% c("free", "sliced")) {
+		exp <- quote(histogram(as.formula(plotFormulas), main = titles, data = dataSet, xlab = xLabs, 
+						par.settings = list(plot.polygon = graphParams$histogram, par.xlab.text = graphParams$"axis.text", 
+								par.ylab.text = graphParams$"axis.text", par.main.text = graphParams$title.text,
+								strip.background = graphParams$"strip.bg"), 
+						refLine = refLine, type = type, addDensity = addDensity, panel = panel.nmHistogram, outer = TRUE, 
+						strip = stripfn, nint = nint, graphParams = graphParams,
+						scales = scales,breaks = NULL,
+						...))
+	}
+
 	plt <- eval(exp)
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
