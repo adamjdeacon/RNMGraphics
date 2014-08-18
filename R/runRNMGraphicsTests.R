@@ -1,7 +1,7 @@
 
 NUMSUPERPOSELEVELS <- 7
 
-setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtests")
+setupTestEnv <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), graphOutputPath = "graphtests")
 {
 	.RNMGraphicsTestEnv <<- new.env()
 	# path where the test data should be found
@@ -10,11 +10,6 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 	.RNMGraphicsTestEnv$testDevice <- "jpeg"
 	.RNMGraphicsTestEnv$imgExtension <- "jpg"
 	.RNMGraphicsTestEnv$deviceSettings <- list(width = 400, height = 400, quality = 75)
-	
-	# load a manifest of expected plots
-	
-	.RNMGraphicsTestEnv$manifest <- read.csv( system.file( package = "RNMGraphics", "unittests/tools/manifest.csv"  ), 
-			stringsAsFactors = FALSE, row.names = 1 )
 	
 	# load test data list
 	
@@ -48,10 +43,10 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 	newStyles <- getAllGraphParams()
 	
 	newStyles$superpose.symbol <- list( cex = rep(1.5, NUMSUPERPOSELEVELS), col = terrain.colors( NUMSUPERPOSELEVELS ), 
-										pch = 1:NUMSUPERPOSELEVELS )
+			pch = 1:NUMSUPERPOSELEVELS )
 	newStyles$superpose.line <- list( alpha = 1, col = terrain.colors(NUMSUPERPOSELEVELS), 
 			lty = rep(1:3, length.out = NUMSUPERPOSELEVELS), lwd = seq(from = 1, to = 3, length.out = NUMSUPERPOSELEVELS)  )
-
+	
 	newStyles$plot.symbol <- list( alpha = 1, cex = 1.5, col = "black", fill = "gray", 
 			pch = 19)
 	
@@ -59,7 +54,7 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 	
 	newStyles$plot.text <- list( alpha = 1, cex = 2, col = "purple" )
 	newStyles$superpose.text <- list( alpha = rep(1, NUMSUPERPOSELEVELS), cex = rep(c(1, 1.5, 2), length.out = NUMSUPERPOSELEVELS),
-			 col = terrain.colors(NUMSUPERPOSELEVELS))
+			col = terrain.colors(NUMSUPERPOSELEVELS))
 	
 	newStyles$loess.line <- list( lwd = 1, col = "lightblue" ) 
 	
@@ -82,88 +77,35 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 	
 	newStyles$strip.bg <-  list(col = terrain.colors(NUMSUPERPOSELEVELS))
 	
-	#	$legend
-#	$legend$position
-#	[1] "right"
-#	
-#	$legend$cex
-#	[1] 0.7
-#	
-#	$legend$maxTitleLength
-#	[1] Inf
-
 	newStyles$legend <- list(position = "top", cex = 1, maxTitleLength  = 7)
 	
 	.RNMGraphicsTestEnv$newStyles <- newStyles
+	
+	
+}
 
-#	$layout.widths
-#	$layout.widths$left.padding
-#	[1] 1
-#	
-#	$layout.widths$right.padding
-#	[1] 1
-#	
-#	$layout.widths$axis.ylab.padding
-#	[1] 1
-#	
-#	$layout.widths$axis.right
-#	[1] 1
-#	
-#	$layout.widths$axis.left
-#	[1] 0.9
-#	
-#	
-#	$layout.heights
-#	$layout.heights$bottom.padding
-#	[1] 1
-#	
-#	$layout.heights$top.padding
-#	[1] 1
-#	
-#	$layout.heights$axis.xlab.padding
-#	[1] 0.8
-#	
-#	$layout.heights$axis.top
-#	[1] 0.8
-#	
-#	$layout.heights$axis.bottom
-#	[1] 0.9
-#	
-#	
-#	$panelLayout
-#	$panelLayout$layout
-#	numeric(0)
-#	
-#	
-#	$panelMisc
-#	$panelMisc$as.table
-#	[1] TRUE
-#	
-#	
-#	$legend
-#	$legend$position
-#	[1] "right"
-#	
-#	$legend$cex
-#	[1] 0.7
-#	
-#	$legend$maxTitleLength
-#	[1] Inf
-#	
-#	
-#	$strip
-#	$strip$stripfun
-#	function(..., var.name)
-#	{
-#		if(is.null(var.name)) strip.names = c(FALSE, TRUE) else strip.names = c(TRUE, TRUE)
-#		strip.default(..., var.name = var.name, strip.names = strip.names)
-#	}
-#	
-#	$strip$strip.bg
-#	[1] "#E6E6E6" "#C3C3C3" "#969696" "#4C4C4C"
-#	
-	
-	
+setupExpectedMD5 <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), branchname = NULL) {
+
+	if (is.null(branchname)) {
+		ExpectedMD5File <- paste("ExpectedMD5_", R.Version()$major, ".", R.Version()$minor, ".csv", sep = "")
+	} else {
+		ExpectedMD5File <- paste("ExpectedMD5_", branchname, "_", R.Version()$major, ".", R.Version()$minor, ".csv", sep = "")
+	}
+	.ExpectedMD5 <- read.csv(file.path( testDataPath, ExpectedMD5File), stringsAsFactors = FALSE)
+	if (.Platform$OS.type == "windows") {
+		.RNMGraphicsTestEnv$ExpectedMD5 <- .ExpectedMD5$WindowsMD5
+	} else {
+		.RNMGraphicsTestEnv$ExpectedMD5 <- .ExpectedMD5$LinuxMD5
+	}
+	names(.RNMGraphicsTestEnv$ExpectedMD5) <- .ExpectedMD5$Graph
+}
+
+getMD5 <- function(e){
+	f = paste(tempfile(), ".jpg", sep = "")
+	do.call(jpeg, c(list(filename = f), .RNMGraphicsTestEnv$deviceSettings))
+	force(e)
+	dev.off()
+	unname(tools::md5sum(f))
 }
 
 #' This routine runs the RNMGraphics unit test suite, and produces test graphs (but external tools are needed to validate
@@ -178,53 +120,40 @@ setupTestEnv <- function(testDataPath = "testdata", graphOutputPath = "graphtest
 #' @author fgochez
 #' @export
 
-runRNMGraphicsTests <- function(protocolFile = "RNMGraphicsTests.html", 
-		internalTestPath = system.file(package = "RNMGraphics", "unittests"), 
-		diagnosticFile = "testenvinfo.txt", 
-		genComparisonTable = TRUE)
+runRNMGraphicsTests <- function(TestPath = system.file(package="RNMGraphics", "unittests"), 
+		ExcludeFolders = NULL, TestResult = NULL, ResultsType = c("html", "text"))
 {
-	require(RUnit)
-	if(!exists(".RNMGraphicsTestEnv"))
-		setupTestEnv()
-	# set up a global test environment
-	if(!file.exists(.RNMGraphicsTestEnv$testOutputPath))
-		dir.create(.RNMGraphicsTestEnv$testOutputPath)
-	# write information about the environment in which these tests have been executed
+	if(!require("RUnit", quietly = TRUE)) stop("There is no 'RUnit' package!")
+	TestPath <- normalizePath(TestPath, winslash = "/", mustWork = TRUE)
+	ResultsType <- match.arg(ResultsType)
 	
-	RNMGraphicsVer <- packageDescription("RNMGraphics", fields = "Built")
-	RNMImportVer <- packageDescription("RNMImport", fields = "Built")
+	if(!exists(".RNMGraphicsTestEnv")) setupTestEnv()
+	.RNMGraphicsTestEnv$testDataPath <- file.path(TestPath, "testdata")
+	setupExpectedMD5(testDataPath = file.path(TestPath, "testdata"))
 	
-	cat( "RNMGraphics: ", RNMGraphicsVer, "\n" , file = diagnosticFile )
-	cat( "RNMImport: ", RNMImportVer, "\n" , file = diagnosticFile, append = TRUE )
-	
-	internalTestSuite <- defineTestSuite( "RNMGraphicsInternalTestSuite", dirs = internalTestPath )
-	
-	res <- runTestSuite(internalTestSuite)
-	
-	# generate HTML report of unit test result
-	
-	printHTMLProtocol(res, protocolFile )
-	
-	# generate a table for running automated comparison tool
-	# currently works for windows test cases ONLY
-	
-	compTables <- vector(mode = "list", length = nrow(.RNMGraphicsTestEnv$manifest))
-	manifest <- .RNMGraphicsTestEnv$manifest
-	
-	# generate comparison tables for individual plot types, to be bound into a single data.frame at the end
-	
-	for(i in 1:length(compTables))
-	{
-		baseFiles <- paste( rownames(manifest)[i], seq(from = 1, to = manifest[i,"amount"]), sep = "", ".", .RNMGraphicsTestEnv$imgExtension )
-		targetFiles <- baseFiles
-		
-		compTables[[i]] <- data.frame( filePath1 = "./graphtests/", filePath2 = "./expected/", 
-				file1 = baseFiles, file2 = targetFiles, outFile = paste("./graphtests/_", baseFiles, sep = "") )
+	# There is no 'recursive' argument in 'list.dirs' under R 2.13.1
+	TestFolders <- list.dirs(TestPath, full.names = TRUE)
+	TestFiles <- list.files(TestPath, full.names = TRUE, recursive = FALSE, include.dirs = TRUE)
+	TestFolders <- intersect(TestFolders, TestFiles)
+	TestFolders <- TestFolders[!basename(TestFolders) %in% ExcludeFolders]
+	if (length(TestFolders) > 0) {
+		TestSuite <- list()
+		for (i in seq_along(TestFolders)) {
+			TestSuiteName <- paste("RNMGraphics Tests - ", basename(TestFolders)[i], sep = "")
+			TestSuite[[i]] <- defineTestSuite(TestSuiteName, dirs = TestFolders[i], testFileRegexp = "^runit\\..+\\.[rR]$") 
+		}
+	} else {
+		TestSuite <- defineTestSuite("RNMGraphics Tests", dirs = TestPath, testFileRegexp = "^runit\\..+\\.[rR]$")
 	}
 	
-	compTable <- do.call(rbind, compTables)
-	write.csv("testcases.csv", x = compTable, quote = FALSE, row.names = FALSE)
+	OUT <- runTestSuite(TestSuite)
+	if(!is.null(TestResult)) {
+		TestResult <- paste(gsub(paste("\\.", ResultsType, sep = ""), "", 
+						TestResult, ignore.case = TRUE), ResultsType, sep = ".")
+		if (ResultsType == "html") printHTMLProtocol(OUT, fileName = TestResult)
+		if (ResultsType == "text") printTextProtocol(OUT, fileName = TestResult)
+	} 
 	
-	res
+	return(OUT)
 	
 }

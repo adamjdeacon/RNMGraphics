@@ -1,24 +1,36 @@
-# $LastChangedDate: 2010-08-25 10:53:09 +0100 (Wed, 25 Aug 2010) $
-# $LastChangedBy: fgochez $
-# $Rev: 20714 $
-# 
-# Author: fgochez
-###############################################################################
 
+test01 <- function() {
+	testData3 <- .RNMGraphicsTestEnv$testDataList[[3]]
+	plot1 <- nmACPlot(testData3, "X")
 
-
-test.nmACPlot <- function()
-{
-	
-	RNMGraphics:::createTestPlots(RNMGraphics:::gen.nmACPlot, 
-			.RNMGraphicsTestEnv$testDataList, 
-			match.fun( .RNMGraphicsTestEnv$testDevice),
-			.RNMGraphicsTestEnv$imgExtension, "nmACPlot", 
-			.RNMGraphicsTestEnv$testOutputPath, styles = .RNMGraphicsTestEnv$newStyles)
-	
-	x <- RNMGraphics:::getExpectedAndActual(.RNMGraphicsTestEnv$testOutputPath,"nmACPlot",	.RNMGraphicsTestEnv$imgExtension, 
-			.RNMGraphicsTestEnv$manifest["nmACPlot", "amount"]) 
-	
-	checkTrue(setequal( x$expected, x$actual), msg = " all expected graphs produced")
-	
+	MD5_plot <- RNMGraphics:::getMD5(show(plot1))
+	MD5_expected <- .RNMGraphicsTestEnv$ExpectedMD5[["nmACPlot1.jpg"]]
+	checkEquals(MD5_plot, MD5_expected)
 }
+
+
+# test styling
+test02 <- function() {
+	
+	testData3 <- .RNMGraphicsTestEnv$testDataList[[3]]
+	oldSettings <- getAllGraphParams()
+	setAllGraphParams(.RNMGraphicsTestEnv$newStyles)
+	testData <- cbind(testData3, G = rep(c("A","B"), times = 25))
+	plot2 <- nmACPlot(testData, "X", timeVar = "TIME", iVar = "ID", gVar = "G", xLab = "-X-", yLab = "X lagged",
+			title = "Style test", addLegend = TRUE)
+	plot3 <- nmACPlot(testData, "X", timeVar = "TIME", iVar = "ID", bVar = "G", xLab = "-X-", yLab = "X lagged",
+			title = "Style test 2")
+	setAllGraphParams(oldSettings)
+	
+	MD5_plot <- RNMGraphics:::getMD5(show(plot2))
+	MD5_expected <- .RNMGraphicsTestEnv$ExpectedMD5[["nmACPlot2.jpg"]]
+	checkEquals(MD5_plot, MD5_expected)
+	
+	MD5_plot <- RNMGraphics:::getMD5(show(plot3))
+	MD5_expected <- .RNMGraphicsTestEnv$ExpectedMD5[["nmACPlot3.jpg"]]
+	checkEquals(MD5_plot, MD5_expected)
+}
+
+
+
+

@@ -1,16 +1,6 @@
-# $LastChangedDate: 2010-08-23 11:54:00 +0100 (Mon, 23 Aug 2010) $
-# $LastChangedBy: fgochez $
-# $Rev: 20626 $
-#
 
-
-# Unit tests for various utility functions 
-# 
-# Author: fgochez
-###############################################################################
 
 # tests the "processTrellis" function
-
 test.processTrellis <- function()
 {
 	testDf <- data.frame( ID = rep(1:5, times = 2), X = seq(from = 1.1, to = 10.1), Y = letters[1:10], Z = seq(from = 1.1, to = 10.1), W = 1:10)
