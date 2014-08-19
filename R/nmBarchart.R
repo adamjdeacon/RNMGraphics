@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 #' Generates a categorical barchart of a set of categorical variables against another one.
 #' @name nmBarChart
@@ -26,8 +19,10 @@
 #' @param ... additional parameters passed to the barchart function
 #' @return Multitrellis class object
 #' @examples
+#' \dontrun{ 
 #' nmBarChart(mtcars, xVars = "cyl", yVars = "gear", bVars = "vs")
-#' @author fgochez
+#' }
+#' @author Mango Solutions
 #' @keywords hplot
 #' @exportMethod nmBarChart
 

@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 
 #' Generates a scatterplot matrix of a set of variables from a PK/PD dataset
@@ -23,7 +16,7 @@
 #' @param subProblems *
 #' @param ... Additional parameters passed to the splom function
 #' @return An object of class multiTrellis 
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords hplot
 #' @exportMethod nmScatterMatrix
 

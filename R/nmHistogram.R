@@ -1,11 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
-
 
 #' creates histograms of one or more NONMEM variables
 #' @title NONMEM data histogram
@@ -33,10 +25,12 @@
 #' @param xAxisScaleRelations X-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
 #' @param ... Additional parameters passed to histogram
 #' @examples
+#' \dontrun{ 
 #'  Theoph.df <- as.data.frame(Theoph)
-#'  nmScatterPlot(Theoph.df, vars = "conc", title = "Theophiline concentration histogram", type = "density") 
+#'  nmHistogram(Theoph.df, vars = "conc", title = "Theophiline concentration histogram", type = "density") 
+#' }
 #' @return An object of class multiTrellis
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords hplot
 #' @exportMethod nmHistogram
 
@@ -188,15 +182,15 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 	multiTrellis(list(plt), maxPanels = maxPanels)
 }
 
-#' A custom panel function for nmHistogram.  In essence it just adds a density line and a reference line if needed
+#' @details panel.nmHistogram is a custom panel function for nmHistogram. In essence it just adds a density line and a reference line if needed.
+#' @name panel functions
+#' @aliases panel.nmBoxPlot panel.nmHistogram panel.overlaidScatter prepanel.nmBoxPlot
 #' @param x Basic parameter passed straight to panel.histogram
 #' @param refLine "none", "mean", or "median" - where to add a reference line
 #' @param addDensity logical flag.  If TRUE, density estimate curve will be generated
 #' @param graphParams Full set (list) of RNMGraphics graphical parameters 
 #' @param ... 
-#' @title nmHistogram panel function
-#' @return NULL 
-#' @author Mango Solutions
+
 
 panel.nmHistogram <- function(x, refLine, addDensity, graphParams, ...)
 {

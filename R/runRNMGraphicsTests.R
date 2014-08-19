@@ -108,17 +108,23 @@ getMD5 <- function(e){
 	unname(tools::md5sum(f))
 }
 
-#' This routine runs the RNMGraphics unit test suite, and produces test graphs (but external tools are needed to validate
-#' them against accepted "master" graphs.  Checks are performed to ensure that all expected graphs are actually generated.
-#' @param protocolFile [C,1] Name of the file to write the html unit test report to
-#' @param internalTestPath [C,1] Path to the unit test scripts distributed with the package
-#' @param diagnosticFile [C,1] Name of a file to output additional diagnostic information to.  This 
-#' will hold information about when various other packages (which are dependencies for ERTK) were built
-#' @title Run RNMGraphics package unit tests and generate graphs for comparison
-#' @return Object returned by the runTestSuite function
-#' @keywords programming,debugging
-#' @author fgochez
-#' @export
+#' Run unit tests.
+#'
+#' Run the unit tests by RUnit package, and generate a html or text report. 
+#' @title Run unit tests.
+#' @param TestPath Path of the folder which contains the test scripts.
+#' @param ExcludeFolders The folders are not tested.
+#' @param TestResult Name of the report file.
+#' @param ResultsType 'html' or 'text'.
+#' @return The results of function \code{\link{[RUnit]runTestSuite}}. 
+#' @author Mango Solutions
+#' @keywords debugging
+#' @examples \dontrun{
+#' x <- runRNMGraphicsTests(TestResult = "runRNMGraphicsTests_tests")
+#' summary(x)
+#' }
+#'
+#' @noRd 
 
 runRNMGraphicsTests <- function(TestPath = system.file(package="RNMGraphics", "unittests"), 
 		ExcludeFolders = NULL, TestResult = NULL, ResultsType = c("html", "text"))

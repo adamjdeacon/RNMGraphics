@@ -1,11 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
-
 
 #' Create a custom dotplot of one or more continuous variables against a categorical variable
 #' @name nmDotPlot
@@ -30,8 +22,10 @@
 #' @return Multitrellis class object containing the plot.
 #' @author Mango Solutions
 #' @examples
+#' \dontrun{ 
 #'  Theoph.df <- as.data.frame(Theoph)
 #'  nmDotPlot( Theoph.df, factVar = "Subject", contVar = "Dose" )
+#' }
 #' @keywords hplot
 #' @exportMethod nmDotPlot
 
@@ -190,17 +184,18 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	
 }
 
-# creates a grouping variable which splits the factor variable onto various panels.
-# TODO: at the moment this algorithm works in the sense that no more individuals are allowed on 
-# each panel than indicated, but sometimes allows considerably less.
-
-# @param var A vector with the values of the actual column 
-# @param varName Name of variable
-# @param maxPerPanel Maximum 
-# @title Factor-splitting trellis variable
-# @return A factor variable such that using it as trellis variable will split the y-axis variable across multiple
-# panels (with no more per panel equal to maxPerPanel
-# @author fgochez
+#' creates a grouping variable which splits the factor variable onto various panels.
+#' 
+#' each panel than indicated, but sometimes allows considerably less.
+#'
+#' @param var A vector with the values of the actual column 
+#' @param varName Name of variable
+#' @param maxPerPanel Maximum 
+#' @title Factor-splitting trellis variable
+#' @return A factor variable such that using it as trellis variable will split the y-axis variable across multiple
+#' panels (with no more per panel equal to maxPerPanel
+#' @author Mango Solutions
+#' @noRd 
 
 .factorTrellis <- function(var, maxPerPanel)
 {

@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 RNMGraphicsWarning <- function(msg = "Warning!\n", call = NULL)
 {
@@ -20,9 +13,10 @@ RNMGraphicsWarning <- function(msg = "Warning!\n", call = NULL)
 #' @param msg Message 
 #' @param call (optional).  Call information for function that generated exception (i.e. from match.call)
 #' @return None
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords error
 #' @export
+#' @noRd
 
 RNMGraphicsStop <- function(msg = "Error!\n",  call = NULL)
 {
@@ -51,4 +45,3 @@ assertClass <- function(object, targetClass)
 	}
 	invisible(NULL)
 }
-# TODO: implement "assertColumns"

@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 #' Creates a boxplot of continuous variables against factor variables
 #' @name nmBoxPlot
@@ -41,8 +34,10 @@
 #' @return Multitrellis class object containing the plot.
 #' @author Mango Solutions
 #' @examples
+#' \dontrun{ 
 #' Theoph.df <- as.data.frame(Theoph)
 #' nmBoxPlot(Theoph.df, contVar = "conc", factVar = "Time", factBin = 6)
+#' }
 #' @keywords hplot
 #' @exportMethod nmBoxPlot
 
@@ -241,13 +236,16 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	} # end else
 }
 
-#' nmBoxPlot custom panel function.  Mainly used to add reference lines
+#' @description panel functions used for different objects.
+#' @details panel.nmBoxPlot is the nmBoxPlot custom panel function. Mainly used to add reference lines.
+#' @name panel functions
+#' @aliases panel.nmBoxPlot panel.nmHistogram panel.overlaidScatter prepanel.nmBoxPlot
 #' @param x passed straight to panel.bwplot
 #' @param y passed straight to panel.bwplot
 #' @param hLines Vector of horizontal reference lines
 #' @param ... 
-#' @title nmBoxPlot panel function
-#' @return None
+#' @title panel functions
+#' @return NULL
 #' @author Mango Solutions
 
 panel.nmBoxPlot <- function(x, y, hLines = NULL, ...)
@@ -259,17 +257,15 @@ panel.nmBoxPlot <- function(x, y, hLines = NULL, ...)
 		panel.abline(h = hLines)
 }
 
-#' prepanel function for nmBoxPlot.  It is needed because in certain cases we want the axis holding the continous 
+#' @details prepanel.nmBoxPlot is the prepanel function for nmBoxPlot. It is needed because in certain cases we want the axis holding the continous 
 #' to be "balanced"
+#' @name panel functions
+#' @aliases panel.nmBoxPlot panel.nmHistogram panel.overlaidScatter prepanel.nmBoxPlot
 #' @param x passed straight to prepanel.default.bwplot
 #' @param y passed straight to prepanel.default.bwplot
 #' @param horizontal logical flag.  Passed straight to prepanel.default.bwplot
 #' @param balanced If TRUE, will "balance" the axis with the continuous variable on it
 #' @param ... Additional arguments passed to prepanel.default.bwplot
-#' @title nmBoxPlot prepanel function
-#' @return None
-#' @author Mango Solutions
-
 
 prepanel.nmBoxPlot <-function(x, y, horizontal, balanced = FALSE, ...)
 {

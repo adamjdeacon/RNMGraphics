@@ -19,7 +19,7 @@ nmACPlot(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL, title
   \item{tVar}{ TName of the "time" variable.}
   \item{iVar}{ Subject identifier variable. }
   \item{bVars}{ Trellis variables, specified as characters (or \code{NULL}, which is the default). }
-  \item{gVars}{ “Grouping” variable – used to group points by colour, for legends and so on. }
+  \item{gVars}{ "Grouping" variable -- used to group points by colour, for legends and so on. }
   \item{titles}{ Main title. }
   \item{xLabs}{ X-axis label. }
   \item{yLabs}{ Y-axis label. }

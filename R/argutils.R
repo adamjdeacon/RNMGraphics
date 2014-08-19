@@ -4,7 +4,7 @@
 #' @param length.out 
 #' @title Repeat Variables
 #' @return NULL
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords utility
 #' @noRd
 

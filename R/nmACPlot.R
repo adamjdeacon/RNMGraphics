@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 
 #' nmACPlot plots a given variable in a data set against itself "lagged" by one time step.
@@ -23,7 +16,7 @@
 #' @param addGrid logical flag.  Should a grid be added?
 #' @param ... Extra parameters passed to nmScatterPlot
 #' @return Obejct of class multiTrellis
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords hplot
 #' @exportMethod nmACPlot
 

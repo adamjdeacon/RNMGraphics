@@ -1,10 +1,4 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
+
 
 .mirrorPlot <- function(originalData, simulatedData, 
 		xVars, yVars, gVar = NULL, bVars = NULL, iVar  = "ID", type = "p", addInterval = FALSE, intervalAlpha = 0.95, simNumber = 1, 

@@ -11,7 +11,7 @@
 \keyword{hplot}
 \arguments{\item{obj}{The object from which data will be plotted (NMRun, NMProblem or data.frame)}
 \item{vars}{Variables from which to generate a histogram (character vector or comma seperate string of names)}
-\item{bVars}{“Trellis” variables on which to split data.}
+\item{bVars}{"Trellis" variables on which to split data.}
 \item{iVar}{Subject identifier variable}
 \item{refLine}{Controls addition of a reference line to the histogram(s).  Choices are "none", "mean" or "median".}
 \item{type}{Determines the style of y-axis that is used for the plot (percentages, frequencies, or proportions)}

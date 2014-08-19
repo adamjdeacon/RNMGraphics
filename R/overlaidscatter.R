@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
@@ -131,9 +124,9 @@
 	result
 }
 
-#' nmScatterPlot panel function - this is used only when overlaid = TRUE. 
-#' @name panel.overlaidscatter
-#' @title nmScatterPlot panel function (2 of 2) used when overlaid y axis variables are requested
+#' @details panel.overlaidScatter is the nmScatterPlot panel function (2 of 2) used when overlaid y axis variables are requested.
+#' @name panel functions
+#' @aliases panel.nmBoxPlot panel.nmHistogram panel.overlaidScatter prepanel.nmBoxPlot
 #' @param x (usual)
 #' @param y (usual)
 #' @param subscripts (usual) 
@@ -142,21 +135,21 @@
 #' @param type one of "p", "i", "l", "o", "t". Note that for "l" (lines connected by the variable specified in "iVars"), 
 #' "o" (lines and points), and "t" (labels connected by lines grouped by "iVars") lines will be added independently within nested groups.
 #' @param groups (usual)
-#' @param ... additional parameters to panel.xyplot / panel.superpose
 #' @param graphParams Full list of RNMGraphics graphical settings
-#' @return none
+#' @param ... additional parameters to panel.xyplot / panel.superpose
 #' @examples 
-#'     df1 <- data.frame(X = rep(1:10, times = 2), Y1 = c(2:11, 3:12)^0.8, Y2 = c(3:12, 4:13)^0.6, G = rep(letters[1:2], each = 10))
-#'     xyplot(Y1 + Y2 ~ X | G, data = df1,
-#'         panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
-#'		 graphParams = getAllGraphParams())
-#'     df1$N <- rep(1:2, times = 5)
-#'     df1 <- df1[with(df1, order(G, N, X)), ]
-#'     xyplot(Y1 + Y2 ~ X | G, data = df1,
-#'         panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
-#'		 graphParams = getAllGraphParams())
-#' @author fgochez
-#' @keywords panel
+#' \dontrun{ 
+#' df1 <- data.frame(X = rep(1:10, times = 2), Y1 = c(2:11, 3:12)^0.8, 
+#'     Y2 = c(3:12, 4:13)^0.6, G = rep(letters[1:2], each = 10))
+#' xyplot(Y1 + Y2 ~ X | G, data = df1,
+#'     panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
+#'     graphParams = getAllGraphParams())
+#' df1$N <- rep(1:2, times = 5)
+#' df1 <- df1[with(df1, order(G, N, X)), ]
+#' xyplot(Y1 + Y2 ~ X | G, data = df1,
+#'     panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
+#'     graphParams = getAllGraphParams())
+#' }
 
 panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE),
 		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, 

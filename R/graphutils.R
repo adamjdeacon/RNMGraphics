@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 
 #' safe version of getVarLabel - extracts the label associated to a variable, unless there is none
@@ -16,8 +9,9 @@
 #' a label, else returns an empty character
 #' @param maxLength : if label is longer than this, insert line-feeds to break
 #' @return variable label, variable name or character(0) depending on parameters
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords variable
+#' @noRd
 
 # TODO: unit test
 
@@ -44,7 +38,7 @@ getVarLabel <- function(varName, useVarNameifMissing = TRUE, maxLength = getGrap
 #' @param numPlots 
 #' @param maxColumns 
 #' @return numeric
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords grid
 #' @noRd
 
@@ -64,8 +58,9 @@ stdGridDims <- function(numPlots, maxColumns )
 #' @param collapseY Collapse Y variables using +? (meant to be used with extended lattice formulas)
 #' @param collapseX Collapse X variables using +? meant to be used with extended lattice formulas)
 #' @return matrix of all xVars against yVars
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords combinations
+#' @noRd
 
 varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 {
@@ -84,8 +79,9 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 #' @param superposeElements list of styles which should be generated for each group (colours, line types, line widths etc)
 #' @param expandElements Should the superpose elements be reproduced for each element in the grouping, or each group level?
 #' @return a list of the grouping elements and the grouping variable that combines the identifier grouping with the other groups 
-#' @author fgochez
+#' @author Mango Solutions
 #' @keywords groupings
+#' @noRd
 
 subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandElements = FALSE)
 {
@@ -155,8 +151,9 @@ defaultStrip <- function(..., var.name)
 #' @param obj 
 #' @param maxPanels single numeric
 #' @return obj 
-#' @author R. Pugh
+#' @author Mango Solutions
 #' @keywords panels
+#' @noRd
 calcMaxPanels <- function(obj, maxPanels = 8) 
 {
 	if (length(maxPanels) != 1 || maxPanels[1] < 1) RNMGraphicsStop("Illegal maxPanels value")	

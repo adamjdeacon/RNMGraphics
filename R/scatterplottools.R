@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 #' Generates a scatter plot legend for use with nmScatterPlot
 #' @title Generate scatter plot legend
@@ -15,7 +8,8 @@
 #' @param sortLevels Should the "grouping levels" be sorted?  This is meant to be used when the scatter plot key is
 #' being generated for a plot with overlaid y-axis variables, rather than for a plot used with a grouping variable 
 #' @return a list to be passed in as a scatter-plot legend 
-#' @author fgochez
+#' @author Mango Solutions
+#' @noRd
 
 scatterPlotKey <- function(gVar, gVarValues, type = c("p", "i", "t", "l", "o"), 
 							sortLevels = TRUE, graphParams = getAllGraphParams())

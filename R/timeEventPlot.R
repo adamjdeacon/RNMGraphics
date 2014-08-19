@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 #' Generates dot plots of dosing events against time for each individual in a NONMEM object.
 #' @name timeEventDPlot
@@ -22,8 +15,10 @@
 #' @return Multitrellis class object containing the plot.
 #' @author Mango Solutions
 #' @examples
+#' \dontrun{ 
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
 #' timeEventDPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
+#' }
 #' @keywords hplot
 #' @exportMethod timeEventDPlot
 
@@ -103,8 +98,10 @@ setMethod("timeEventDPlot", signature(obj = "NMProblem"), timeEventDPlot.NMProbl
 #' @return 	Multitrellis class object containing the plot.
 #' @author Mango Solutions
 #' @examples
+#' \dontrun{ 
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
-#' timeEventSPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
+#' timeEventSPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject") 
+#' } 
 #' @keywords hplot
 #' @exportMethod timeEventSPlot
 

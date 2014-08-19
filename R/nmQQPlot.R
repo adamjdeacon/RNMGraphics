@@ -1,10 +1,3 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
 
 #' Generates a qq-plot (for the normal distribution) from one or more NONMEM variables
 #' @title NONMEM qqplot 
@@ -29,7 +22,9 @@
 #' @return Multi-trellis class object containing the plot
 #' @author Mango Solutions
 #' @examples
+#' \dontrun{ 
 #' nmQQNorm(ChickWeight.df,"weight", bVar =  "Diet", xAxisScaleRelations="free")
+#' }
 #' @keywords hplot
 #' @exportMethod nmQQNorm
 
