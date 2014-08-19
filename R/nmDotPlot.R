@@ -16,6 +16,10 @@
 #' @param addLegend Logical flag.  Should legends be added?
 #' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
 #'                      If a character vector or a vector of length greater than one, the explicit breakpoints.
+#' @param problemNum The problem required for a \code{NMRun} object. 
+#' @param subProblems The sub problem of a run with simulations.
+#' @param maxFactPerPanel Max fact per panel.
+#' @param xAxisPlotStyle "data" or "cont" or "cat".
 #' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
 #' @param xAxisScaleRelations X-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
 #' @param ... Additional parameters to \code{dotplot}. 
@@ -132,7 +136,7 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 	if(!is.null(bVars))
 	{
 		
-		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = c(iVar, paste(factVar, "GRP", sep = ".")))
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exemptColumns = c(iVar, paste(factVar, "GRP", sep = ".")))
 		obj <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
     

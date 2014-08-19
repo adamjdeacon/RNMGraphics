@@ -6,15 +6,16 @@
 #' @param obj object of class NMProblem, NMRun or data.frame
 #' @param vars Character vector or comma seperated list of variable names to plot
 #' @param bVars character vector or comma-seperated list of trellis variables
+#' @param iVar Identifier variable
 #' @param addLoess Logical flag. Should a loess smoother curve be added to the scatter-plots? 
 #' @param title Plot's main title
-#' @param addLoess Add a loess smoother? 
-#' @param layout *
-#' @param maxPanels *
-#' @param maxTLevels *
-#' @param problemNum *
-#' @param subProblems *
-#' @param ... Additional parameters passed to the splom function
+#' @param layout Numeric vector giving the number of columns, rows and pages in a multipanel display. 
+#' @param maxPanels Maximum number of panels that should appear on each page of a graph.  Overrides \code{layout} 
+#' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned. 
+#'        If a character vector or a vector of length greater than one, the explicit breakpoints.
+#' @param problemNum The problem required for a \code{NMRun} object. 
+#' @param subProblems The sub problem of a run with simulations.
+#' @param ... Additional parameters to \code{splom}.
 #' @return An object of class multiTrellis 
 #' @author Mango Solutions
 #' @keywords hplot
@@ -86,7 +87,7 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exemptColumns = iVar)
 		obj <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "+"), sep = "|") 

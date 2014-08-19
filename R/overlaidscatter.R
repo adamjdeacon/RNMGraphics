@@ -33,7 +33,7 @@
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVars)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exemptColumns = iVars)
 		bVars <- temp$columns
 		# coerce each "by" variable to a factor
 		dataSet <- coerceToFactors(temp$data, bVars)
@@ -172,7 +172,7 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 	{
 		#TODO: fix colours here, as they ignore the different y-variables
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		groupInfo <- subjectGrouping(idLabels, groups, graphParams$"superpose.text", expand= TRUE)
+		groupInfo <- subjectGrouping(idLabels, groups, graphParams$"superpose.text", expandElements= TRUE)
 		textopt <- graphParams$"superpose.text"
 		ltext(x, y, idLabels[subscripts], col = groupInfo$elements$col[subscripts] , cex = groupInfo$elements$cex[subscripts] , ...)
 	}
@@ -187,7 +187,7 @@ panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALS
 		RNMGraphicsStopifnot(!is.null(idLabels))
 		textopt <- graphParams$superpose.text
 		groupInfo <- subjectGrouping(idLabels, groups, graphParams$superpose.line )
-		groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expand = TRUE) 
+		groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expandElements = TRUE) 
 		
 		ltext(x, y, idLabels[subscripts], col = groupInfo2$elements$col[subscripts] ,
 				groupInfo2$elements$cex[subscripts], ...)		

@@ -10,14 +10,14 @@ initializeOptions <- function()
 
 	scal <- seq(from = 0.3, to = 1, length.out = 7)
 	superpose.polygon <- list(alpha = rep(1, 7), lty = rep(1, 7), lwd = rep(1, 7), 
-			border = rep("black", 7), col = topo.colors(8)) 
+			border = rep("black", 7), col = grDevices::topo.colors(8)) 
 	
 	# initialize colours for superpose.polygon
 	# histogram
 	hist <- list(alpha = 1, col = "steelblue", border = "black", lty = 1, lwd = 1, dens.col = "darkred", dens.lty = 1, dens.lwd = 1.5)
 	
 	superpose.symbol <- list(cex = rep(0.8, 7), 
-			col =  grey.colors(7),	pch = rep(c(1, 2, 19), length.out = 8) )
+			col =  grDevices::grey.colors(7),	pch = rep(c(1, 2, 19), length.out = 8) )
 	superpose.line <- list(alpha = 1, col = c("#0080ff", "#ff00ff",  "darkgreen","#ff0000",  "orange", "#00ff00","brown")  , 
 			lty = rep(1, 8), lwd = rep(1, 8))
 	
@@ -45,7 +45,7 @@ initializeOptions <- function()
 							umb.col = "blue", umb.lty = 1, umb.lwd=1 ),
 			"title.text" = list(alpha = 1, cex = 1.2, col = "black", font = 2, lineheight = 1),
 			grid = list(col = "lightgray", lty = 1, lwd = 1),
-			strip.bg = list(col = rev(grey.colors(4))), 
+			strip.bg = list(col = rev(grDevices::grey.colors(4))), 
 					# list(col = c("#ffe5cc", "#ccffcc", "#ccffff", "#cce6ff", "#ffccff", "#ffcccc", "#ffffcc")),
 			layout.widths = layout.widths,
 			layout.heights = layout.heights,

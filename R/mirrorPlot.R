@@ -44,7 +44,7 @@
 	consolidatedData <- rbind( originalData[commonColumns], simDataToPlot[commonColumns]) 
 	
 	nmScatterPlot( consolidatedData, xVars = xVars, yVars = yVars, gVars = gVar, iVars = iVar, 
-			bVars = c("NSIM", bVars) , type = type, ... )
+			bVars = c("NSIM", bVars) , types = type, ... )
 }
 
 mirrorPlot <- function(obj, xVars, yVars, gVar = NULL, bVars = NULL, iVar  = "ID", 
@@ -60,8 +60,8 @@ mirrorPlot.NMRun <- function(obj, xVars, yVars, gVar = NULL, bVars = NULL, iVar 
 		type = "p", addInterval = FALSE, intervalAlpha = 0.95, simNumber = 1, 
 		originalProblemNum = 1, simProblemNum = 2, ... )
 {
-	origProblem <- getProblem(obj, problem = originalProblemNum)
-	simProblem <- getProblem(obj, problem = simProblemNum)
+	origProblem <- getProblem(obj, problemNumber = originalProblemNum)
+	simProblem <- getProblem(obj, problemNumber = simProblemNum)
 	
 	
 }

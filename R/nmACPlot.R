@@ -14,6 +14,8 @@
 #' @param yLabs y-axis label
 #' @param extraSubset Not used at the moment
 #' @param addGrid logical flag.  Should a grid be added?
+#' @param problemNum The problem required for a \code{NMRun} object. 
+#' @param subProblems The sub problem of a run with simulations.
 #' @param ... Extra parameters passed to nmScatterPlot
 #' @return Obejct of class multiTrellis
 #' @author Mango Solutions
@@ -93,7 +95,7 @@ nmACPlot.data.frame <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NU
 	obj.lagged <- do.call(rbind, obj.lagged); obj[[laggedVar]] <- obj.lagged[[laggedVar]]
 	obj[[var]] <- obj.lagged[[var]]
 	# obj <- na.omit(obj)
-	nmScatterPlot(obj, xVar = laggedVar, yVar = var,
+	nmScatterPlot(obj, xVars = laggedVar, yVars = var,
 			bVars = bVars, gVars = gVars, xLab = xLabs, yLab = yLabs,
 			addGrid = addGrid, extraSubset = extraSubset, titles = titles, ...)
 }

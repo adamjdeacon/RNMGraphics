@@ -11,13 +11,16 @@
 #' @param xLab x-axis label
 #' @param yLab y-axis label
 #' @param addLegend Should legends be added?
+#' @param problemNum The problem required for a \code{NMRun} object. 
+#' @param subProblems The sub problem of a run with simulations.
 #' @param ... 
 #' @return Multitrellis class object containing the plot.
 #' @author Mango Solutions
 #' @examples
 #' \dontrun{ 
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
-#' timeEventDPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
+#' timeEventDPlot(Theoph2, tVar = "Time", concVar = "conc", 
+#'   doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
 #' }
 #' @keywords hplot
 #' @exportMethod timeEventDPlot
@@ -63,7 +66,7 @@ timeEventDPlot.data.frame <- function(obj, tVar = "TIME", doseVar = "AMT",
 		addLegend = TRUE, problemNum = 1, subProblems = 1, ...) 
 {
 		
-	nmDotPlot(obj, factVar = iVar, contVar = tVar, gVar = evtVar, xLab = xLab, yLab = yLab, addLegend = addLegend, 
+	nmDotPlot(obj, factVar = iVar, contVar = tVar, gVar = evtVar, xLabs = xLab, yLabs = yLab, addLegend = addLegend, 
 			title = title, problemNum = 1, subProblems = 1, ...)
 }
 
@@ -89,6 +92,10 @@ setMethod("timeEventDPlot", signature(obj = "NMProblem"), timeEventDPlot.NMProbl
 #' @param title Main title
 #' @param xLab X-axis label
 #' @param yLab Y-axis label
+#' @param layout Numeric vector giving the number of columns, rows and pages in a multipanel display
+#' @param maxPanels Maximum number of panels to display on each page 
+#' @param problemNum The problem required for a \code{NMRun} object
+#' @param subProblems The sub problem of a run with simulations
 #' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
 #' @param xAxisScaleRelations X-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
 #' @param expX Logical flag.  Exponentiate x-axis variable?
@@ -100,7 +107,8 @@ setMethod("timeEventDPlot", signature(obj = "NMProblem"), timeEventDPlot.NMProbl
 #' @examples
 #' \dontrun{ 
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
-#' timeEventSPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject") 
+#' timeEventSPlot(Theoph2, tVar = "Time", concVar = "conc", 
+#'   doseVar = "Dose", evtVar = "Evt", iVar = "Subject") 
 #' } 
 #' @keywords hplot
 #' @exportMethod timeEventSPlot

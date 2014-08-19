@@ -4,12 +4,12 @@
 #' @param obj NMRun, NMProblem, or data.frame object
 #' @param vars Vector or comma-separated list of variables to plot 
 #' @param bVars Vector or comma-separated list of "by" variables
+#' @param iVar Identifier variable
 #' @param titles Main title
 #' @param xLabs x-axis label
 #' @param yLabs y-axis label
 #' @param addGrid unused
 #' @param qqLine logical flag.  Should a reference line be added?
-#' @param yAxisScaleRelations One of "same" "free" "sliced". How panel y axes are scaled in relation to each other 
 #' @param layout Numeric vector giving the number of columns, rows and pages in a multipanel display. 
 #' @param maxPanels Maximum number of panels that should appear on each page of a graph. 
 #' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
@@ -98,7 +98,7 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVar)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exemptColumns = iVar)
 		dataSet <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|") 

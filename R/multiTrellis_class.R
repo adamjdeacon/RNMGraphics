@@ -56,7 +56,7 @@ validity.multiTrellis <- function(object)
 #' @description A class designed to hold multiple lattice plots and their layout on a single device page.
 #' At the moment, this is mostly unimplemented and only a single plot is stored. 
 #'
-#' @section Objects from the Class
+#' @section Objects from the Class:
 #' 	Objects of this class are typically returned by plotting routines in this package.  They can also be 
 #' 	created via the \code{multiTrellis} function, though this is not meant to be done directly.
 #' 

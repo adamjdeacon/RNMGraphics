@@ -43,7 +43,8 @@
 #' @examples
 #' \dontrun{ 
 #'  Theoph.df <- as.data.frame(Theoph)
-#'  nmScatterPlot(Theoph.df, xVar = "Time", yVar = "conc", iVar = "Subject", type = "l", title = "Theophiline", yLab = "conc")
+#'  nmScatterPlot(Theoph.df, xVar = "Time", yVar = "conc", 
+#'    iVar = "Subject", type = "l", title = "Theophiline", yLab = "conc")
 #'  Indometh.df <- as.data.frame(Indometh)
 #'  nmScatterPlot(Indometh.df, xVar = "time", yVar = "conc", bVar = "Subject")
 #' }
@@ -202,7 +203,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	{
 		bVars <- CSLtoVector(bVars)
 		# bin the by-variables as necessary
-		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVars)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exemptColumns = iVars)
 		bVars <- temp$columns
 		# coerce each "by" variable to a factor
 		dataSet <- coerceToFactors(temp$data, bVars)
@@ -407,7 +408,7 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		if(!is.null(groups))
 		{
 			textopt <- graphParams$"superpose.text"
-			groupInfo <- subjectGrouping(idLabels, groups, textopt, expand = TRUE)
+			groupInfo <- subjectGrouping(idLabels, groups, textopt, expandElements = TRUE)
 			ltext(x, y, idLabels[subscripts], col = groupInfo$elements$col[subscripts] , cex = groupInfo$elements$cex[subscripts] , ...)
 		}
 		else
@@ -425,7 +426,7 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		{
 			textopt <- graphParams$"superpose.text"
 			groupInfo <- subjectGrouping(idLabels, groups, graphParams$superpose.line)
-			groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expand = TRUE)
+			groupInfo2 <- subjectGrouping(idLabels, groups, textopt, expandElements = TRUE)
 			ltext(x, y, idLabels[subscripts], col = groupInfo2$elements$col[subscripts] ,
 					groupInfo2$elements$cex[subscripts], ...)		
 			panel.superpose(x, y, groups = groupInfo$grouping, type = "l", 

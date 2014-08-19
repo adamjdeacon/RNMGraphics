@@ -140,7 +140,7 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	if(!is.null(bVars))
 	{
 		bVars <-CSLtoVector(bVars)
-		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exempt = iVar)
+		temp <- processTrellis(obj, bVars, maxLevels = maxTLevels, exemptColumns = iVar)
 		obj <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
 		

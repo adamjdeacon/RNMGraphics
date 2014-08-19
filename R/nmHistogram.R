@@ -27,7 +27,8 @@
 #' @examples
 #' \dontrun{ 
 #'  Theoph.df <- as.data.frame(Theoph)
-#'  nmHistogram(Theoph.df, vars = "conc", title = "Theophiline concentration histogram", type = "density") 
+#'  nmHistogram(Theoph.df, vars = "conc", 
+#'    title = "Theophiline concentration histogram", type = "density") 
 #' }
 #' @return An object of class multiTrellis
 #' @author Mango Solutions
@@ -135,7 +136,7 @@ nmHistogram.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", refLine
 	if(!is.null(bVars))
 	{
 		bVars <- CSLtoVector(bVars)
-		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exempt = iVar)
+		temp <- processTrellis(dataSet, bVars, maxLevels = maxTLevels, exemptColumns = iVar)
 		dataSet <- coerceToFactors(temp$data, temp$columns)
 		bVars <- temp$columns
 		plotFormulas <- paste(plotFormulas, paste(bVars, collapse = "*"), sep = "|")
