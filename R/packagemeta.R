@@ -23,6 +23,13 @@ setAllGraphParams <- function(settings)
 	}
 }
 
+#' Get all graphical style options. See \code{\link{setAllGraphParams}}.
+#' @title Get all graphical parameters
+#' @return A named list 
+#' @author fgochez
+#' @keywords utilities
+#' @export
+
 getAllGraphParams <- function()
 {
 	.RNMGraphicsEnv$graphPars
@@ -36,6 +43,7 @@ getAllGraphParams <- function()
 #' @return None
 #' @author fgochez
 #' @keywords environment
+#' @export
 
 setGraphParams <- function(field, setting)
 {
@@ -59,6 +67,7 @@ setGraphParams <- function(field, setting)
 #' @return A named list 
 #' @author fgochez
 #' @keywords environment
+#' @export
 
 getGraphParams <- function(field)
 {

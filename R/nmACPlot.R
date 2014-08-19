@@ -25,6 +25,7 @@
 #' @return Obejct of class multiTrellis
 #' @author fgochez
 #' @keywords hplot
+#' @exportMethod nmACPlot
 
 nmACPlot <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NULL, gVars = NULL,
 		titles = "", xLabs = NULL, yLabs = NULL, extraSubset = NULL, addGrid = TRUE, 
@@ -68,6 +69,10 @@ nmACPlot.data.frame <- function(obj, var, tVar = "TIME", iVar = "ID", bVars = NU
 		problemNum = 1, subProblems = 1, ...)
 {
 	
+	## include conversion from comma seperated list to vector to allow for handling of 
+	## comma seperated list case as permitted in all other functions
+	var <- CSLtoVector(var, removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(var) == 1, "Must have only one variable\n")
 	# lag while preserving the ID structure
 	# only one variable allowed at the moment
 	var <- var[1]

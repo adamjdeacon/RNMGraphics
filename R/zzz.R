@@ -71,6 +71,11 @@ updateRNMImportSettings <- function()
 
 .onLoad <- function(libname, pkgname)
 {
-	updateRNMImportSettings()
-	initializeOptions()
+	if ("RNMImport" %in% .packages()) {
+		
+		updateRNMImportSettings()
+		
+		initializeOptions()
+		
+	} else { warning("RNMImport is not loaded") }
 }

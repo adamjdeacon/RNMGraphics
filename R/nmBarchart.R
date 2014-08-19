@@ -29,6 +29,7 @@
 #' nmBarChart(mtcars, xVars = "cyl", yVars = "gear", bVars = "vs")
 #' @author fgochez
 #' @keywords hplot
+#' @exportMethod nmBarChart
 
 nmBarChart <- function(obj, xVars, yVars, bVars = NULL, xLab = NULL, xRotAngle = 0, yLab = NULL, titles = NULL, addLegend = TRUE 
 					   ,xBin = Inf , problemNum = 1, subProblems = 1, 
@@ -73,10 +74,15 @@ nmBarChart.data.frame <- function(obj, xVars, yVars, bVars = NULL, xLab = NULL, 
         xAxisScaleRelations = c("same", "free", "sliced"),
         ...)
 {
-	xVars <- CSLtoVector(xVars)
+	xVars <- CSLtoVector(xVars, removeEmpty = TRUE)
 	RNMGraphicsStopifnot(length(xVars) == 1, "Currently not accepting more than one X variable\n")
-	yVars <- CSLtoVector(yVars)
+	yVars <- CSLtoVector(yVars, removeEmpty = TRUE)
 	RNMGraphicsStopifnot(length(yVars) == 1, "Currently not accepting more than one Y variable\n")
+	
+	if(!(xVars %in% names(obj))){ 
+		obj$dummy <- ""
+		xVars <- "dummy"
+	}
 	
     obj <- applyGraphSubset(obj)
 	

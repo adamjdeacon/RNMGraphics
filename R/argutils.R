@@ -1,20 +1,12 @@
-# SVN revision: $Rev$
-# Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
-# 
-# Original author: fgochez
-# Copyright Mango Solutions, Chippenham, UK
-###############################################################################
-
-
 #' 
 #' @param assignTo 
 #' @param valsToRepeat 
 #' @param length.out 
-#' @title
-#' @return 
+#' @title Repeat Variables
+#' @return NULL
 #' @author fgochez
-#' @keywords
+#' @keywords utility
+#' @noRd
 
 repeatVars <- function(assignTo, valsToRepeat, length.out = 1)
 {

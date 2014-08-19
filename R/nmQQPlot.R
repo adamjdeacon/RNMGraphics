@@ -31,6 +31,8 @@
 #' @examples
 #' nmQQNorm(ChickWeight.df,"weight", bVar =  "Diet", xAxisScaleRelations="free")
 #' @keywords hplot
+#' @exportMethod nmQQNorm
+
 
 nmQQNorm <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "", xLabs = "normal", yLabs, 
 		addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), layout = NULL, maxPanels = NULL,
@@ -71,6 +73,11 @@ nmQQNorm.data.frame <- function(obj, vars, bVars = NULL, iVar = "ID", titles = "
 			xLabs = "normal", yLabs, addGrid = TRUE, qqLine = TRUE, yAxisScaleRelations = c("same","free","sliced"), 
 			layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, xAxisScaleRelations = c("same","free","sliced"),  ...)
 {   
+	## include removeEmpty option to prevent empty string errors
+	## include error handling if not enough variables are provided
+	vars <- CSLtoVector(vars, removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(vars) > 0, "At least one variable must be provided to create this plot.\n")
+	
 	vars <- CSLtoVector(vars)
 	obj <- applyGraphSubset(obj)
 	# we now filter variables that do not have more than one level

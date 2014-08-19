@@ -18,12 +18,29 @@ setDefaultGraphSubset <- function(sub)
 	.RNMGraphicsEnv$defaultSubset <- sub
 }
 	# TODO: make this a generic function later
-	
+
+#' assigns to \code{"graphSubset"} attribute
+#' @title Calculate Max Panels
+#' @param x
+#' @param value
+#' @return x
+#' @author fgochez
+#' @keywords graph
+#' @export
+
 "graphSubset<-" <- function(x, value)
 {
 	attr(x, "graphSubset") <- value
 	x
 }
+
+#' returns the value of attribute \code{"graphSubset"}
+#' @title Calculate Max Panels
+#' @param x
+#' @return character vector
+#' @author fgochez
+#' @keywords graph
+#' @export
 
 graphSubset <- function(x)
 {

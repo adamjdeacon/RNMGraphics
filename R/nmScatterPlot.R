@@ -1,6 +1,6 @@
 # SVN revision: $Rev$
 # Date of last change: $LastChangedDate$
-# Last changed by: $LastChangedBy$
+# Last changed by: $LastChangedBy: agott@MANGO.LOCAL $
 # 
 # Original author: fgochez
 # Copyright Mango Solutions, Chippenham, UK
@@ -12,10 +12,10 @@
 #' @title NONMEM scatter plot
 #' @param obj An object of class NMRun, NMProblem, or data.frame. The object from which data will be plotted.
 #' @param xVars Single string with name of x-axis variable.
-#' @param yVars Variables to plot on the y-axes, specified as a comma seperated string or character vector
-#' @param bVars “Trellis” variables on which to split data.
-#' @param gVars “Grouping” variable – used to group points by colour, for legends and so on.  
-#' @param iVars Variable name of the “inherent grouping” (subject identifier) variable.  This affects plots whose type is "l", "i", "o" or "t".
+#' @param yVars Variables to plot on the y-axes, specified as a comma separated string or character vector
+#' @param bVars "Trellis" variables on which to split data.
+#' @param gVars "Grouping" variable -- used to group points by colour, for legends and so on.  
+#' @param iVars Variable name of the "inherent grouping" (subject identifier) variable.  This affects plots whose type is "l", "i", "o" or "t".
 #' Lines will be grouped by this variable in addition to any other grouping (e.g. in gVar), but colours will not vary in this grouping
 #' @param addLegend Should legends be added?
 #' @param addGrid should grids be added?
@@ -29,118 +29,134 @@
 #' these conditions, a warning will be emitted
 #' @param xLab x-axis label.  By default, will use the names of the x-axis variable
 #' @param yLab similar to the above, but for y-axis label
-#' @param doPlot Should the plot be plotted immediately, before returning it as an object?
 #' @param types Plot type to use.  Allowed types are "p" (for standard points), "l" (lines connected by the variable
-#' specified in "iVars", "i" for points labeled by "iVars"), "o" (lines and points), and "t" for labels connected by lines grouped by "iVars"
+#' specified in "iVars", "i" for points labelled by "iVars"), "o" (lines and points), and "t" for labels connected by lines grouped by "iVars"
 #' @param overlaid Logical flag. If TRUE, for each fixed x, the y variables will be overlaid onto a single plot
-#' @param problemNum Number of the problem (applicable to NMRun class only)
-#' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes obly)
-#' @param uniqueX If the number of unique values of the x-axis variable is less than this number, a boxplot will be generated instead.  Must be an integer value between 
-#' 0 and 100, or Inf.
-#' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
+#' @param layout A length 2 vector which is passed to the layout argument of xyplot
 #' @param maxPanels Maximum number of panels that should appear on each page of a graph.
-#' @param xRotAngle Angle by which to rotate the x-axis tick marks
-#' @param layout A length 2 vector which is passed in as the layout parameter to xyplot
 #' @param maxTLevels If a single numeric (or string), the maximum number of levels that a "by" variable can have before it is binned.
 #'                      If a character vector or a vector of length greater than one, the explicit breakpoints.
-#' @param graphParams A full list of graphical parameter settings, such as that returned by getAllGraphParams().
+#' @param xRotAngle Angle by which to rotate the x-axis tick marks
+#' @param equalAxisScales single logical
+#' @param problemNum Number of the problem (applicable to NMRun class only)
+#' @param subProblems Number of the simulation subproblems to use (applicable to the NMSim* classes only)
+#' @param uniqueX Number of unique values for the X axis.  If number of uniques is less than or equal to this, a boxplot is created instead
+#' @param graphParams A full list of graphical parameter settings, such as that returned by \code{\link{getAllGraphParams}}.
 #' Will override global settings. By default, these will be the global settings
 #' @param xAxisScaleRelations X-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}.
-#' @param \dots Additonal variables passed to the xyplot function 
+#' @param yAxisScaleRelations Y-axis scale relations when panels are displayed. One of \code{"same"}, \code{"free"} or \code{"sliced"}. 
+#' @param \dots Additional variables passed to the xyplot function 
 #' @return An object of class \code{multiTrellis} holding the plot
 #' @examples
 #'  Theoph.df <- as.data.frame(Theoph)
-#'  nmScatterPlot(Theoph.df, xVar = "Time", yVar = "conc", iVar = "Subject", type = "l", title = "Theophiline", xLab = "conc") 
+#'  nmScatterPlot(Theoph.df, xVar = "Time", yVar = "conc", iVar = "Subject", type = "l", title = "Theophiline", yLab = "conc")
 #'  Indometh.df <- as.data.frame(Indometh)
 #'  nmScatterPlot(Indometh.df, xVar = "time", yVar = "conc", bVar = "Subject")
 #' @author Mango Solutions
 #' @keywords hplot
+#' @exportMethod nmScatterPlot
 
 LOGAXISLIMIT <- 0.01
 
-nmScatterPlot <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
-		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="", logX = NULL,
-		logY = NULL, idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
-		types = "p", overlaid = FALSE, equalAxisScales = FALSE ,layout = NULL, maxPanels = NULL, 
-		maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"), xRotAngle = 0,
+nmScatterPlot <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
+		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles = "", 
+		logX = NULL, logY = NULL, 
+		idLines = FALSE, abLines = NULL, xLab = NULL, yLab = NULL, 
+		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		xRotAngle = 0, equalAxisScales = FALSE,
 		problemNum = 1, subProblems = 1, uniqueX = 7, graphParams = getAllGraphParams(),
-        xAxisScaleRelations = c("same", "free", "sliced"), ...)
+		xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	RNMGraphicsStop("Not implemented for this class yet!")
-}	
+}
+
 setGeneric("nmScatterPlot")
 
-nmScatterPlot.NMRun <- function( obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
-							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles="" , 
-							logX = FALSE, logY = FALSE,idLines = FALSE,  abLines = NULL, xLab = NULL, 
-							yLab = NULL, types = "p", overlaid = FALSE, equalAxisScales = FALSE ,
-							layout = NULL, maxPanels = NULL, 
-							maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"), 
-							xRotAngle = 0, problemNum = 1, subProblems = 1, uniqueX = 7, 
-							graphParams = getAllGraphParams(), xAxisScaleRelations = c("same", "free", "sliced"), ...)
+nmScatterPlot.NMRun <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
+		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles = "", 
+		logX = FALSE, logY = FALSE,
+		idLines = FALSE,  abLines = NULL, xLab = NULL, yLab = NULL, 
+		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		xRotAngle = 0, equalAxisScales = FALSE, 
+		problemNum = 1, subProblems = 1, uniqueX = 7, graphParams = getAllGraphParams(), 
+		xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	prob <- getProblem(obj, problemNum)
 	x <- as.list(match.call())
 	x$obj <- prob
 	do.call(nmScatterPlot, x[-1])
-	
 }
 
 setMethod("nmScatterPlot", signature(obj = "NMRun"), nmScatterPlot.NMRun)
 
 
 nmScatterPlot.NMProblem <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
-							addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
-							logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,xLab =NULL , yLab = NULL, 
-							types = "p",  overlaid = FALSE, equalAxisScales = FALSE,  
-							layout = NULL, maxPanels = NULL , 
-							maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"),
-							xRotAngle = 0, problemNum = 1, subProblems = 1, uniqueX = 7,
-							graphParams = getAllGraphParams(), xAxisScaleRelations = c("same", "free", "sliced"),...)
+		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles = "", 
+		logX = FALSE, logY = FALSE,
+		idLines = FALSE,  abLines = NULL, xLab = NULL, yLab = NULL, 
+		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		xRotAngle = 0, equalAxisScales = FALSE, 
+		problemNum = 1, subProblems = 1, uniqueX = 7, graphParams = getAllGraphParams(), 
+		xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
 	
 	dataSet <- applyGraphSubset(nmData(obj, subProblemNum = subProblems), graphSubset(obj))
 	x <- as.list(match.call())
 	x$obj <- dataSet
-
+	
 	do.call(nmScatterPlot, x[-1])
 	
 }
 
 nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = "ID", 
-		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles ="", 
-		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
-		yLab = NULL,  types = "p", overlaid = FALSE , 
-		 equalAxisScales = FALSE,  layout = NULL, maxPanels = NULL ,  
-		 maxTLevels = Inf, yAxisScaleRelations = c("same", "free", "sliced"),
-		 xRotAngle = 0, problemNum = 1, subProblems = 1, uniqueX = 7, 
-		 graphParams = getAllGraphParams(), xAxisScaleRelations = c("same", "free", "sliced"), ...)
+		addLegend = FALSE, addGrid = TRUE, addLoess = FALSE, titles = "", 
+		logX = FALSE, logY = FALSE,
+		idLines = FALSE,  abLines = NULL, xLab = NULL, yLab = NULL, 
+		types = "p", overlaid = FALSE, layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
+		xRotAngle = 0, equalAxisScales = FALSE, 
+		problemNum = 1, subProblems = 1, uniqueX = 7, graphParams = getAllGraphParams(), 
+		xAxisScaleRelations = c("same", "free", "sliced"), yAxisScaleRelations = c("same", "free", "sliced"), ...)
 {
-
+	
 	if(length(maxPanels) > 0) layout <- NULL
 	# ensure that maxPanels is numeric, even if empty
 	else maxPanels <- numeric(0)
 	# extract xVars - currently only one is allowed
-	xVars <- CSLtoVector(xVars)
+	## agott (15/11/13)
+	## include removeEmpty option to prevent empty string errors
+	xVars <- CSLtoVector(xVars, removeEmpty = TRUE)
 	RNMGraphicsStopifnot(length(xVars) == 1, msg = "Multiple x variables are not allowed at the moment\n")
-	yVars <- CSLtoVector(yVars)
+	
+	## agott (15/11/13)
+	## include removeEmpty option to prevent empty string errors
+	yVars <- CSLtoVector(yVars, removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(yVars) >= 1, msg = "At least one y variable must be selected\n")
+	
+	
 	# extract the desired subset
 	dataSet <- applyGraphSubset(obj, graphSubset(obj))
-
+	
+	# check iVars
+	iVars <- if(!is.null(iVars)) { CSLtoVector(iVars) }
+	
+	iVars <- iVars[iVars %in% colnames(dataSet)]
+	
+	if (length(iVars) == 0) { iVars <- NULL }
+	
 	# Check to see whether there are less than "uniqueX" values on the X axis.  If there are, switch instead to a boxplot
 	RNMGraphicsStopifnot(length(uniqueX) == 1 && uniqueX %in% c(0:100, Inf), msg = "'uniqueX' input must be an integer in range [1-100], or Inf\n")
 	xUni <- length(unique(dataSet[[xVars]]))
 	if (xUni <= uniqueX) {
 		# Need to switch to use the boxplot function instead
 		return(nmBoxPlot(obj = dataSet, contVar = yVars, factVar = xVars, 
-			bVars = bVars, iVar = iVars, titles = titles, xLabs = xLab, yLabs = yLab, 
-			xRotAngle = xRotAngle, layout = layout, maxPanels = maxPanels, 
-			maxTLevels = maxTLevels, yAxisScaleRelations = yAxisScaleRelations, xAxisScaleRelations = xAxisScaleRelations, 
-            problemNum = problemNum, 
-			subProblems = subProblems, ...)
+						bVars = bVars, iVar = iVars, titles = titles, xLabs = xLab, yLabs = yLab, 
+						xRotAngle = xRotAngle, layout = layout, maxPanels = maxPanels, 
+						maxTLevels = maxTLevels, yAxisScaleRelations = yAxisScaleRelations, xAxisScaleRelations = xAxisScaleRelations, 
+						problemNum = problemNum, 
+						subProblems = subProblems, ...)
 		)
 	}
-
+	
 	# if the y-axis variables should be overlaid (rather than displayed side-by-side on lattice panels),
 	# go straight to the .overlaidScatter function and return the result
 	if(overlaid && length(yVars) > 1)
@@ -153,7 +169,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 						yLab = yLab, types = types, equalAxisScales = equalAxisScales,
 						maxPanels = maxPanels, layout = layout, maxTLevels = maxTLevels, xRotAngle = xRotAngle,
 						graphParams = graphParams, xAxisScaleRelations = match.arg(xAxisScaleRelations),
-                        yAxisScaleRelations = match.arg(yAxisScaleRelations), ...))
+						yAxisScaleRelations = match.arg(yAxisScaleRelations), ...))
 	}
 	
 	# take all combinations of x variables against y variables
@@ -168,9 +184,10 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	
 	gVars <- if(!is.null(gVars)) CSLtoVector(gVars) else "NULL"
 	# At the moment, only one gVar handled
+	if (!all(length(gVars) == 1)) { warning("gVars must be length 1; using", gVars[1], "only") } 
 	gVars <- gVars[1]
 	titles <- rep(titles,numCombos)
-
+	
 	# assign and y labels, taking care to handle the case where they are missing
 	# TODO: There is a quirk here in that xLab and yLab _cannot_ be a comma seperated list since empty strings
 	# are currently deleted by CSLtoVector.  A workaround is needed for this, and documentation should
@@ -183,12 +200,6 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		yLab <- rep(yLab, length.out = numCombos)
 	else
 		yLab <- varCombos[,2]
-
-	# repeat these variables so that there is one entry for each combination. 
-	# repeatVars(c("addLegend", "addGrid", "addLoess", "titles", "logX", "logY", "idLines","types", "equalAxisScales"),
-	# 			list(addLegend, addGrid, addLoess, titles, logX, logY, idLines ,types, equalAxisScales), length.out = numCombos )
-
-	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
 	
 	plotFormulas <- apply(cbind(varCombos[,2], varCombos[,1] ), 1, paste, collapse = "~")
 	# if there are "by variables", adjust the plotting formulas passed to xyplot
@@ -201,7 +212,7 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		# coerce each "by" variable to a factor
 		dataSet <- coerceToFactors(temp$data, bVars)
 		# post-process the plot formulas by adding the trellis variables
-		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
+		plotFormulas <- sapply(seq_len(numCombos), function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	plotList <- vector(mode = "list", length = numCombos)
 	
@@ -217,7 +228,10 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	else plotKey <- NULL
 	
 	# get idLabels.  Note that these will have to be repeated if there is more than one yvar
-	idLabels <- if(iVars[1] == "NULL") NULL else rep(dataSet[[iVars[1]]], length(yVars) ) 
+	pastes <- function(...) { paste(..., sep = "/") }
+	
+	idLabels <- if(is.null(iVars)) { NULL } else { rep(do.call("pastes", dataSet[iVars]), times = length(yVars)) }
+	
 	# initialize x axis label rotation to xRotAngle		
 	scales <- list(x = list(rot = xRotAngle), y = list())
 	
@@ -260,9 +274,9 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 		
 		if(logX | logY) 
 		{
-		
+			
 			# Here we use a minimum to avoid 0 or negative axes with logging
-		
+			
 			scales$limits <- padLimits(range(unlist(dataSet[,c(xVars[1],yVars)]), na.rm=TRUE), min = LOGAXISLIMIT)
 			RNMGraphicsWarning("Matching scales and logging requested - axis limits will be bounded from below by 0.01 which may caused data to be clipped\n")			
 		}
@@ -274,26 +288,26 @@ nmScatterPlot.data.frame <- function(obj, xVars, yVars, bVars = NULL, gVars = NU
 	# only apply the yAxisScaleRelations if there is reason to 
 	
 	if(length(yVars) > 1 || length(bVars) > 0) 
-    {
-        scales$y$relation <- match.arg(yAxisScaleRelations)      
-    }
-    
-    # only apply the xAxisScaleRelations if there is reason to
-    
-    if(length(bVars) > 0)
-    {        
-        scales$x$relation <- match.arg(xAxisScaleRelations)      
-    }
-    
-    featuresToAdd <- c("grid" = addGrid, "loess" = addLoess, "idLine" = idLines)
+	{
+		scales$y$relation <- match.arg(yAxisScaleRelations)      
+	}
+	
+	# only apply the xAxisScaleRelations if there is reason to
+	
+	if(length(bVars) > 0)
+	{        
+		scales$x$relation <- match.arg(xAxisScaleRelations)      
+	}
+	
+	featuresToAdd <- c("grid" = addGrid, "loess" = addLoess, "idLine" = idLines)
 	plotList[[1]] <- 
 			with(graphParams, 
 					xyplot(as.formula(plotFormulas[[1]]), groups = eval(parse(text = gVars)),  
-							data = dataSet, panel = panel.nmScatterPlot, featuresToAdd = featuresToAdd, 
-							key = plotKey, main = titles[[1]], idLabels = idLabels, scales =scales,
-							xlab = xLab[1],	ylab = yLab[1],	type = types[1], 
-							par.settings = par.settings, outer = TRUE, stack = FALSE, strip = stripfn, 
-							layout = layout, multiYVar = length(yVars) > 1, logX = logX, logY = logY, 
+							data = dataSet, panel = panel.nmScatterPlot, outer = TRUE, stack = FALSE, 
+							featuresToAdd = featuresToAdd, key = plotKey, main = titles[[1]], idLabels = idLabels, 
+							xlab = xLab[1],	ylab = yLab[1],	type = types[1], scales =scales,
+							par.settings = par.settings, strip = stripfn, layout = layout, 
+							multiYVar = length(yVars) > 1, logX = logX, logY = logY, 
 							graphParams = graphParams, abLines = abLines, ...)
 			) # end with
 	gridDims <- stdGridDims(numCombos,3 )
@@ -321,24 +335,23 @@ setMethod("nmScatterPlot", signature(obj = "NMProblem"), nmScatterPlot.NMProblem
 # @param ... additional parameters to panel.xyplot / panel.superpose
 # @param graphParams Full list of RNMGraphics graphical settings
 # @return none
-# @nord
-# @keywords
+# @keywords panel
 
 panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE), 
 		idLabels = NULL, type = c("p", "i", "l", "o","t"), groups = NULL, multiYVar = FALSE, 
 		graphParams, abLines = NULL, ...)
 {
 	type <- match.arg(type)
- 	
+	
 	# call panel.xyplot to setup first
 	panel.xyplot(x, y, type = "n",...)
 	if(featuresToAdd["grid"])
 	{
 		gridOpts <- graphParams$"grid"
 		panel.grid(h = -1, v = -1, col = gridOpts$col, alpha = gridOpts$alpha, lty = gridOpts$lty, 
-					lwd = gridOpts$lwd)
+				lwd = gridOpts$lwd)
 	}
-
+	
 	if(featuresToAdd["idLine"])
 		panel.abline(a = 0, b = 1)
 	
@@ -350,8 +363,8 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	{
 		# points only
 		panel.xyplot(x = x, y = y, subscripts = subscripts, type = type, groups,
-					...)
-			
+				...)
+		
 	}
 	
 	else if(type == "l")
@@ -361,14 +374,14 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 		{
 			plot.line <- graphParams$plot.line
 			panel.superpose(x, y, groups = idLabels, type = type, subscripts = subscripts, 
-				col.line = plot.line$col, col.lwd = plot.line$lwd, lty = plot.line$lty, ...)
+					col.line = plot.line$col, col.lwd = plot.line$lwd, lty = plot.line$lty, ...)
 		}
 		else
 		{
 			panel.superpose(x, y, groups = groupInfo$grouping, type = type, subscripts = subscripts, 
 					col.line = groupInfo$elements$col, lty = groupInfo$elements$lty, lwd = groupInfo$elements$lwd, ...)
 		}
-			
+		
 	}
 	# lines + points connecting subjects
 	else if(type == "o")
@@ -381,8 +394,8 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 			plot.line <- graphParams$plot.line
 			panel.xyplot(x, y, type = "p", subscripts = subscripts, ...)
 			panel.superpose(x, y, groups = idLabels, 
-				type = "l", subscripts = subscripts, col = plot.line$col, 
-				lty = plot.line$lty, lwd = plot.line$lwd, ...)
+					type = "l", subscripts = subscripts, col = plot.line$col, 
+					lty = plot.line$lty, lwd = plot.line$lwd, ...)
 		}
 		else
 		{
@@ -412,7 +425,7 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 	else if(type == "t")
 	{
 		RNMGraphicsStopifnot(!is.null(idLabels))
-		 
+		
 		if(!is.null(groups)) 
 		{
 			textopt <- graphParams$"superpose.text"
@@ -434,30 +447,30 @@ panel.nmScatterPlot <- function(x, y, subscripts = seq_along(x), featuresToAdd =
 					groups = idLabels, col.line = plot.line$col, lty = plot.line$lty, lwd = plot.line$lwd, ...) 
 		}
 	}
-
+	
 	if(featuresToAdd["loess"])
 	{
 		loessOpts <- graphParams$"loess.line"
 		# implement a try-catch just in case loess curve fails to compute correctly
-		tryLoess <- try(panel.loess(x,y, col = loessOpts$col, lwd = loessOpts$lwd))
+		tryLoess <- try(panel.loess(x,y, col = loessOpts$col, lwd = loessOpts$lwd), silent = TRUE)
 		if(inherits(tryLoess, "try-error"))
 			RNMGraphicsWarning("Failed to calculate loess curve, omitting from this panel\n")
 	}
-    
-    if(!is.null(abLines))
-    {
-        # check that abLines is a list of vectors of length 1 or 2
-        if(!(is(abLines, "list") & all(sapply(abLines, length) %in% c(1,2))))
-        {
-            RNMGraphicsWarning("Reference line parameter (abLines) is invalid")
-            return()
-        }
-                
-        for(x in abLines)
-        {
-            tryCatch(panel.abline(x), 
-                    error = function(e) RNMGraphicsWarning(paste("Failed to plot a reference line, error message is:", e)))
-        }
-        
-    }
+	
+	if(!is.null(abLines))
+	{
+		# check that abLines is a list of vectors of length 1 or 2
+		if(!(is(abLines, "list") & all(sapply(abLines, length) %in% c(1,2))))
+		{
+			RNMGraphicsWarning("Reference line parameter (abLines) is invalid")
+			return()
+		}
+		
+		for(x in abLines)
+		{
+			tryCatch(panel.abline(x), 
+					error = function(e) RNMGraphicsWarning(paste("Failed to plot a reference line, error message is:", e)))
+		}
+		
+	}
 }

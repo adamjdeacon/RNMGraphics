@@ -25,6 +25,7 @@
 #' @return An object of class multiTrellis 
 #' @author fgochez
 #' @keywords hplot
+#' @exportMethod nmScatterMatrix
 
 nmScatterMatrix <- function(obj, vars,bVars = NULL, iVar = "ID",  addLoess = FALSE, title ="", 
 		layout = NULL, maxPanels = NULL, maxTLevels = Inf, problemNum = 1, subProblems = 1, ...)
@@ -61,7 +62,20 @@ nmScatterMatrix.data.frame <- function(obj, vars,bVars = NULL, iVar = "ID",
 		addLoess = FALSE, title = "", layout = NULL, maxPanels = NULL, maxTLevels = Inf, 
 		problemNum = 1, subProblems = 1, ...)
 {
-	vars <- CSLtoVector(vars)
+	## Add error handling to give informative error if less than two variables are provided
+	if(length(vars) < 2){
+		if(length(vars)==1){
+			splitVars <- CSLtoVector(vars, removeEmpty = TRUE)
+			if(length(splitVars)<2){
+				stop("At least two variables must be selected to create this graphic")
+			}
+		} else{
+			stop("At least two variables must be selected to create this graphic")
+		}	
+	}
+	
+	# Use the removeEmpty option to prevent error with empty strings
+	vars <- CSLtoVector(vars, removeEmpty = TRUE)
 	vars <- paste("'", vars, "'", sep = "")
 	numCombos <- length(vars)
 	if(length(maxPanels) > 0) layout <- NULL
@@ -110,7 +124,7 @@ panel.nmScatterMatrix <- function(x,y, addLoess = FALSE, ...)
 	if(addLoess)
 	{
 		loessopt <- getGraphParams("loess.line")
-		loessTry <- try(with(loessopt, panel.loess(x, y, col = col, lwd = lwd) ))
+		loessTry <- try(with(loessopt, panel.loess(x, y, col = col, lwd = lwd) ), silent = TRUE)
 		if(inherits(loessTry, "try-error")) RNMGraphicsWarning("A call to panel.loess failed, so the smoother will be omitted.\n")
 	}
 }

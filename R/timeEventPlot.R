@@ -25,6 +25,7 @@
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
 #' timeEventDPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
 #' @keywords hplot
+#' @exportMethod timeEventDPlot
 
 timeEventDPlot<- function(obj, tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",title = "Time to event", xLab = "TIME", yLab = "ID",
@@ -105,6 +106,7 @@ setMethod("timeEventDPlot", signature(obj = "NMProblem"), timeEventDPlot.NMProbl
 #' Theoph2 <- as.data.frame(transform(Theoph, Evt = as.numeric((Time == 0)) ))
 #' timeEventSPlot(Theoph2, tVar = "Time", concVar = "conc", doseVar = "Dose", evtVar = "Evt", iVar = "Subject")  
 #' @keywords hplot
+#' @exportMethod timeEventSPlot
 
 timeEventSPlot <- function(obj, concVar = "DV", tVar = "TIME", doseVar = "AMT", 
 		evtVar = "EVID", iVar = "ID",  subjectNum = NULL,
@@ -202,7 +204,7 @@ timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVa
     objModified <- obj
     if(expX)
     {
-        expXVar <- try(exp(obj[,tVar]))
+		expXVar <- try(exp(obj[,tVar]), silent = TRUE)
         if(is(expXVar, "try-error"))
         {
             # this shouldn't be possible when invoked from application front-end
@@ -213,7 +215,7 @@ timeEventSPlot.data.frame <- function(obj, concVar = "DV", tVar = "TIME", doseVa
     }
     if(expY)
     {
-        expYVars <- try(exp(obj[,concVar]))
+		expYVars <- try(exp(obj[,concVar]), silent = TRUE)
         if(is(expYVars, "try-error"))
         {
             # this shouldn't be possible when invoked from application front-end

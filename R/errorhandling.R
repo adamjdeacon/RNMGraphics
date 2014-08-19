@@ -42,6 +42,13 @@ RNMGraphicsStopifnot <-function(condition, msg = NULL, call = NULL)
 	RNMGraphicsStop(msg, call = call)
 }
 
-assertClass <- RNMImport:::assertClass
-
+assertClass <- function(object, targetClass)
+{
+	if(!inherits(object, targetClass))
+	{
+		msg <- paste(deparse(substitute(object)), "is not of class", targetClass)
+		RNMImportStop(msg)
+	}
+	invisible(NULL)
+}
 # TODO: implement "assertColumns"

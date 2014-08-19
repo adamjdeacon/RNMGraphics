@@ -6,8 +6,6 @@
 # Copyright Mango Solutions, Chippenham, UK
 ###############################################################################
 
-LOGAXISLIMIT <- 0.01
-
 .overlaidScatter <- function(obj, xVars, yVars, bVars = NULL, gVars = NULL, iVars = NULL, 
 		addLegend = TRUE, addGrid = TRUE, addLoess = FALSE, titles ="", 
 		logX = FALSE, logY = FALSE, idLines = FALSE, abLines = NULL,  xLab = NULL, 
@@ -20,6 +18,9 @@ LOGAXISLIMIT <- 0.01
 	
 	dataSet <- applyGraphSubset(obj)
 	
+	xVars <- CSLtoVector(xVars)
+	if (all(length(xVars) != 1)) { stop("multiple x-variables not currently implemented") }
+		
 	plotFormulas <- paste(yVarsCollapsed, "~", xVars)
 	varCombos <- as.matrix(expand.grid(yVarsCollapsed, xVars))
 	
@@ -44,12 +45,17 @@ LOGAXISLIMIT <- 0.01
 		# coerce each "by" variable to a factor
 		dataSet <- coerceToFactors(temp$data, bVars)
 		# coerce each "by" variable to a factor
-		plotFormulas <- sapply(1:numCombos, function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
+		plotFormulas <- sapply(seq_len(numCombos), function(i) paste(plotFormulas[i], paste(bVars, collapse = "+"), sep = "|"))
 	}
 	repeatVars(c("addLegend", "addGrid", "addLoess", "titles", "logX", "logY", "idLines","types", "yVarsCollapsed", "equalAxisScales"),
 			list(addLegend, addGrid, addLoess, titles, logX, logY, idLines ,types,yVarsCollapsed, equalAxisScales), length.out = numCombos )
-	iVars <- if(!is.null(iVars)) rep(CSLtoVector(iVars), length.out = numCombos) else rep("NULL", length.out = numCombos)
-
+	
+	iVars <- if(!is.null(iVars)) { CSLtoVector(iVars) }
+	
+	iVars <- iVars[iVars %in% colnames(dataSet)]
+	
+	if (length(iVars) == 0) { iVars <- NULL }
+	
 	par.settings <- mapTopar.settings(graphParams)
 	for(i in seq_along(plotFormulas))
 	{
@@ -65,7 +71,15 @@ LOGAXISLIMIT <- 0.01
 					if((types[i] %in% c("i", "p"))) plotKey$lines$col <- graphParams$loess.line$col[1]
 			}
 		}  else plotKey <- NULL
-		idLabels <- if(iVars[i] == "NULL") NULL else rep(dataSet[[iVars[i]]], times = length(yVars))
+		
+		# if type = "i", idLabels must not be NULL
+		# assuming that iVars is only ever not length 1 when there is nested grouping in iVars
+		#     there will never be one iVars grouping for this plot no matter how many xVars are selected.
+		#     adding this grouping will cause the panel function to plot nested grouped lines separately.
+		
+		pastes <- function(...) { paste(..., sep = "/") }
+		
+		idLabels <- if(is.null(iVars)) { NULL } else { rep(do.call("pastes", dataSet[iVars]), times = length(yVars)) }
 		
 		scales <- list(x = list(rot = xRotAngle, relation = xAxisScaleRelations),
                 y = list(relation = yAxisScaleRelations))
@@ -101,7 +115,7 @@ LOGAXISLIMIT <- 0.01
 		
 		plotList[[i]] <- 
 				with(graphParams, 
-				xyplot(as.formula(plotFormulas[[i]]), stack = TRUE,
+				xyplot(as.formula(plotFormulas[[i]]),
 						data = dataSet, panel = panel.overlaidScatter, featuresToAdd = featuresToAdd, 
 						key = plotKey, main = titles[[i]], idLabels = idLabels,
 						xlab = xLab[i], ylab = yLab[i], type = types[i], scales = scales,
@@ -125,14 +139,24 @@ LOGAXISLIMIT <- 0.01
 #' @param subscripts (usual) 
 #' @param featuresToAdd named logical vector of features to add (grid, loess, idLine) 
 #' @param idLabels Identifier labels 
-#' @param type one of "p", "i", "l", "o", "t"
+#' @param type one of "p", "i", "l", "o", "t". Note that for "l" (lines connected by the variable specified in "iVars"), 
+#' "o" (lines and points), and "t" (labels connected by lines grouped by "iVars") lines will be added independently within nested groups.
 #' @param groups (usual)
 #' @param ... additional parameters to panel.xyplot / panel.superpose
 #' @param graphParams Full list of RNMGraphics graphical settings
 #' @return none
-#' @nord
+#' @examples 
+#'     df1 <- data.frame(X = rep(1:10, times = 2), Y1 = c(2:11, 3:12)^0.8, Y2 = c(3:12, 4:13)^0.6, G = rep(letters[1:2], each = 10))
+#'     xyplot(Y1 + Y2 ~ X | G, data = df1,
+#'         panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
+#'		 graphParams = getAllGraphParams())
+#'     df1$N <- rep(1:2, times = 5)
+#'     df1 <- df1[with(df1, order(G, N, X)), ]
+#'     xyplot(Y1 + Y2 ~ X | G, data = df1,
+#'         panel = RNMGraphics:::panel.overlaidScatter, type = "o", idLabels = df1$G, 
+#'		 graphParams = getAllGraphParams())
 #' @author fgochez
-#' @keywords
+#' @keywords panel
 
 panel.overlaidScatter <- function(x, y, groups, featuresToAdd =  c("grid" = FALSE, "loess" = FALSE, "idLine" = FALSE),
 		subscripts = seq_along(x), type = c("p", "o", "i", "l", "t"), idLabels = NULL, 

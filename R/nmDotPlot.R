@@ -33,6 +33,7 @@
 #'  Theoph.df <- as.data.frame(Theoph)
 #'  nmDotPlot( Theoph.df, factVar = "Subject", contVar = "Dose" )
 #' @keywords hplot
+#' @exportMethod nmDotPlot
 
 nmDotPlot <- function(obj, factVar, contVar, bVars = NULL, iVar = "ID", gVar = "NULL",
 		title = NULL, xLabs = NULL, yLabs = NULL, layout = NULL, maxPanels = numeric(0),
@@ -83,7 +84,13 @@ nmDotPlot.data.frame <- function(obj, factVar, contVar, bVars = NULL,iVar = "ID"
 					xAxisPlotStyle = c("data", "cont", "cat"), ...)   
 {
 
-
+	## include removeEmpty option to prevent empty string errors
+	## include error handling if not enough variables are provided
+	contVar <- CSLtoVector(contVar, removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(contVar) > 0, "At least one variable must be provided to contVar to create this plot.\n")
+	factVar <- CSLtoVector(factVar, removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(factVar) > 0, "At least one variable must be provided to factVar to create this plot.\n")
+	
 	contVars <- paste(CSLtoVector(contVar), collapse = "+")
 	factVars <- paste(CSLtoVector(factVar), collapse = "+")
 

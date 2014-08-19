@@ -17,7 +17,7 @@
 #' @param maxLength : if label is longer than this, insert line-feeds to break
 #' @return variable label, variable name or character(0) depending on parameters
 #' @author fgochez
-#' @keywords
+#' @keywords variable
 
 # TODO: unit test
 
@@ -40,13 +40,13 @@ getVarLabel <- function(varName, useVarNameifMissing = TRUE, maxLength = getGrap
 }
 
 #' (currently deprecated)
-#' @name
-#' @title
+#' @title grid dimensions
 #' @param numPlots 
 #' @param maxColumns 
-#' @return 
+#' @return numeric
 #' @author fgochez
-#' @keywords
+#' @keywords grid
+#' @noRd
 
 stdGridDims <- function(numPlots, maxColumns )
 {
@@ -58,15 +58,14 @@ stdGridDims <- function(numPlots, maxColumns )
 }
 
 #' Generates a matrix of combinations of one set of set of variables "against" another set
-#' @name Matrix of vector combinations
-#' @title 
+#' @title Generates a matrix of combinations for variables
 #' @param xVars Vector or comma seperated list of x variable names
 #' @param yVars Vector or comma seperated list of y variable names
 #' @param collapseY Collapse Y variables using +? (meant to be used with extended lattice formulas)
 #' @param collapseX Collapse X variables using +? meant to be used with extended lattice formulas)
 #' @return matrix of all xVars against yVars
 #' @author fgochez
-#' @keywords
+#' @keywords combinations
 
 varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 {
@@ -79,7 +78,6 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 
 #' Utility function that generates groupings for use with scatter plot types = l, i, o and t.
 #' Takes account of the fact that the subject identifier groupings should not vary line/text etc. colours, 
-#' @name Subject groupings
 #' @title Generate subject groupings
 #' @param idLabels subject identifier labels (e.g. from iVar) 
 #' @param group Additional grouping variable
@@ -87,7 +85,7 @@ varComboMatrix <- function(xVars, yVars, collapseY = TRUE, collapseX = FALSE)
 #' @param expandElements Should the superpose elements be reproduced for each element in the grouping, or each group level?
 #' @return a list of the grouping elements and the grouping variable that combines the identifier grouping with the other groups 
 #' @author fgochez
-#' @keywords
+#' @keywords groupings
 
 subjectGrouping <- function(idLabels, group = NULL, superposeElements, expandElements = FALSE)
 {
@@ -152,8 +150,13 @@ defaultStrip <- function(..., var.name)
 	
 }
 
-# Written by R. Pugh
-# reassigns panel layout based on a maximum number of panels.
+#' reassigns panel layout based on a maximum number of panels.
+#' @title Calculate Max Panels
+#' @param obj 
+#' @param maxPanels single numeric
+#' @return obj 
+#' @author R. Pugh
+#' @keywords panels
 calcMaxPanels <- function(obj, maxPanels = 8) 
 {
 	if (length(maxPanels) != 1 || maxPanels[1] < 1) RNMGraphicsStop("Illegal maxPanels value")	

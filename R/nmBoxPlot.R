@@ -44,6 +44,7 @@
 #' Theoph.df <- as.data.frame(Theoph)
 #' nmBoxPlot(Theoph.df, contVar = "conc", factVar = "Time", factBin = 6)
 #' @keywords hplot
+#' @exportMethod nmBoxPlot
 
 # TODO: contVarOnX does not work with overLaid = TRUE
 
@@ -107,7 +108,15 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 	
 	# turn variables into vectors instead of comma seperated strings
 	
-	contVars <- CSLtoVector(contVar)
+	## include removeEmpty to prevent errors around empty strings
+	## add some error handling around contVar if no variable is selected
+	contVars <- CSLtoVector(contVar,removeEmpty = TRUE)
+	RNMGraphicsStopifnot(length(contVars) > 0, "At least one variable must be provided to contVar to create this plot.\n")
+	
+	## agott (14/08/13)
+	## include removeEmpty option to prevent empty string errors and multiple 
+	## variables passed to factVar
+	factVar <- CSLtoVector(factVar, removeEmpty = TRUE)
 	
     RNMGraphicsStopifnot(length(factVar) == 1, "Currently not allowing more than one factor variable")
 	
@@ -240,7 +249,6 @@ nmBoxPlot.data.frame <- function(obj, contVar, factVar, bVars = NULL, iVar = "ID
 #' @title nmBoxPlot panel function
 #' @return None
 #' @author Mango Solutions
-#' @nord
 
 panel.nmBoxPlot <- function(x, y, hLines = NULL, ...)
 {
@@ -261,7 +269,6 @@ panel.nmBoxPlot <- function(x, y, hLines = NULL, ...)
 #' @title nmBoxPlot prepanel function
 #' @return None
 #' @author Mango Solutions
-#' @nord
 
 
 prepanel.nmBoxPlot <-function(x, y, horizontal, balanced = FALSE, ...)
