@@ -1,8 +1,9 @@
 
-NUMSUPERPOSELEVELS <- 7
 
 setupTestEnv <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), graphOutputPath = "graphtests")
 {
+	NUMSUPERPOSELEVELS <- 7
+	
 	.RNMGraphicsTestEnv <<- new.env()
 	# path where the test data should be found
 	.RNMGraphicsTestEnv$testDataPath <- testDataPath
@@ -87,7 +88,7 @@ setupTestEnv <- function(testDataPath = system.file("unittests", "testdata" ,pac
 setupExpectedMD5 <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), branchname = NULL) {
 
 	if (is.null(branchname)) {
-		ExpectedMD5File <- paste("ExpectedMD5_", R.Version()$major, ".", R.Version()$minor, ".csv", sep = "")
+		ExpectedMD5File <- paste("ExpectedMD5.csv", sep = "")
 	} else {
 		ExpectedMD5File <- paste("ExpectedMD5_", branchname, "_", R.Version()$major, ".", R.Version()$minor, ".csv", sep = "")
 	}
