@@ -1,10 +1,15 @@
 
+stopifnot(require(RNMGraphics, quietly = TRUE))
 
-setupTestEnv <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), graphOutputPath = "graphtests")
+setupTestEnv <- function(testDataPath = file.path("./unittests", "testdata"),
+                         graphOutputPath = "graphtests")
 {
-	NUMSUPERPOSELEVELS <- 7
+  NUMSUPERPOSELEVELS <- 7
+  
+  testDataPath <- normalizePath(testDataPath, winslash = "/", mustWork = TRUE)
 	
-	.RNMGraphicsTestEnv <<- new.env()
+  .RNMGraphicsTestEnv <<- new.env()
+  
 	# path where the test data should be found
 	.RNMGraphicsTestEnv$testDataPath <- testDataPath
 	.RNMGraphicsTestEnv$testOutputPath <- graphOutputPath
@@ -85,7 +90,8 @@ setupTestEnv <- function(testDataPath = system.file("unittests", "testdata" ,pac
 	
 }
 
-setupExpectedMD5 <- function(testDataPath = system.file("unittests", "testdata" ,package = "RNMGraphics"), branchname = NULL) {
+setupExpectedMD5 <- function(testDataPath = file.path("./unittests", "testdata"),
+                             branchname = NULL) {
 
 	if (is.null(branchname)) {
 		ExpectedMD5File <- paste("ExpectedMD5.csv", sep = "")
@@ -127,7 +133,7 @@ getMD5 <- function(e){
 #'
 #' @noRd 
 
-runRNMGraphicsTests <- function(TestPath = system.file(package="RNMGraphics", "unittests"), 
+runRNMGraphicsTests <- function(TestPath = "./unittests", 
 		ExcludeFolders = NULL, TestResult = NULL, ResultsType = c("html", "text"))
 {
 	if(!require("RUnit", quietly = TRUE)) stop("There is no 'RUnit' package!")
@@ -164,3 +170,6 @@ runRNMGraphicsTests <- function(TestPath = system.file(package="RNMGraphics", "u
 	return(OUT)
 	
 }
+
+OUT <- runRNMGraphicsTests(ExcludeFolders = "testdata")
+summary(OUT)
