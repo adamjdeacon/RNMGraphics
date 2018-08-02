@@ -7,5 +7,7 @@ r:
     - devel
     - oldrel
 
+r_github_packages: MangoTheCat/RNMImport
+
 after_success:
 
